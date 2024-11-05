@@ -33,6 +33,8 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -62,6 +64,7 @@ import lombok.ToString;
 @ToString
 public class DrillEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     // @NotNull -> This can (and should) be null when creating a new entity
     private Long id;
 
@@ -70,7 +73,7 @@ public class DrillEntity {
     @Size(max = 255)
     private String name;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "drill_category_join",
         joinColumns = @JoinColumn(name = "drill_id"),
@@ -78,7 +81,7 @@ public class DrillEntity {
     )
     private List<CategoryEntity> categories;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "drill_sub_category_join",
         joinColumns = @JoinColumn(name = "drill_id"),

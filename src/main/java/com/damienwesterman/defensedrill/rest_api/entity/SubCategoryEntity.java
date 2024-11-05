@@ -28,6 +28,8 @@ package com.damienwesterman.defensedrill.rest_api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
@@ -53,6 +55,7 @@ import lombok.ToString;
 @ToString
 public class SubCategoryEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     // @NotNull -> This can (and should) be null when creating a new entity
     private Long id;
 

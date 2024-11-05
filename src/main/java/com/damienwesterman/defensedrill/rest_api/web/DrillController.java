@@ -26,6 +26,15 @@
 
 package com.damienwesterman.defensedrill.rest_api.web;
 
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+
+
+@RestController
+@RequestMapping("/drill")
+@RequiredArgsConstructor
 public class DrillController {
     // TODO: FINISH ME
 }
