@@ -28,6 +28,7 @@ package com.damienwesterman.defensedrill.rest_api.entity;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -36,8 +37,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,29 +62,29 @@ import lombok.ToString;
 @ToString
 public class DrillEntity {
     @Id
-    @NotNull
+    // @NotNull -> This can (and should) be null when creating a new entity
     private Long id;
 
     @Column(unique = true)
-    @NotNull
+    @NotEmpty
     @Size(max = 255)
     private String name;
 
     @ManyToMany
     @JoinTable(
-        name = "drill_group_join",
+        name = "drill_category_join",
         joinColumns = @JoinColumn(name = "drill_id"),
-        inverseJoinColumns = @JoinColumn(name = "group_id")
+        inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<GroupEntity> groups;
+    private List<CategoryEntity> categories;
 
     @ManyToMany
     @JoinTable(
-        name = "drill_sub_group_join",
+        name = "drill_sub_category_join",
         joinColumns = @JoinColumn(name = "drill_id"),
-        inverseJoinColumns = @JoinColumn(name = "sub_group_id")
+        inverseJoinColumns = @JoinColumn(name = "sub_category_id")
     )
-    private List<GroupEntity> subGroups;
+    private List<SubCategoryEntity> subCategories;
 
     @ElementCollection
     @CollectionTable(
@@ -92,6 +94,10 @@ public class DrillEntity {
     @Column(name = "related_drill_id")
     private List<Long> relatedDrills;
 
-
-    // private List<InstructionEntity> instructions;
+    @OneToMany(
+        mappedBy = "drillId",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<InstructionEntity> instructions;
 }

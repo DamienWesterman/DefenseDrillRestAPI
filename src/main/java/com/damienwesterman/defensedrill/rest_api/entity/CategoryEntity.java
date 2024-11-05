@@ -30,10 +30,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +42,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "sub_groups")
+@Table(name = "categories")
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -49,17 +51,18 @@ import lombok.ToString;
 @Builder
 @EqualsAndHashCode
 @ToString
-public class SubGroupEntity {
+public class CategoryEntity {
     @Id
-    @NotNull
+    // @NotNull -> This can (and should) be null when creating a new entity
     private Long id;
 
     @Column(unique = true)
-    @NotNull
+    @NotEmpty
     @Size(max = 255)
     private String name;
 
     @Column
+    @NotEmpty
     @Size(max = 511)
     private String description;
 }

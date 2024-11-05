@@ -28,12 +28,17 @@ package com.damienwesterman.defensedrill.rest_api.entity;
 
 import java.io.Serializable;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,6 +48,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "instructions")
 @IdClass(InstructionEntity.InstructionId.class)
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -52,10 +58,28 @@ import lombok.ToString;
 @ToString
 public class InstructionEntity {
     @Id
+    @NotNull
     private Long drillId;
 
     @Id
+    // @NotNull -> TBD by its index position in DrillEntity.instructions list
     private Long number;
+
+    @Column
+    @NotEmpty
+    @Size(max = 511)
+    private String description;
+
+    @Column
+    @NotEmpty
+    @Size(max = 4095)
+    /** Pipeling delimited string of steps */
+    private String steps;// TODO: make getters/setters for this for lists
+
+    @Column
+    @Size(max = 127)
+    /** Video ID correlates to the Jellyfin Item ID */
+    private String videoId;
 
     @NoArgsConstructor
     @AllArgsConstructor
