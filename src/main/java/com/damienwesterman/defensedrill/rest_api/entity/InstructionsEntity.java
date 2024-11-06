@@ -47,7 +47,7 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "instructions")
-@IdClass(InstructionEntity.InstructionId.class)
+@IdClass(InstructionsEntity.InstructionId.class)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -56,12 +56,13 @@ import lombok.ToString;
 @Builder
 @EqualsAndHashCode
 @ToString
-public class InstructionEntity {
+public class InstructionsEntity {
     @Id
     @NotNull
     private Long drillId;
 
     @Id
+    // TODO: Check these, because validation happens at two places, during repository checks AND at controller time, so maybe have separate DTOs with separate constraints
     // @NotNull -> TBD by its index position in DrillEntity.instructions list
     private Long number;
 

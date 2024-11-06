@@ -73,7 +73,7 @@ public class DrillEntity {
     @Size(max = 255)
     private String name;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
         name = "drill_category_join",
         joinColumns = @JoinColumn(name = "drill_id"),
@@ -81,7 +81,7 @@ public class DrillEntity {
     )
     private List<CategoryEntity> categories;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
         name = "drill_sub_category_join",
         joinColumns = @JoinColumn(name = "drill_id"),
@@ -102,5 +102,5 @@ public class DrillEntity {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    private List<InstructionEntity> instructions;
+    private List<InstructionsEntity> instructions;
 }

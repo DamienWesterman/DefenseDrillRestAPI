@@ -26,6 +26,12 @@
 
 package com.damienwesterman.defensedrill.rest_api.repository;
 
-public interface SubCategoryRepo {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
+
+@Repository
+public interface SubCategoryRepo extends JpaRepository<SubCategoryEntity, Long> {
     // TODO: FINISH ME
 }
