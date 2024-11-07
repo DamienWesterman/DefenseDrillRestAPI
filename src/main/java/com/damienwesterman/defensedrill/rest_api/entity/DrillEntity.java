@@ -33,6 +33,7 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -73,7 +74,7 @@ public class DrillEntity {
     @Size(max = 255)
     private String name;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "drill_category_join",
         joinColumns = @JoinColumn(name = "drill_id"),
@@ -81,7 +82,7 @@ public class DrillEntity {
     )
     private List<CategoryEntity> categories;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "drill_sub_category_join",
         joinColumns = @JoinColumn(name = "drill_id"),
@@ -89,7 +90,7 @@ public class DrillEntity {
     )
     private List<SubCategoryEntity> subCategories;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "related_drills",
         joinColumns = @JoinColumn(name = "primary_drill_id")
@@ -100,6 +101,7 @@ public class DrillEntity {
     @OneToMany(
         mappedBy = "drillId",
         cascade = CascadeType.ALL,
+        fetch = FetchType.EAGER,
         orphanRemoval = true
     )
     private List<InstructionsEntity> instructions;

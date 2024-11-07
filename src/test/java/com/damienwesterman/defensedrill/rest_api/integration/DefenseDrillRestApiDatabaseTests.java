@@ -28,13 +28,18 @@ package com.damienwesterman.defensedrill.rest_api.integration;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.TransactionSystemException;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
@@ -397,37 +402,179 @@ public class DefenseDrillRestApiDatabaseTests {
 
     @Test
     public void test_drillRepo_save_duplicateName_fails() {
-        // TODO: FINISH ME
+        String duplicateName = "New Drill";
+
+        DrillEntity drill1 = DrillEntity.builder()
+                                .id(null)
+                                .name(duplicateName)
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        assertDoesNotThrow(() -> drillRepo.save(drill1));
+
+        DrillEntity drill2 = DrillEntity.builder()
+                                .id(null)
+                                .name(duplicateName)
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        assertThrows(DataIntegrityViolationException.class, 
+            () -> drillRepo.save(drill2));
     }
 
     @Test
-    public void test_drillRepo_save_emptyDescription_fails() {
-        // TODO: FINISH ME
+    public void test_drillRepo_save_saveWithExistingCategories_succeeds() {
+        // CategoryEntity
+        CategoryEntity category = CategoryEntity.builder()
+                                    .id(null)
+                                    .name("New Category Name")
+                                    .description("New Category Description")
+                                    .build();
+        CategoryEntity returnedCategory = categoryRepo.save(category);
+
+        // SubCategoryEntity
+        SubCategoryEntity subCategory = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name("New SubCategory Name")
+                                            .description("New SubCategory Description")
+                                            .build();
+        SubCategoryEntity returnedSubCategory = subCategoryRepo.save(subCategory);
+
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(List.of(returnedCategory))
+                                .subCategories(List.of(returnedSubCategory))
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        DrillEntity returnedDrill = drillRepo.save(drill);
+
+        assertEquals(1, drillRepo.findAll().size());
+        assertEquals(1, returnedDrill.getCategories().size());
+        assertEquals(1, returnedDrill.getSubCategories().size());
     }
 
     @Test
     public void test_drillRepo_save_nonExistentCategories_fails() {
-        // TODO: FINISH ME
+        // CategoryEntity
+        CategoryEntity category = CategoryEntity.builder()
+                                    .id(null)
+                                    .name("New Category Name")
+                                    .description("New Category Description")
+                                    .build();
+
+        // SubCategoryEntity
+        SubCategoryEntity subCategory = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name("New SubCategory Name")
+                                            .description("New SubCategory Description")
+                                            .build();
+
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        // Non existent category
+        drill.setCategories(List.of(category));
+        assertThrows(InvalidDataAccessApiUsageException.class,
+            () -> drillRepo.save(drill));
+
+        // Non existent sub category
+        drill.setCategories(null);
+        drill.setSubCategories(List.of(subCategory));
+        assertThrows(InvalidDataAccessApiUsageException.class,
+            () -> drillRepo.save(drill));
     }
 
     @Test
-    public void test_drillRepo_save_saveWithNonExistentInstructions_succeeds() {
+    public void test_drillRepo_save_updateWithNewCategories_succeeds() {
         // TODO: FINISH ME
     }
+
+    /*
+    // Yeah this wouldn't work because Instructions can't exist without a Drill
+    @Test
+    public void test_drillRepo_save_saveWithExistingInstructions_succeeds()
+
+    // This one won't work because the drill needs to exist first, can't do it simultaneously
+    @Test
+    public void test_drillRepo_save_saveWithNonExistentInstructions_succeeds()
+    */
 
     @Test
     public void test_drillRepo_save_updateWithMoreInstructions_succeeds() {
-        // TODO: FINISH ME
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        Long drillId = drillRepo.save(drill).getId();
+        InstructionsEntity instructions = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(0L)
+                                            .description("Instructions Description")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
+
+        drill.setInstructions(new ArrayList<>());
+        drill.getInstructions().add(instructions);
+        DrillEntity returnedEntity = drillRepo.save(drill);
+
+        assertEquals(1, returnedEntity.getInstructions().size());
     }
 
     @Test
     public void test_drillRepo_save_updateWithLessInstructions_succeeds() {
-        // TODO: FINISH ME
-    }
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        Long drillId = drillRepo.save(drill).getId();
+        InstructionsEntity instructions1 = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(0L)
+                                            .description("Instructions Description 1")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
+        InstructionsEntity instructions2 = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(1L)
+                                            .description("Instructions Description 2")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
 
-    @Test
-    public void test_drillRepo_save_updateWithMiddleInstructionRemove_succeedsAndCondensesList() {
-        // TODO: FINISH ME
+        instructionsRepo.save(instructions1);
+        instructionsRepo.save(instructions2);
+        DrillEntity returnedEntity = drillRepo.findById(drillId).get();
+
+        assertEquals(2, returnedEntity.getInstructions().size());
+
+        returnedEntity.getInstructions().remove(instructions2);
+        DrillEntity returnedEntity2 = drillRepo.save(returnedEntity);
+
+        assertEquals(1, returnedEntity2.getInstructions().size());
+        assertEquals(1, instructionsRepo.findAll().size());
     }
 
     @Test
