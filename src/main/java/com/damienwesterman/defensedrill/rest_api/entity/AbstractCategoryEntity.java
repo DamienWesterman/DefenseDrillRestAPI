@@ -11,6 +11,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Abstract superclass for {@link CategoryEntity} and {@link SubCategoryEntity}.
+ */
 @MappedSuperclass
 @Data
 @NoArgsConstructor
