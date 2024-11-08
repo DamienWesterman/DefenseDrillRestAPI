@@ -28,8 +28,9 @@ package com.damienwesterman.defensedrill.rest_api.integration;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,6 +165,170 @@ public class DefenseDrillRestApiDatabaseTests {
 
         assertEquals(1, instructionsRepo.findAll().size());
         assertEquals(0, returnedInstructions.getDescription().compareTo(instructions.getDescription()));
+    }
+
+    @Test
+    public void test_drillRepo_findByNameAndFindById_succeedsWithExistingDrill() {
+        String drillName = "NEW DRILL";
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name(drillName)
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        DrillEntity savedDrill = drillRepo.save(drill);
+
+        assertTrue(drillRepo.findById(savedDrill.getId()).isPresent());
+        assertTrue(drillRepo.findByNameIgnoreCase(savedDrill.getName()).isPresent());
+        assertTrue(drillRepo.findByNameIgnoreCase(savedDrill.getName().toLowerCase()).isPresent());
+    }
+
+    @Test
+    public void test_categoriesRepo_findByNameAndFindById_succeedsWithExistingCategories() {
+        // CategoryEntity
+        String categoryName = "NEW CATEGORY";
+        CategoryEntity category = CategoryEntity.builder()
+                                    .id(null)
+                                    .name(categoryName)
+                                    .description("New Category Description")
+                                    .build();
+
+        CategoryEntity savedCategory = categoryRepo.save(category);
+
+        assertTrue(categoryRepo.findById(savedCategory.getId()).isPresent());
+        assertTrue(categoryRepo.findByNameIgnoreCase(savedCategory.getName()).isPresent());
+        assertTrue(categoryRepo.findByNameIgnoreCase(savedCategory.getName().toLowerCase()).isPresent());
+
+        // SubCategoryEntity
+        String subCategoryName = "NEW SUB CATEGORY";
+        SubCategoryEntity subCategory = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name(subCategoryName)
+                                            .description("New SubCategory Description")
+                                            .build();
+
+        SubCategoryEntity savedSubCategory = subCategoryRepo.save(subCategory);
+
+        assertTrue(subCategoryRepo.findById(savedSubCategory.getId()).isPresent());
+        assertTrue(subCategoryRepo.findByNameIgnoreCase(savedSubCategory.getName()).isPresent());
+        assertTrue(subCategoryRepo.findByNameIgnoreCase(savedSubCategory.getName().toLowerCase()).isPresent());
+    }
+
+    @Test
+    public void test_instructionsRepo_findByDrillIdAndNumber_succeedsWithExistingInstructions() {
+        // Need to have an existing drill
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        Long drillId = drillRepo.save(drill).getId();
+        InstructionsEntity instructions = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(0L)
+                                            .description("Instructions Description")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
+
+        InstructionsEntity savedInstructions = instructionsRepo.save(instructions);
+
+        assertTrue(
+            instructionsRepo.findById(
+                new InstructionsEntity.InstructionId(drillId, savedInstructions.getNumber()))
+            .isPresent());
+    }
+
+    @Test
+    public void test_drillRepo_findByNameAndFindById_failsWithNonExistantDrill() {
+        String drillName = "NEW DRILL";
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name(drillName)
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        DrillEntity savedDrill = drillRepo.save(drill);
+
+        assertFalse(drillRepo.findById(savedDrill.getId() + 1L).isPresent());
+        assertFalse(drillRepo.findByNameIgnoreCase(savedDrill.getName() + " NOPE").isPresent());
+        assertFalse(drillRepo.findByNameIgnoreCase(savedDrill.getName().toLowerCase() + " NOPE").isPresent());
+    }
+
+    @Test
+    public void test_categoriesRepo_findByNameAndFindById_failsWithNonExistantCategories() {
+        // CategoryEntity
+        String categoryName = "NEW CATEGORY";
+        CategoryEntity category = CategoryEntity.builder()
+                                    .id(null)
+                                    .name(categoryName)
+                                    .description("New Category Description")
+                                    .build();
+
+        CategoryEntity savedCategory = categoryRepo.save(category);
+
+        assertFalse(categoryRepo.findById(savedCategory.getId() + 1).isPresent());
+        assertFalse(categoryRepo.findByNameIgnoreCase(savedCategory.getName() + " NOPE").isPresent());
+        assertFalse(categoryRepo.findByNameIgnoreCase(savedCategory.getName().toLowerCase() + " NOPE").isPresent());
+
+        // SubCategoryEntity
+        String subCategoryName = "NEW SUB CATEGORY";
+        SubCategoryEntity subCategory = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name(subCategoryName)
+                                            .description("New SubCategory Description")
+                                            .build();
+
+        SubCategoryEntity savedSubCategory = subCategoryRepo.save(subCategory);
+
+        assertFalse(subCategoryRepo.findById(savedSubCategory.getId() + 1).isPresent());
+        assertFalse(subCategoryRepo.findByNameIgnoreCase(savedSubCategory.getName() + " NOPE").isPresent());
+        assertFalse(subCategoryRepo.findByNameIgnoreCase(savedSubCategory.getName().toLowerCase() + " NOPE").isPresent());
+    }
+
+    @Test
+    public void test_instructionsRepo_findByDrillIdAndNumber_failsWithNonExistantInstructions() {
+        // Need to have an existing drill
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        Long drillId = drillRepo.save(drill).getId();
+        InstructionsEntity instructions = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(0L)
+                                            .description("Instructions Description")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
+
+        InstructionsEntity savedInstructions = instructionsRepo.save(instructions);
+
+        assertFalse(
+            instructionsRepo.findById(
+                new InstructionsEntity.InstructionId(drillId + 1, savedInstructions.getNumber()))
+            .isPresent());
+        assertFalse(
+            instructionsRepo.findById(
+                new InstructionsEntity.InstructionId(drillId, savedInstructions.getNumber() + 1))
+            .isPresent());
+            assertFalse(
+        instructionsRepo.findById(
+            new InstructionsEntity.InstructionId(drillId + 1, savedInstructions.getNumber() + 1))
+        .isPresent());
     }
 
     @Test
@@ -499,7 +664,63 @@ public class DefenseDrillRestApiDatabaseTests {
 
     @Test
     public void test_drillRepo_save_updateWithNewCategories_succeeds() {
-        // TODO: FINISH ME
+        // CategoryEntity
+        CategoryEntity category = CategoryEntity.builder()
+                                    .id(null)
+                                    .name("New Category Name")
+                                    .description("New Category Description")
+                                    .build();
+        CategoryEntity returnedCategory = categoryRepo.save(category);
+
+        // SubCategoryEntity
+        SubCategoryEntity subCategory = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name("New SubCategory Name")
+                                            .description("New SubCategory Description")
+                                            .build();
+        SubCategoryEntity returnedSubCategory = subCategoryRepo.save(subCategory);
+
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(new ArrayList<>())
+                                .subCategories(new ArrayList<>())
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        drill.getCategories().add(returnedCategory);
+        drill.getSubCategories().add(returnedSubCategory);
+        DrillEntity returnedDrill = drillRepo.save(drill);
+
+        assertEquals(1, drillRepo.findAll().size());
+        assertEquals(1, returnedDrill.getCategories().size());
+        assertEquals(1, returnedDrill.getSubCategories().size());
+
+
+        // CategoryEntity
+        CategoryEntity category2 = CategoryEntity.builder()
+                                    .id(null)
+                                    .name("New Category Name 2")
+                                    .description("New Category Description 2")
+                                    .build();
+        CategoryEntity returnedCategory2 = categoryRepo.save(category2);
+
+        // SubCategoryEntity
+        SubCategoryEntity subCategory2 = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name("New SubCategory Name 2")
+                                            .description("New SubCategory Description 2")
+                                            .build();
+        SubCategoryEntity returnedSubCategory2 = subCategoryRepo.save(subCategory2);
+
+        returnedDrill = drillRepo.findById(returnedDrill.getId()).get();
+        returnedDrill.getCategories().add(returnedCategory2);
+        returnedDrill.getSubCategories().add(returnedSubCategory2);
+        DrillEntity returnedDrill2 = drillRepo.save(returnedDrill);
+
+        assertEquals(2, returnedDrill2.getCategories().size());
+        assertEquals(2, returnedDrill2.getSubCategories().size());
     }
 
     /*
@@ -579,13 +800,73 @@ public class DefenseDrillRestApiDatabaseTests {
 
     @Test
     public void test_drillRepo_delete_deleteDrill_doesNotDeleteCategories() {
-        // TODO: FINISH ME
+        // CategoryEntity
+        CategoryEntity category = CategoryEntity.builder()
+                                    .id(null)
+                                    .name("New Category Name")
+                                    .description("New Category Description")
+                                    .build();
+        CategoryEntity returnedCategory = categoryRepo.save(category);
+
+        // SubCategoryEntity
+        SubCategoryEntity subCategory = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name("New SubCategory Name")
+                                            .description("New SubCategory Description")
+                                            .build();
+        SubCategoryEntity returnedSubCategory = subCategoryRepo.save(subCategory);
+
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(List.of(returnedCategory))
+                                .subCategories(List.of(returnedSubCategory))
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        DrillEntity returnedDrill = drillRepo.save(drill);
+
+        assertEquals(1, drillRepo.findAll().size());
+        assertEquals(1, categoryRepo.findAll().size());
+        assertEquals(1, subCategoryRepo.findAll().size());
+
+        drillRepo.delete(returnedDrill);
+
+        assertEquals(0, drillRepo.findAll().size());
+        assertEquals(1, categoryRepo.findAll().size());
+        assertEquals(1, subCategoryRepo.findAll().size());
     }
 
     @Test
     public void test_drillRepo_delete_deleteDrill_doesDeleteInstructions() {
-        // TODO: FINISH ME
-    }
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        Long drillId = drillRepo.save(drill).getId();
+        InstructionsEntity instructions = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(0L)
+                                            .description("Instructions Description")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
 
-    // TODO: Test the find methods, make sure findByNameIgnoreCase exists too in all relevant repos
+        drill.setInstructions(new ArrayList<>());
+        drill.getInstructions().add(instructions);
+        DrillEntity returnedEntity = drillRepo.save(drill);
+
+        assertEquals(1, drillRepo.findAll().size());
+        assertEquals(1, instructionsRepo.findAll().size());
+
+        drillRepo.delete(returnedEntity);
+
+        assertEquals(0, drillRepo.findAll().size());
+        assertEquals(0, instructionsRepo.findAll().size());
+    }
 }
