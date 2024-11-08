@@ -27,6 +27,8 @@
 package com.damienwesterman.defensedrill.rest_api.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,6 +47,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
+/**
+ * Database Entity to contain all the information for a single set of Instructions for a drill.
+ */
 @Entity
 @Table(name = "instructions")
 @IdClass(InstructionsEntity.InstructionId.class)
@@ -62,8 +68,7 @@ public class InstructionsEntity {
     private Long drillId;
 
     @Id
-    // TODO: Check these, because validation happens at two places, during repository checks AND at controller time, so maybe have separate DTOs with separate constraints
-    // @NotNull -> TBD by its index position in DrillEntity.instructions list
+    @NotNull
     private Long number;
 
     @Column
@@ -75,13 +80,32 @@ public class InstructionsEntity {
     @NotEmpty
     @Size(max = 4095)
     /** Pipeling delimited string of steps */
-    private String steps;// TODO: make getters/setters for this for lists
+    private String steps;
 
     @Column
     @Size(max = 127)
     /** Video ID correlates to the Jellyfin Item ID */
     private String videoId;
 
+    public void setStepsFromList(List<String> stepsList) {
+        this.steps = String.join("|", stepsList);
+    }
+
+    /**
+     * Retrieve the steps as a List rather than single string.
+     *
+     * @return {@code List<String>} of steps. Modifying this returned list
+     *         will NOT modify the internal state. {@link #setStepsFromList(List)}
+     *         must be called to save any state changes.
+     */
+    public List<String> getStepsAsList() {
+        // Make sure it is a mutable array
+        return new ArrayList<String>(List.of(steps.split("\\|")));
+    }
+
+    /**
+     * Composite ID class used for {@link InstructionsEntity}'s primary key.
+     */
     @NoArgsConstructor
     @AllArgsConstructor
     @Getter

@@ -486,12 +486,11 @@ public class DefenseDrillRestApiDatabaseTests {
         assertThrows(TransactionSystemException.class,
             () -> instructionsRepo.save(instructions));
 
-        // TODO: uncomment?
         // // Empty number
-        // instructions.setDrillId(drillId);
-        // instructions.setNumber(null);
-        // assertThrows(ConstraintViolationException.class,
-        //     () -> instructionsRepo.save(instructions));
+        instructions.setDrillId(drillId);
+        instructions.setNumber(null);
+        assertThrows(TransactionSystemException.class,
+            () -> instructionsRepo.save(instructions));
 
         // Empty description
         instructions.setNumber(1L);
