@@ -53,6 +53,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Database Entity to contain all the information for a Drill.
+ */
 @Entity
 @Table(name = "drills")
 @Data

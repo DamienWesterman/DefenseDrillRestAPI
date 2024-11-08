@@ -33,6 +33,9 @@ import org.springframework.stereotype.Repository;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 
+/**
+ * Database repository for {@link CategoryEntity}.
+ */
 @Repository
 public interface CategoryRepo extends JpaRepository<CategoryEntity, Long> {
     Optional<CategoryEntity> findByNameIgnoreCase(String name);

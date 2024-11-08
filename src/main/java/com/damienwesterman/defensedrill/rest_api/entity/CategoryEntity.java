@@ -43,6 +43,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Database Entity to contain all the information for a drill Category.
+ */
 @Entity
 @Table(name = "categories")
 @Data

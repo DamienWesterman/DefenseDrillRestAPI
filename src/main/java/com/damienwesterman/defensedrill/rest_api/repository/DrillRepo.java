@@ -33,6 +33,9 @@ import org.springframework.stereotype.Repository;
 
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 
+/**
+ * Database repository for {@link DrillEntity}.
+ */
 @Repository
 public interface DrillRepo extends JpaRepository<DrillEntity, Long> {
     Optional<DrillEntity> findByNameIgnoreCase(String name);

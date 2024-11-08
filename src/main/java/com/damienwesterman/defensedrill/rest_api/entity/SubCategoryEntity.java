@@ -43,6 +43,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
+/**
+ * Database Entity to contain all the information for a drill SubCategory.
+ */
 @Entity
 @Table(name = "sub_categories")
 @Data

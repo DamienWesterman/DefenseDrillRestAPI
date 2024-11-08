@@ -33,6 +33,9 @@ import org.springframework.stereotype.Repository;
 
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
 
+/**
+ * Database repository for {@link SubCategoryEntity}.
+ */
 @Repository
 public interface SubCategoryRepo extends JpaRepository<SubCategoryEntity, Long> {
     Optional<SubCategoryEntity> findByNameIgnoreCase(String lowerCase);

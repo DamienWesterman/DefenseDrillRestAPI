@@ -31,7 +31,9 @@ import org.springframework.stereotype.Repository;
 
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 
+/**
+ * Database repository for {@link InstructionsEntity}.
+ */
 @Repository
 public interface InstructionsRepo extends JpaRepository<InstructionsEntity, InstructionsEntity.InstructionId> {
-    // TODO: FINISH ME
 }
