@@ -24,8 +24,17 @@
  * limitations under the License.
  */
 
-package com.damienwesterman.defensedrill.rest_api.unit;
+package com.damienwesterman.defensedrill.rest_api.exception;
 
-public class DrillServiceTest {
-    
+/**
+ * TODO: Doc comments
+ */
+public class DatabaseInsertException extends RuntimeException {
+    public DatabaseInsertException(String message) {
+       super(message);
+    }
+ 
+    public DatabaseInsertException(String message, Throwable cause) {
+       super(message, cause);
+    }
 }
