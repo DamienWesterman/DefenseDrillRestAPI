@@ -868,4 +868,6 @@ public class DefenseDrillRestApiDatabaseTests {
         assertEquals(0, drillRepo.findAll().size());
         assertEquals(0, instructionsRepo.findAll().size());
     }
+
+    // TODO: delete instruction/category does not delete drill
 }

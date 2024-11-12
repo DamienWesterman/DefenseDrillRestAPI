@@ -39,6 +39,7 @@ public class CategoriesServiceTest {
         service = new CategoriesService(categoryRepo, subCategoryRepo);
     }
 
+    // TODO: Change implementation to return void and throw new specific exception
     @Test
     public void test_save_usesCorrectRepoDependingOnEntityType() {
         assertTrue(service.save(categoryEntity));

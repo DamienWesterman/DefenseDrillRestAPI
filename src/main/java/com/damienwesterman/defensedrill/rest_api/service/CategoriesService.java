@@ -43,6 +43,7 @@ import lombok.AllArgsConstructor;
 public class CategoriesService {
     private final CategoryRepo categoryRepo;
     private final SubCategoryRepo subCategoryRepo;
+    // TODO: Create constraint to error message map based on sql named constraints, maybe in utils class
     // TODO: FINISH ME
 
     public boolean save(AbstractCategoryEntity abstractCategory) {
