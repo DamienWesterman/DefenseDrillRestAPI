@@ -26,6 +26,38 @@
 
 package com.damienwesterman.defensedrill.rest_api.service;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
+import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
+import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
+import com.damienwesterman.defensedrill.rest_api.repository.CategoryRepo;
+import com.damienwesterman.defensedrill.rest_api.repository.SubCategoryRepo;
+
+import jakarta.validation.ConstraintViolationException;
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor
 public class CategoriesService {
+    private final CategoryRepo categoryRepo;
+    private final SubCategoryRepo subCategoryRepo;
     // TODO: FINISH ME
+
+    public boolean save(AbstractCategoryEntity abstractCategory) {
+        try {
+            if ( abstractCategory instanceof CategoryEntity) {
+                categoryRepo.save((CategoryEntity) abstractCategory);
+            } else if (abstractCategory instanceof SubCategoryEntity) {
+                subCategoryRepo.save((SubCategoryEntity) abstractCategory);
+            }
+        } catch (ConstraintViolationException cve) {
+            return false;
+        } catch (DataIntegrityViolationException dive) {
+            return false;
+        }
+
+        return true;
+    }
 }
