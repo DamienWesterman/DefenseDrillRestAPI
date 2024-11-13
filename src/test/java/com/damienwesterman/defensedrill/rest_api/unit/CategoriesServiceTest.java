@@ -26,7 +26,9 @@
 
 package com.damienwesterman.defensedrill.rest_api.unit;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,6 +43,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
+import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.repository.CategoryRepo;
 import com.damienwesterman.defensedrill.rest_api.repository.SubCategoryRepo;
 import com.damienwesterman.defensedrill.rest_api.service.CategoriesService;
@@ -65,33 +68,32 @@ public class CategoriesServiceTest {
         service = new CategoriesService(categoryRepo, subCategoryRepo);
     }
 
-    // TODO: Change implementation to return void and throw new specific exception
     @Test
     public void test_save_usesCorrectRepoDependingOnEntityType() {
-        assertTrue(service.save(categoryEntity));
+        assertDoesNotThrow(() -> service.save(categoryEntity));
         verify(categoryRepo, times(1)).save(categoryEntity);
 
-        assertTrue(service.save(subCategoryEntity));
+        assertDoesNotThrow(() -> service.save(subCategoryEntity));
         verify(subCategoryRepo, times(1)).save(subCategoryEntity);
     }
 
     @Test
     public void test_save_givenBadEntityConstraintViolation_returnsFalse() {
         // Repos throw ConstraintViolationException when DAO constraint violations are detected
-        when(categoryRepo.save(categoryEntity)).thenThrow(ConstraintViolationException.class);
-        assertFalse(service.save(categoryEntity));
+        when(categoryRepo.save(categoryEntity)).thenThrow(new ConstraintViolationException("ConstraintViolationImpl{interpolatedMessage='must not be empty', propertyPath=name, rootBeanClass=class", null));
+        assertThrows(DatabaseInsertException.class, () -> service.save(categoryEntity));
 
-        when(subCategoryRepo.save(subCategoryEntity)).thenThrow(ConstraintViolationException.class);
-        assertFalse(service.save(subCategoryEntity));
+        when(subCategoryRepo.save(subCategoryEntity)).thenThrow(new ConstraintViolationException("ConstraintViolationImpl{interpolatedMessage='must not be empty', propertyPath=name, rootBeanClass=class", null));
+        assertThrows(DatabaseInsertException.class, () -> service.save(subCategoryEntity));
     }
 
     @Test
     public void test_save_givenBadEntityNonUnique_returnsFalse() {
         // Repos throw DataIntegrityViolationException when db detects constraint violations
-        when(categoryRepo.save(categoryEntity)).thenThrow(DataIntegrityViolationException.class);
-        assertFalse(service.save(categoryEntity));
+        when(categoryRepo.save(categoryEntity)).thenThrow(new DataIntegrityViolationException("constraint_drills_unique_name"));
+        assertThrows(DatabaseInsertException.class, () -> service.save(categoryEntity));
 
-        when(subCategoryRepo.save(subCategoryEntity)).thenThrow(DataIntegrityViolationException.class);
-        assertFalse(service.save(subCategoryEntity));
+        when(subCategoryRepo.save(subCategoryEntity)).thenThrow(new DataIntegrityViolationException("constraint_drills_unique_name"));
+        assertThrows(DatabaseInsertException.class, () -> service.save(subCategoryEntity));
     }
 }

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
+import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.repository.CategoryRepo;
 import com.damienwesterman.defensedrill.rest_api.repository.SubCategoryRepo;
 
@@ -45,7 +46,7 @@ public class CategoriesService {
     private final SubCategoryRepo subCategoryRepo;
     // TODO: FINISH ME
 
-    public boolean save(AbstractCategoryEntity abstractCategory) {
+    public void save(AbstractCategoryEntity abstractCategory) {
         try {
             if ( abstractCategory instanceof CategoryEntity) {
                 categoryRepo.save((CategoryEntity) abstractCategory);
@@ -53,11 +54,15 @@ public class CategoriesService {
                 subCategoryRepo.save((SubCategoryEntity) abstractCategory);
             }
         } catch (ConstraintViolationException cve) {
-            return false;
+            System.out.println("ERROR: " + ErrorMessageUtils.exceptionToErrorMessage(cve));
+            throw new DatabaseInsertException(
+                ErrorMessageUtils.exceptionToErrorMessage(cve), cve
+            );
         } catch (DataIntegrityViolationException dive) {
-            return false;
+            System.out.println("ERROR: " + ErrorMessageUtils.exceptionToErrorMessage(dive));
+            throw new DatabaseInsertException(
+                ErrorMessageUtils.exceptionToErrorMessage(dive), dive
+            );
         }
-
-        return true;
     }
 }
