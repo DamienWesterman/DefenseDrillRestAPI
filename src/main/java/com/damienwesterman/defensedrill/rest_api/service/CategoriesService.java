@@ -26,6 +26,9 @@
 
 package com.damienwesterman.defensedrill.rest_api.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -54,15 +57,37 @@ public class CategoriesService {
                 subCategoryRepo.save((SubCategoryEntity) abstractCategory);
             }
         } catch (ConstraintViolationException cve) {
-            System.out.println("ERROR: " + ErrorMessageUtils.exceptionToErrorMessage(cve));
             throw new DatabaseInsertException(
                 ErrorMessageUtils.exceptionToErrorMessage(cve), cve
             );
         } catch (DataIntegrityViolationException dive) {
-            System.out.println("ERROR: " + ErrorMessageUtils.exceptionToErrorMessage(dive));
             throw new DatabaseInsertException(
                 ErrorMessageUtils.exceptionToErrorMessage(dive), dive
             );
         }
+    }
+
+    public Optional<CategoryEntity> findCategory(long id) {
+        return categoryRepo.findById(id);
+    }
+
+    public Optional<SubCategoryEntity> findSubCategory(long id) {
+        return subCategoryRepo.findById(id);
+    }
+
+    public Optional<CategoryEntity> findCategory(String name) {
+        return categoryRepo.findByNameIgnoreCase(name);
+    }
+
+    public Optional<SubCategoryEntity> findSubCategory(String name) {
+        return subCategoryRepo.findByNameIgnoreCase(name);
+    }
+
+    public List<CategoryEntity> findAllCategories() {
+        return categoryRepo.findAll();
+    }
+
+    public List<SubCategoryEntity> findAllSubCategories() {
+        return subCategoryRepo.findAll();
     }
 }

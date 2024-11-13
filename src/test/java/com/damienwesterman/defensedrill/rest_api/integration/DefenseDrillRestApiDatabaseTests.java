@@ -83,18 +83,18 @@ public class DefenseDrillRestApiDatabaseTests {
 
     @Test
     public void test_drillRepo_queryDbWorksWithEmptyDb_returns0() {
-        assertEquals(0, drillRepo.findAll().size());
+        assertEquals(0, drillRepo.count());
     }
 
     @Test
     public void test_categoryRepos_queryDbWorksWithEmptyDb_returns0() {
-        assertEquals(0, categoryRepo.findAll().size());
-        assertEquals(0, subCategoryRepo.findAll().size());
+        assertEquals(0, categoryRepo.count());
+        assertEquals(0, subCategoryRepo.count());
     }
 
     @Test
     public void test_instructionsRepo_queryDbWorksWithEmptyDb_returns0() {
-        assertEquals(0, instructionsRepo.findAll().size());
+        assertEquals(0, instructionsRepo.count());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity returnedDrill = drillRepo.save(drill);
 
-        assertEquals(1, drillRepo.findAll().size());
+        assertEquals(1, drillRepo.count());
         assertEquals(0, returnedDrill.getName().compareTo(drill.getName()));
     }
 
@@ -125,7 +125,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         CategoryEntity returnedCategory = categoryRepo.save(category);
 
-        assertEquals(1, categoryRepo.findAll().size());
+        assertEquals(1, categoryRepo.count());
         assertEquals(0, returnedCategory.getName().compareTo(category.getName()));
 
         // SubCategoryEntity
@@ -137,7 +137,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         SubCategoryEntity returnedSubCategory = subCategoryRepo.save(subCategory);
 
-        assertEquals(1, subCategoryRepo.findAll().size());
+        assertEquals(1, subCategoryRepo.count());
         assertEquals(0, returnedSubCategory.getName().compareTo(subCategory.getName()));
     }
 
@@ -163,7 +163,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         InstructionsEntity returnedInstructions = instructionsRepo.save(instructions);
 
-        assertEquals(1, instructionsRepo.findAll().size());
+        assertEquals(1, instructionsRepo.count());
         assertEquals(0, returnedInstructions.getDescription().compareTo(instructions.getDescription()));
     }
 
@@ -453,7 +453,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         assertDoesNotThrow(() -> instructionsRepo.save(instructions1));
         assertDoesNotThrow(() -> instructionsRepo.save(instructions2));
-        assertEquals(2, instructionsRepo.findAll().size());
+        assertEquals(2, instructionsRepo.count());
     }
 
     @Test
@@ -619,7 +619,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity returnedDrill = drillRepo.save(drill);
 
-        assertEquals(1, drillRepo.findAll().size());
+        assertEquals(1, drillRepo.count());
         assertEquals(1, returnedDrill.getCategories().size());
         assertEquals(1, returnedDrill.getSubCategories().size());
     }
@@ -692,7 +692,7 @@ public class DefenseDrillRestApiDatabaseTests {
         drill.getSubCategories().add(returnedSubCategory);
         DrillEntity returnedDrill = drillRepo.save(drill);
 
-        assertEquals(1, drillRepo.findAll().size());
+        assertEquals(1, drillRepo.count());
         assertEquals(1, returnedDrill.getCategories().size());
         assertEquals(1, returnedDrill.getSubCategories().size());
 
@@ -794,7 +794,7 @@ public class DefenseDrillRestApiDatabaseTests {
         DrillEntity returnedEntity2 = drillRepo.save(returnedEntity);
 
         assertEquals(1, returnedEntity2.getInstructions().size());
-        assertEquals(1, instructionsRepo.findAll().size());
+        assertEquals(1, instructionsRepo.count());
     }
 
     @Test
@@ -826,15 +826,15 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity returnedDrill = drillRepo.save(drill);
 
-        assertEquals(1, drillRepo.findAll().size());
-        assertEquals(1, categoryRepo.findAll().size());
-        assertEquals(1, subCategoryRepo.findAll().size());
+        assertEquals(1, drillRepo.count());
+        assertEquals(1, categoryRepo.count());
+        assertEquals(1, subCategoryRepo.count());
 
         drillRepo.delete(returnedDrill);
 
-        assertEquals(0, drillRepo.findAll().size());
-        assertEquals(1, categoryRepo.findAll().size());
-        assertEquals(1, subCategoryRepo.findAll().size());
+        assertEquals(0, drillRepo.count());
+        assertEquals(1, categoryRepo.count());
+        assertEquals(1, subCategoryRepo.count());
     }
 
     @Test
@@ -860,14 +860,151 @@ public class DefenseDrillRestApiDatabaseTests {
         drill.getInstructions().add(instructions);
         DrillEntity returnedEntity = drillRepo.save(drill);
 
-        assertEquals(1, drillRepo.findAll().size());
-        assertEquals(1, instructionsRepo.findAll().size());
+        assertEquals(1, drillRepo.count());
+        assertEquals(1, instructionsRepo.count());
 
         drillRepo.delete(returnedEntity);
 
-        assertEquals(0, drillRepo.findAll().size());
-        assertEquals(0, instructionsRepo.findAll().size());
+        assertEquals(0, drillRepo.count());
+        assertEquals(0, instructionsRepo.count());
     }
 
-    // TODO: delete instruction/category does not delete drill
+    @Test
+    public void test_categoriesRepo_delete_deleteCategories_doesNotDeleteDrill() {
+        // CategoryEntity
+        CategoryEntity category = CategoryEntity.builder()
+                                    .id(null)
+                                    .name("New Category Name")
+                                    .description("New Category Description")
+                                    .build();
+        CategoryEntity returnedCategory = categoryRepo.save(category);
+
+        // SubCategoryEntity
+        SubCategoryEntity subCategory = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name("New SubCategory Name")
+                                            .description("New SubCategory Description")
+                                            .build();
+        SubCategoryEntity returnedSubCategory = subCategoryRepo.save(subCategory);
+
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(List.of(returnedCategory))
+                                .subCategories(List.of(returnedSubCategory))
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        drillRepo.save(drill);
+
+        assertEquals(1, drillRepo.count());
+        assertEquals(1, categoryRepo.count());
+        assertEquals(1, subCategoryRepo.count());
+
+        categoryRepo.delete(returnedCategory);
+        subCategoryRepo.delete(returnedSubCategory);
+
+        assertEquals(1, drillRepo.count());
+        assertEquals(0, categoryRepo.count());
+        assertEquals(0, subCategoryRepo.count());
+    }
+
+    @Test
+    public void test_categoriesRepo_delete_deleteCategories_removesFromDrillList() {
+        // CategoryEntity
+        CategoryEntity category = CategoryEntity.builder()
+                                    .id(null)
+                                    .name("New Category Name")
+                                    .description("New Category Description")
+                                    .build();
+        CategoryEntity returnedCategory = categoryRepo.save(category);
+
+        // SubCategoryEntity
+        SubCategoryEntity subCategory = SubCategoryEntity.builder()
+                                            .id(null)
+                                            .name("New SubCategory Name")
+                                            .description("New SubCategory Description")
+                                            .build();
+        SubCategoryEntity returnedSubCategory = subCategoryRepo.save(subCategory);
+
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(List.of(returnedCategory))
+                                .subCategories(List.of(returnedSubCategory))
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        DrillEntity returnedDrill = drillRepo.save(drill);
+
+        assertEquals(1, returnedDrill.getCategories().size());
+        assertEquals(1, returnedDrill.getSubCategories().size());
+
+        categoryRepo.delete(returnedCategory);
+        subCategoryRepo.delete(returnedSubCategory);
+        DrillEntity returnedDrill2 = drillRepo.findById(returnedDrill.getId()).get();
+
+        assertEquals(0, returnedDrill2.getCategories().size());
+        assertEquals(0, returnedDrill2.getSubCategories().size());
+    }
+
+    @Test
+    public void test_instructionsRepo_delete_deleteInstructions_doesNotDeleteDrill() {
+        // Need to have an existing drill
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        Long drillId = drillRepo.save(drill).getId();
+        InstructionsEntity instructions = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(0L)
+                                            .description("Instructions Description")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
+
+        InstructionsEntity returnedInstructions = instructionsRepo.save(instructions);
+
+        assertEquals(1, instructionsRepo.count());
+        assertEquals(1, drillRepo.count());
+
+        instructionsRepo.delete(returnedInstructions);
+
+        assertEquals(0, instructionsRepo.count());
+        assertEquals(1, drillRepo.count());
+    }
+
+    @Test
+    public void test_instructionsRepo_delete_deleteInstructions_removeFromDrillList() {
+        // Need to have an existing drill
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        Long drillId = drillRepo.save(drill).getId();
+        InstructionsEntity instructions = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(0L)
+                                            .description("Instructions Description")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
+
+        InstructionsEntity returnedInstructions = instructionsRepo.save(instructions);
+        assertEquals(1, drillRepo.findById(drillId).get().getInstructions().size());
+
+        instructionsRepo.delete(returnedInstructions);
+        assertEquals(0, drillRepo.findById(drillId).get().getInstructions().size());
+    }
 }

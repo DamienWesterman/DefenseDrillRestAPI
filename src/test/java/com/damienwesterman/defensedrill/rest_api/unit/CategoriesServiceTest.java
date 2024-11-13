@@ -27,12 +27,14 @@
 package com.damienwesterman.defensedrill.rest_api.unit;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,6 +70,7 @@ public class CategoriesServiceTest {
         service = new CategoriesService(categoryRepo, subCategoryRepo);
     }
 
+    // Save serves as both a create and update
     @Test
     public void test_save_usesCorrectRepoDependingOnEntityType() {
         assertDoesNotThrow(() -> service.save(categoryEntity));
@@ -78,7 +81,7 @@ public class CategoriesServiceTest {
     }
 
     @Test
-    public void test_save_givenBadEntityConstraintViolation_returnsFalse() {
+    public void test_save_givenBadEntityConstraintViolation_ThrowsException() {
         // Repos throw ConstraintViolationException when DAO constraint violations are detected
         when(categoryRepo.save(categoryEntity)).thenThrow(new ConstraintViolationException("ConstraintViolationImpl{interpolatedMessage='must not be empty', propertyPath=name, rootBeanClass=class", null));
         assertThrows(DatabaseInsertException.class, () -> service.save(categoryEntity));
@@ -88,7 +91,7 @@ public class CategoriesServiceTest {
     }
 
     @Test
-    public void test_save_givenBadEntityNonUnique_returnsFalse() {
+    public void test_save_givenBadEntityNonUnique_throwsException() {
         // Repos throw DataIntegrityViolationException when db detects constraint violations
         when(categoryRepo.save(categoryEntity)).thenThrow(new DataIntegrityViolationException("constraint_drills_unique_name"));
         assertThrows(DatabaseInsertException.class, () -> service.save(categoryEntity));
@@ -96,4 +99,42 @@ public class CategoriesServiceTest {
         when(subCategoryRepo.save(subCategoryEntity)).thenThrow(new DataIntegrityViolationException("constraint_drills_unique_name"));
         assertThrows(DatabaseInsertException.class, () -> service.save(subCategoryEntity));
     }
+
+    @Test
+    public void test_find_byId_callsCorrectRepoFind() {
+        when(categoryRepo.findById(0L)).thenReturn(Optional.of(categoryEntity));
+        assertEquals(categoryEntity, service.findCategory(0L).get());
+        verify(categoryRepo, times(1)).findById(0L);
+
+        when(subCategoryRepo.findById(0L)).thenReturn(Optional.of(subCategoryEntity));
+        assertEquals(subCategoryEntity, service.findSubCategory(0L).get());
+        verify(subCategoryRepo, times(1)).findById(0L);
+    }
+
+    @Test
+    public void test_find_byName_callsCorrectRepoFind() {
+        String name = "NAME";
+        when(categoryRepo.findByNameIgnoreCase(name)).thenReturn(Optional.of(categoryEntity));
+        assertEquals(categoryEntity, service.findCategory(name).get());
+        verify(categoryRepo, times(1)).findByNameIgnoreCase(name);
+
+        when(subCategoryRepo.findByNameIgnoreCase(name)).thenReturn(Optional.of(subCategoryEntity));
+        assertEquals(subCategoryEntity, service.findSubCategory(name).get());
+        verify(subCategoryRepo, times(1)).findByNameIgnoreCase(name);
+    }
+
+    @Test
+    public void test_findAll_callsCorrectRepoFind() {
+        List<CategoryEntity> categoryList = List.of(categoryEntity);
+        when(categoryRepo.findAll()).thenReturn(categoryList);
+        assertEquals(categoryList, service.findAllCategories());
+        verify(categoryRepo, times(1)).findAll();
+
+        List<SubCategoryEntity> subCategoryList = List.of(subCategoryEntity);
+        when(subCategoryRepo.findAll()).thenReturn(subCategoryList);
+        assertEquals(subCategoryList, service.findAllSubCategories());
+        verify(subCategoryRepo, times(1)).findAll();
+    }
+
+    // TODO: Test all parts of the CRUD/repo functionalities
 }
