@@ -35,20 +35,27 @@ import org.springframework.transaction.TransactionSystemException;
 
 import jakarta.validation.ConstraintViolationException;
 
-/** TODO: Doc comments - static utils class*/
+/**
+ * Utility class providing static methods for converting database operation exceptions into a
+ * user friendly error message.
+ */
 /* package-private */ class ErrorMessageUtils {
-    /** Only the database generate constraints, not jakarta. Must reflect all constraint names in db/migration TODO: clean up */
+    /**
+     * Map of named database constraints to user friendly messages.
+     * <br><br>
+     * Must reflect all constraint names in db/migration.
+     */
     private final static Map<String, String> constraintErrorMessageMap = Map.ofEntries(
-        Map.entry("constraint_drills_unique_name", "Name already exists."),
-        Map.entry("constraint_categories_unique_name", "Name already exists."),
-        Map.entry("constraint_sub_categories_unique_name", "Name already exists."),
-        Map.entry("constraint_dcjoin_fk_drill_id", "Drill does not exist."),
-        Map.entry("constraint_dcjoin_fk_category_id", "Category does not exist."),
-        Map.entry("constraint_dscjoin_fk_drill_id", "Drill does not exist."),
-        Map.entry("constraint_dscjoin_fk_sub_category_id", "Sub-Category does not exist."),
-        Map.entry("constraint_rd_fk_primary_drill", "Primary Drill does not exist."),
-        Map.entry("constraint_rd_fk_related_drill", "Related Drill does not exist."),
-        Map.entry("constraint_instructions_fk_drill_id", "Drill does not exist.")
+        Map.entry(  "constraint_drills_unique_name",          "Name already exists."),
+        Map.entry(  "constraint_categories_unique_name",      "Name already exists."),
+        Map.entry(  "constraint_sub_categories_unique_name",  "Name already exists."),
+        Map.entry(  "constraint_dcjoin_fk_drill_id",          "Drill does not exist."),
+        Map.entry(  "constraint_dcjoin_fk_category_id",       "Category does not exist."),
+        Map.entry(  "constraint_dscjoin_fk_drill_id",         "Drill does not exist."),
+        Map.entry(  "constraint_dscjoin_fk_sub_category_id",  "Sub-Category does not exist."),
+        Map.entry(  "constraint_rd_fk_primary_drill",         "Primary Drill does not exist."),
+        Map.entry(  "constraint_rd_fk_related_drill",         "Related Drill does not exist."),
+        Map.entry(  "constraint_instructions_fk_drill_id",    "Drill does not exist.")
     );
     private final static String GENERIC_ERROR_MESSAGE = "An error has occurred.";
 
@@ -57,6 +64,12 @@ import jakarta.validation.ConstraintViolationException;
      */
     private ErrorMessageUtils() { }
 
+    /**
+     * Convert an exception into a user friendly error message.
+     *
+     * @param e Thrown exception.
+     * @return User friendly error message string.
+     */
     public static String exceptionToErrorMessage(Exception e) {
         if (e instanceof DataIntegrityViolationException || e instanceof TransactionSystemException) {
             // Need to parse the exception to find the sql named constraint that was violated
@@ -68,6 +81,12 @@ import jakarta.validation.ConstraintViolationException;
         return GENERIC_ERROR_MESSAGE;
     }
 
+    /**
+     * Convert a database generated exception into a user friendly error message.
+     *
+     * @param exception {@link DataIntegrityViolationException} or {@link TransactionSystemException} string error message.
+     * @return User friendly error message string.
+     */
     private static String sqlExceptionToString(String exception) {
         for (String constraintKey : constraintErrorMessageMap.keySet()) {
             if (exception.contains(constraintKey)) {
@@ -79,6 +98,12 @@ import jakarta.validation.ConstraintViolationException;
         return GENERIC_ERROR_MESSAGE;
     }
 
+    /**
+     * Convert a jakarta generated exception into a user friendly error message.
+     *
+     * @param exception {@link ConstraintViolationException} string error message.
+     * @return User friendly error message string.
+     */
     private static String jakartaExceptionToErrorMessage(String exception) {StringBuilder errorMessage = new StringBuilder();
 
         // Regular expression pattern to match the property path and interpolated message

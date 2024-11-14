@@ -27,7 +27,7 @@
 package com.damienwesterman.defensedrill.rest_api.exception;
 
 /**
- * TODO: Doc comments
+ * Exception for any issue with saving or updating database entities.
  */
 public class DatabaseInsertException extends RuntimeException {
     public DatabaseInsertException(String message) {
