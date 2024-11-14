@@ -33,6 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 
+// TODO: FIXME: START HERE - ABSTRACT THESE TWO AND MAKE THE SERVICE ABSTRACT AS WELL - ADJUST THE TESTS
 /**
  * Database repository for {@link CategoryEntity}.
  */

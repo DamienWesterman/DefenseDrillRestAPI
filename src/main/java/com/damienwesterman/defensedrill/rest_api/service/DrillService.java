@@ -26,7 +26,16 @@
 
 package com.damienwesterman.defensedrill.rest_api.service;
 
+import org.springframework.stereotype.Service;
+
+import com.damienwesterman.defensedrill.rest_api.repository.DrillRepo;
+
+import lombok.AllArgsConstructor;
+
 // TODO: FINISH ME DOC COMMENTS
+@Service
+@AllArgsConstructor
 public class DrillService {
+    private final DrillRepo drillRepo;
     // TODO: FINISH ME
 }
