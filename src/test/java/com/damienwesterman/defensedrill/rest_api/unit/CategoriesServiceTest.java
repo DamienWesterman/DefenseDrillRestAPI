@@ -136,5 +136,12 @@ public class CategoriesServiceTest {
         verify(subCategoryRepo, times(1)).findAll();
     }
 
-    // TODO: Test all parts of the CRUD/repo functionalities
+    @Test
+    public void test_delete_callsDeleteById() {
+        service.deleteCategory(0L);
+        verify(categoryRepo, times(1)).deleteById(0L);
+
+        service.deleteSubCategory(0L);
+        verify(subCategoryRepo, times(1)).deleteById(0L);
+    }
 }

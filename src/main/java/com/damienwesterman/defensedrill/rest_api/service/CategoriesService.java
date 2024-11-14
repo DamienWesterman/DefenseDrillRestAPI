@@ -47,7 +47,6 @@ import lombok.AllArgsConstructor;
 public class CategoriesService {
     private final CategoryRepo categoryRepo;
     private final SubCategoryRepo subCategoryRepo;
-    // TODO: FINISH ME
 
     public void save(AbstractCategoryEntity abstractCategory) {
         try {
@@ -89,5 +88,13 @@ public class CategoriesService {
 
     public List<SubCategoryEntity> findAllSubCategories() {
         return subCategoryRepo.findAll();
+    }
+
+    public void deleteCategory(long id) {
+        categoryRepo.deleteById(id);
+    }
+
+    public void deleteSubCategory(long id) {
+        subCategoryRepo.deleteById(id);
     }
 }

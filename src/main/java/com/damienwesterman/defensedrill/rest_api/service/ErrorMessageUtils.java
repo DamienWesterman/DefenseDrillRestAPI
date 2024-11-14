@@ -35,7 +35,7 @@ import org.springframework.transaction.TransactionSystemException;
 
 import jakarta.validation.ConstraintViolationException;
 
-/** TODO: Doc comments */
+/** TODO: Doc comments - static utils class*/
 /* package-private */ class ErrorMessageUtils {
     /** Only the database generate constraints, not jakarta. Must reflect all constraint names in db/migration TODO: clean up */
     private final static Map<String, String> constraintErrorMessageMap = Map.ofEntries(
@@ -52,12 +52,17 @@ import jakarta.validation.ConstraintViolationException;
     );
     private final static String GENERIC_ERROR_MESSAGE = "An error has occurred.";
 
+    /**
+     * Private Constructor.
+     */
+    private ErrorMessageUtils() { }
+
     public static String exceptionToErrorMessage(Exception e) {
         if (e instanceof DataIntegrityViolationException || e instanceof TransactionSystemException) {
             // Need to parse the exception to find the sql named constraint that was violated
             return sqlExceptionToString(e.getLocalizedMessage());
         } else if (e instanceof ConstraintViolationException) {
-            return jakartaExceptionTErrorMessage(e.getLocalizedMessage());
+            return jakartaExceptionToErrorMessage(e.getLocalizedMessage());
         }
 
         return GENERIC_ERROR_MESSAGE;
@@ -74,7 +79,7 @@ import jakarta.validation.ConstraintViolationException;
         return GENERIC_ERROR_MESSAGE;
     }
 
-    private static String jakartaExceptionTErrorMessage(String exception) {StringBuilder errorMessage = new StringBuilder();
+    private static String jakartaExceptionToErrorMessage(String exception) {StringBuilder errorMessage = new StringBuilder();
 
         // Regular expression pattern to match the property path and interpolated message
         Pattern pattern = Pattern.compile("interpolatedMessage='(.*?)',.*?propertyPath=(.*?),");
