@@ -31,7 +31,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.TransactionSystemException;
 
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
@@ -78,16 +80,15 @@ import jakarta.validation.ConstraintViolationException;
      * @return The saved entity.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
-    public static <T, S extends JpaRepository<T, Long>> T trySave(S repo, T entity) throws DatabaseInsertException {
+    public static <T, S extends JpaRepository<T, Long>> T trySave(@NonNull S repo, @NonNull T entity) throws DatabaseInsertException {
         try {
             return repo.save(entity);
-        } catch (ConstraintViolationException cve) {
+        } catch (ConstraintViolationException |
+                    DataIntegrityViolationException |
+                    InvalidDataAccessApiUsageException |
+                    TransactionSystemException e) {
             throw new DatabaseInsertException(
-                exceptionToErrorMessage(cve), cve
-            );
-        } catch (DataIntegrityViolationException dive) {
-            throw new DatabaseInsertException(
-                exceptionToErrorMessage(dive), dive
+                exceptionToErrorMessage(e), e
             );
         }
     }
@@ -98,12 +99,14 @@ import jakarta.validation.ConstraintViolationException;
      * @param e Thrown exception.
      * @return User friendly error message string.
      */
-    private static String exceptionToErrorMessage(Exception e) {
-        if (e instanceof DataIntegrityViolationException || e instanceof TransactionSystemException) {
-            // Need to parse the exception to find the sql named constraint that was violated
+    private static String exceptionToErrorMessage(@NonNull Exception e) {
+        if (e instanceof DataIntegrityViolationException) {
             return sqlExceptionToString(e.getLocalizedMessage());
-        } else if (e instanceof ConstraintViolationException) {
+        } else if (e instanceof ConstraintViolationException || e instanceof TransactionSystemException) {
+            // TransactionSystemException occurs on top of a ConstraintViolationException, so they are handled the same
             return jakartaExceptionToErrorMessage(e.getLocalizedMessage());
+        } else if (e instanceof InvalidDataAccessApiUsageException) {
+            return transientExceptionToErrorMessage(e.getLocalizedMessage());
         }
 
         return GENERIC_ERROR_MESSAGE;
@@ -116,6 +119,7 @@ import jakarta.validation.ConstraintViolationException;
      * @return User friendly error message string.
      */
     private static String sqlExceptionToString(String exception) {
+        // Need to parse the exception to find the sql named constraint that was violated
         for (String constraintKey : constraintErrorMessageMap.keySet()) {
             if (exception.contains(constraintKey)) {
                 // Found the constraint that was violated
@@ -152,5 +156,14 @@ import jakarta.validation.ConstraintViolationException;
         } else {
             return GENERIC_ERROR_MESSAGE;
         }
+    }
+
+    // TODO: DOC COMMENTS
+    private static String transientExceptionToErrorMessage(String exception) {
+        // TODO: FINISH ME
+        /*
+         * org.springframework.dao.InvalidDataAccessApiUsageException: org.hibernate.TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing: com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity
+         */
+        return GENERIC_ERROR_MESSAGE;
     }
 }

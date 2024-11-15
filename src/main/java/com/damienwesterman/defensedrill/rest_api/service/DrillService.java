@@ -26,16 +26,54 @@
 
 package com.damienwesterman.defensedrill.rest_api.service;
 
+import java.util.List;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
+import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
+import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.repository.DrillRepo;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 // TODO: FINISH ME DOC COMMENTS
+// TODO: NonNull annotations
 @Service
 @RequiredArgsConstructor
 public class DrillService {
-    private final DrillRepo drillRepo;
+    private final DrillRepo repo;
     // TODO: FINISH ME
+
+    /**
+     * 
+     * @param drill
+     * @return
+     * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
+     */
+    @Transactional
+    public DrillEntity save(@NonNull DrillEntity drill) throws DatabaseInsertException {
+        if (0 == drill.getInstructions().size()) {
+            return ErrorMessageUtils.trySave(repo, drill);
+        }
+
+        /*
+         * Instructions cannot be saved until they have a valid drill ID. So we need
+         * to remove them for the initial save, retrieve the drill ID, then update the
+         * saved drill to include the instructions.
+        */
+        List<InstructionsEntity> instructions = drill.getInstructions();
+        drill.getInstructions().clear();
+        DrillEntity returnedDrill = ErrorMessageUtils.trySave(repo, drill);
+
+        instructions.forEach(instructionsEntity ->
+            instructionsEntity.setDrillId(returnedDrill.getId())
+        );
+        returnedDrill.setInstructions(instructions);
+
+        // Update the existing drill with the instructions
+        return ErrorMessageUtils.trySave(repo, returnedDrill);
+    }
 }

@@ -759,6 +759,38 @@ public class DefenseDrillRestApiDatabaseTests {
     }
 
     @Test
+    public void test_drillRepo_save_updateWithInvalidInstructions_throwsException() {
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+        Long drillId = drillRepo.save(drill).getId();
+        InstructionsEntity instructions = InstructionsEntity.builder()
+                                            .drillId(drillId)
+                                            .number(null)
+                                            .description("Instructions Description")
+                                            .steps("Step1|Step2|Step3")
+                                            .videoId(null)
+                                            .build();
+
+        drill.setInstructions(new ArrayList<>());
+        drill.getInstructions().add(instructions);
+
+        assertThrows(TransactionSystemException.class, () -> drillRepo.save(drill));
+
+        drill.getInstructions().remove(instructions);
+        instructions.setNumber(0L);
+        instructions.setDrillId(drillId + 1);
+        drill.getInstructions().add(instructions);
+
+        assertThrows(DataIntegrityViolationException.class, () -> drillRepo.save(drill));
+    }
+
+    @Test
     public void test_drillRepo_save_updateWithLessInstructions_succeeds() {
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)

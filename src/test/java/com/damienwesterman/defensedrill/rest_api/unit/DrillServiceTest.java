@@ -26,18 +26,33 @@
 
 package com.damienwesterman.defensedrill.rest_api.unit;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.transaction.TransactionSystemException;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
+import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.repository.DrillRepo;
 import com.damienwesterman.defensedrill.rest_api.service.DrillService;
+
+import jakarta.validation.ConstraintViolationException;
 
 @ExtendWith(MockitoExtension.class)
 public class DrillServiceTest {
@@ -66,32 +81,57 @@ public class DrillServiceTest {
     // Save serves as both a create and update
     @Test
     public void test_save_createWithNoInstructions_callsRepoOnce() {
-        // TODO: FINISH ME
+        when(drill1.getInstructions()).thenReturn(List.of());
+        assertDoesNotThrow(() -> service.save(drill1));
+        verify(repo, times(1)).save(drill1);
     }
 
     @Test
-    public void test_save_createWithInstructions_callsRepoTwice() {
-        // TODO: FINISH ME
+    public void test_save_createWithOneInstructions_callsRepoTwice() {
+        List<InstructionsEntity> instructions = new ArrayList<InstructionsEntity>(List.of(instructions1));
+        when(drill1.getInstructions()).thenReturn(instructions);
+        when(repo.save(drill1)).thenReturn(drill1);
+        assertDoesNotThrow(() -> service.save(drill1));
+        verify(repo, times(2)).save(drill1);
+    }
+
+    @Test
+    public void test_save_createWithTwoInstructions_callsRepoTwice() {
+        List<InstructionsEntity> instructions = new ArrayList<InstructionsEntity>(List.of(instructions1, instructions2));
+        when(drill1.getInstructions()).thenReturn(instructions);
+        when(repo.save(drill1)).thenReturn(drill1);
+        assertDoesNotThrow(() -> service.save(drill1));
+        verify(repo, times(2)).save(drill1);
     }
 
     @Test
     public void test_save_givenBadEntityConstraintViolation_ThrowsException() {
-        // TODO: FINISH ME
+        // Repos throw ConstraintViolationException when DAO constraint violations are detected
+        when(repo.save(drill1)).thenThrow(new ConstraintViolationException("ConstraintViolationImpl{interpolatedMessage='must not be empty', propertyPath=name, rootBeanClass=class", null));
+        assertThrows(DatabaseInsertException.class, () -> service.save(drill1));
     }
 
     @Test
     public void test_save_givenBadEntityNonUnique_ThrowsException() {
-        // TODO: FINISH ME
+        // Repos throw DataIntegrityViolationException when db detects constraint violations
+        when(repo.save(drill1)).thenThrow(new DataIntegrityViolationException("constraint_drills_unique_name"));
+        assertThrows(DatabaseInsertException.class, () -> service.save(drill1));
     }
 
     @Test
     public void test_save_givenBadInstructionEntity_ThrowsVioaltion() {
-        // TODO: FINISH ME
+        // Repos throw TransactionSystemException when DAO constraint violations are detected in an Instructions insert
+        when(repo.save(drill1)).thenThrow(new TransactionSystemException("ConstraintViolationImpl{interpolatedMessage='must not be empty', propertyPath=name, rootBeanClass=class", null));
+        assertThrows(DatabaseInsertException.class, () -> service.save(drill1));
+
+        // Repos throw DataIntegrityViolationException when db detects constraint violations - namely foreign key exception for Instructions. Tested elsewhere
     }
 
     @Test
     public void test_save_givenNonExistentCategories_ThrowsViolation() {
-        // TODO: FINISH ME InvalidDataAccessApiUsageException for non existent categories
+        // Repos throw InvalidDataAccessApiUsageException when given an unsaved internal entity
+        when(repo.save(drill1)).thenThrow(new InvalidDataAccessApiUsageException("org.springframework.dao.InvalidDataAccessApiUsageException: org.hibernate.TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing: com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity", null));
+        assertThrows(DatabaseInsertException.class, () -> service.save(drill1));
     }
 
     @Test
@@ -104,5 +144,23 @@ public class DrillServiceTest {
         // TODO: FINISH ME
     }
 
-    // TODO: tests - find, delete
+    @Test
+    public void test_find_byId_callsRepoFindById() {
+        // TODO: FINISH ME
+    }
+
+    @Test
+    public void test_find_byName_callsRepoFindByName() {
+        // TODO: FINISH ME
+    }
+
+    @Test
+    public void test_findAll_callsRepoFindAll() {
+        // TODO: FINISH ME
+    }
+
+    @Test
+    public void test_delete_callsDeleteById() {
+        // TODO: FINISH ME
+    }
 }
