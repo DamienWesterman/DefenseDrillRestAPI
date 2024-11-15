@@ -53,20 +53,11 @@ public abstract class AbstractCategoryService<T extends AbstractCategoryEntity, 
      * This can be used for create OR update operations.
      *
      * @param abstractCategory Entity to save.
+     * @return The saved entity.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
-    public void save(@NonNull T abstractCategory) {
-        try {
-            repo.save(abstractCategory);
-        } catch (ConstraintViolationException cve) {
-            throw new DatabaseInsertException(
-                ErrorMessageUtils.exceptionToErrorMessage(cve), cve
-            );
-        } catch (DataIntegrityViolationException dive) {
-            throw new DatabaseInsertException(
-                ErrorMessageUtils.exceptionToErrorMessage(dive), dive
-            );
-        }
+    public T save(@NonNull T abstractCategory) throws DatabaseInsertException {
+        return ErrorMessageUtils.trySave(repo, abstractCategory);
     }
 
     /**

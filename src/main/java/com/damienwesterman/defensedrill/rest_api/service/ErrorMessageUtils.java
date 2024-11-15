@@ -31,7 +31,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.TransactionSystemException;
+
+import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -65,12 +68,37 @@ import jakarta.validation.ConstraintViolationException;
     private ErrorMessageUtils() { }
 
     /**
+     * Wrapper function to call JpaRespository.save(). Handles any exception the database might
+     * throw and re-throws it with a user friendly error message.
+     *
+     * @param <T> Database Entity.
+     * @param <S> Repository for T entity.
+     * @param entity The entity to attempt to save.
+     * @param repo Repository to use for the save operation.
+     * @return The saved entity.
+     * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
+     */
+    public static <T, S extends JpaRepository<T, Long>> T trySave(S repo, T entity) throws DatabaseInsertException {
+        try {
+            return repo.save(entity);
+        } catch (ConstraintViolationException cve) {
+            throw new DatabaseInsertException(
+                exceptionToErrorMessage(cve), cve
+            );
+        } catch (DataIntegrityViolationException dive) {
+            throw new DatabaseInsertException(
+                exceptionToErrorMessage(dive), dive
+            );
+        }
+    }
+
+    /**
      * Convert an exception into a user friendly error message.
      *
      * @param e Thrown exception.
      * @return User friendly error message string.
      */
-    public static String exceptionToErrorMessage(Exception e) {
+    private static String exceptionToErrorMessage(Exception e) {
         if (e instanceof DataIntegrityViolationException || e instanceof TransactionSystemException) {
             // Need to parse the exception to find the sql named constraint that was violated
             return sqlExceptionToString(e.getLocalizedMessage());
