@@ -26,18 +26,13 @@
 
 package com.damienwesterman.defensedrill.rest_api.repository;
 
-import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 
-// TODO: FIXME: START HERE - ABSTRACT THESE TWO AND MAKE THE SERVICE ABSTRACT AS WELL - ADJUST THE TESTS
 /**
  * Database repository for {@link CategoryEntity}.
  */
 @Repository
-public interface CategoryRepo extends JpaRepository<CategoryEntity, Long> {
-    Optional<CategoryEntity> findByNameIgnoreCase(String name);
+public interface CategoryRepo extends AbstractCategoryRepo<CategoryEntity> {
 }

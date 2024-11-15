@@ -26,9 +26,6 @@
 
 package com.damienwesterman.defensedrill.rest_api.repository;
 
-import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
@@ -37,6 +34,5 @@ import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
  * Database repository for {@link SubCategoryEntity}.
  */
 @Repository
-public interface SubCategoryRepo extends JpaRepository<SubCategoryEntity, Long> {
-    Optional<SubCategoryEntity> findByNameIgnoreCase(String lowerCase);
+public interface SubCategoryRepo extends AbstractCategoryRepo<SubCategoryEntity> {
 }

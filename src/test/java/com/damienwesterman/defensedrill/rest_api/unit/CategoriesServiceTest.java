@@ -48,7 +48,8 @@ import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.repository.CategoryRepo;
 import com.damienwesterman.defensedrill.rest_api.repository.SubCategoryRepo;
-import com.damienwesterman.defensedrill.rest_api.service.CategoriesService;
+import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
+import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -63,20 +64,22 @@ public class CategoriesServiceTest {
     @Mock
     private SubCategoryEntity subCategoryEntity;
 
-    private CategoriesService service;
+    private CategorySerivce categorySerivce;
+    private SubCategorySerivce subCategoryService;
 
     @BeforeEach
     public void setup() {
-        service = new CategoriesService(categoryRepo, subCategoryRepo);
+        categorySerivce = new CategorySerivce(categoryRepo);
+        subCategoryService = new SubCategorySerivce(subCategoryRepo);
     }
 
     // Save serves as both a create and update
     @Test
     public void test_save_usesCorrectRepoDependingOnEntityType() {
-        assertDoesNotThrow(() -> service.save(categoryEntity));
+        assertDoesNotThrow(() -> categorySerivce.save(categoryEntity));
         verify(categoryRepo, times(1)).save(categoryEntity);
 
-        assertDoesNotThrow(() -> service.save(subCategoryEntity));
+        assertDoesNotThrow(() -> subCategoryService.save(subCategoryEntity));
         verify(subCategoryRepo, times(1)).save(subCategoryEntity);
     }
 
@@ -84,30 +87,30 @@ public class CategoriesServiceTest {
     public void test_save_givenBadEntityConstraintViolation_ThrowsException() {
         // Repos throw ConstraintViolationException when DAO constraint violations are detected
         when(categoryRepo.save(categoryEntity)).thenThrow(new ConstraintViolationException("ConstraintViolationImpl{interpolatedMessage='must not be empty', propertyPath=name, rootBeanClass=class", null));
-        assertThrows(DatabaseInsertException.class, () -> service.save(categoryEntity));
+        assertThrows(DatabaseInsertException.class, () -> categorySerivce.save(categoryEntity));
 
         when(subCategoryRepo.save(subCategoryEntity)).thenThrow(new ConstraintViolationException("ConstraintViolationImpl{interpolatedMessage='must not be empty', propertyPath=name, rootBeanClass=class", null));
-        assertThrows(DatabaseInsertException.class, () -> service.save(subCategoryEntity));
+        assertThrows(DatabaseInsertException.class, () -> subCategoryService.save(subCategoryEntity));
     }
 
     @Test
     public void test_save_givenBadEntityNonUnique_throwsException() {
         // Repos throw DataIntegrityViolationException when db detects constraint violations
         when(categoryRepo.save(categoryEntity)).thenThrow(new DataIntegrityViolationException("constraint_drills_unique_name"));
-        assertThrows(DatabaseInsertException.class, () -> service.save(categoryEntity));
+        assertThrows(DatabaseInsertException.class, () -> categorySerivce.save(categoryEntity));
 
         when(subCategoryRepo.save(subCategoryEntity)).thenThrow(new DataIntegrityViolationException("constraint_drills_unique_name"));
-        assertThrows(DatabaseInsertException.class, () -> service.save(subCategoryEntity));
+        assertThrows(DatabaseInsertException.class, () -> subCategoryService.save(subCategoryEntity));
     }
 
     @Test
     public void test_find_byId_callsCorrectRepoFind() {
         when(categoryRepo.findById(0L)).thenReturn(Optional.of(categoryEntity));
-        assertEquals(categoryEntity, service.findCategory(0L).get());
+        assertEquals(categoryEntity, categorySerivce.find(0L).get());
         verify(categoryRepo, times(1)).findById(0L);
 
         when(subCategoryRepo.findById(0L)).thenReturn(Optional.of(subCategoryEntity));
-        assertEquals(subCategoryEntity, service.findSubCategory(0L).get());
+        assertEquals(subCategoryEntity, subCategoryService.find(0L).get());
         verify(subCategoryRepo, times(1)).findById(0L);
     }
 
@@ -115,11 +118,11 @@ public class CategoriesServiceTest {
     public void test_find_byName_callsCorrectRepoFind() {
         String name = "NAME";
         when(categoryRepo.findByNameIgnoreCase(name)).thenReturn(Optional.of(categoryEntity));
-        assertEquals(categoryEntity, service.findCategory(name).get());
+        assertEquals(categoryEntity, categorySerivce.find(name).get());
         verify(categoryRepo, times(1)).findByNameIgnoreCase(name);
 
         when(subCategoryRepo.findByNameIgnoreCase(name)).thenReturn(Optional.of(subCategoryEntity));
-        assertEquals(subCategoryEntity, service.findSubCategory(name).get());
+        assertEquals(subCategoryEntity, subCategoryService.find(name).get());
         verify(subCategoryRepo, times(1)).findByNameIgnoreCase(name);
     }
 
@@ -127,21 +130,21 @@ public class CategoriesServiceTest {
     public void test_findAll_callsCorrectRepoFind() {
         List<CategoryEntity> categoryList = List.of(categoryEntity);
         when(categoryRepo.findAll()).thenReturn(categoryList);
-        assertEquals(categoryList, service.findAllCategories());
+        assertEquals(categoryList, categorySerivce.findAll());
         verify(categoryRepo, times(1)).findAll();
 
         List<SubCategoryEntity> subCategoryList = List.of(subCategoryEntity);
         when(subCategoryRepo.findAll()).thenReturn(subCategoryList);
-        assertEquals(subCategoryList, service.findAllSubCategories());
+        assertEquals(subCategoryList, subCategoryService.findAll());
         verify(subCategoryRepo, times(1)).findAll();
     }
 
     @Test
     public void test_delete_callsDeleteById() {
-        service.deleteCategory(0L);
+        categorySerivce.delete(0L);
         verify(categoryRepo, times(1)).deleteById(0L);
 
-        service.deleteSubCategory(0L);
+        subCategoryService.delete(0L);
         verify(subCategoryRepo, times(1)).deleteById(0L);
     }
 }

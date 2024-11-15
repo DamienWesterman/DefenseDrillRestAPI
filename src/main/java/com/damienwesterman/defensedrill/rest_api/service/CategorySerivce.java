@@ -28,14 +28,16 @@ package com.damienwesterman.defensedrill.rest_api.service;
 
 import org.springframework.stereotype.Service;
 
-import com.damienwesterman.defensedrill.rest_api.repository.DrillRepo;
+import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
+import com.damienwesterman.defensedrill.rest_api.repository.CategoryRepo;
 
-import lombok.RequiredArgsConstructor;
 
-// TODO: FINISH ME DOC COMMENTS
+/**
+ * Service class for interacting with {@link CategoryEntity} objects in the database.
+ */
 @Service
-@RequiredArgsConstructor
-public class DrillService {
-    private final DrillRepo drillRepo;
-    // TODO: FINISH ME
+public class CategorySerivce extends AbstractCategoryService<CategoryEntity, CategoryRepo> {
+    public CategorySerivce(CategoryRepo repo) {
+        super(repo);
+    }
 }

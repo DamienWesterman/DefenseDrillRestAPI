@@ -24,18 +24,19 @@
  * limitations under the License.
  */
 
-package com.damienwesterman.defensedrill.rest_api.service;
+package com.damienwesterman.defensedrill.rest_api.repository;
 
-import org.springframework.stereotype.Service;
+import java.util.Optional;
 
-import com.damienwesterman.defensedrill.rest_api.repository.DrillRepo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-import lombok.RequiredArgsConstructor;
+import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
 
-// TODO: FINISH ME DOC COMMENTS
-@Service
-@RequiredArgsConstructor
-public class DrillService {
-    private final DrillRepo drillRepo;
-    // TODO: FINISH ME
+/**
+ * Interface for an {@link AbstractCategoryEntity}.
+ */
+@NoRepositoryBean
+public interface AbstractCategoryRepo<T extends AbstractCategoryEntity> extends JpaRepository<T, Long> {
+    Optional<T> findByNameIgnoreCase(String name);
 }

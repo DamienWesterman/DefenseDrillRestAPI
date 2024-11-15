@@ -30,26 +30,22 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 
 import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
-import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
-import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
-import com.damienwesterman.defensedrill.rest_api.repository.CategoryRepo;
-import com.damienwesterman.defensedrill.rest_api.repository.SubCategoryRepo;
-
+import com.damienwesterman.defensedrill.rest_api.repository.AbstractCategoryRepo;
 import jakarta.validation.ConstraintViolationException;
-import lombok.AllArgsConstructor;
 
 /**
  * Service class for interacting with {@link AbstractCategoryEntity} objects in the database.
  */
-@Service
-@AllArgsConstructor
-public class CategoriesService {
-    private final CategoryRepo categoryRepo;
-    private final SubCategoryRepo subCategoryRepo;
+public abstract class AbstractCategoryService<T extends AbstractCategoryEntity, S extends AbstractCategoryRepo<T>> {
+    protected final S repo;
+
+    public AbstractCategoryService(S repo) {
+        this.repo = repo;
+    }
 
     /**
      * Save an AbstractCategoryEntity into the database.
@@ -59,13 +55,9 @@ public class CategoriesService {
      * @param abstractCategory Entity to save.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
-    public void save(AbstractCategoryEntity abstractCategory) {
+    public void save(@NonNull T abstractCategory) {
         try {
-            if ( abstractCategory instanceof CategoryEntity) {
-                categoryRepo.save((CategoryEntity) abstractCategory);
-            } else if (abstractCategory instanceof SubCategoryEntity) {
-                subCategoryRepo.save((SubCategoryEntity) abstractCategory);
-            }
+            repo.save(abstractCategory);
         } catch (ConstraintViolationException cve) {
             throw new DatabaseInsertException(
                 ErrorMessageUtils.exceptionToErrorMessage(cve), cve
@@ -80,76 +72,38 @@ public class CategoriesService {
     /**
      * Find an entity in the database by ID - if it exists.
      *
-     * @param id ID of the CategoryEntity.
+     * @param id ID of the AbstractCategoryEntity.
      * @return Optional containing the returned entity - if it exists.
      */
-    public Optional<CategoryEntity> findCategory(long id) {
-        return categoryRepo.findById(id);
-    }
-
-    /**
-     * Find an entity in the database by ID - if it exists.
-     *
-     * @param id ID of the SubCategoryEntity.
-     * @return Optional containing the returned entity - if it exists.
-     */
-    public Optional<SubCategoryEntity> findSubCategory(long id) {
-        return subCategoryRepo.findById(id);
+    public Optional<T> find(@NonNull Long id) {
+        return repo.findById(id);
     }
 
     /**
      * Find an entity in the database by name (case insensitive) - if it exists.
      *
-     * @param name Name of the CategoryEntity.
+     * @param name Name of the AbstractCategoryEntity.
      * @return Optional containing the returned entity - if it exists.
      */
-    public Optional<CategoryEntity> findCategory(String name) {
-        return categoryRepo.findByNameIgnoreCase(name);
-    }
-
-    /**
-     * Find an entity in the database by name (case insensitive) - if it exists.
-     *
-     * @param name Name of the SubCategoryEntity.
-     * @return Optional containing the returned entity - if it exists.
-     */
-    public Optional<SubCategoryEntity> findSubCategory(String name) {
-        return subCategoryRepo.findByNameIgnoreCase(name);
+    public Optional<T> find(@NonNull String name) {
+        return repo.findByNameIgnoreCase(name);
     }
 
     /**
      * Return all entities in the database.
      *
-     * @return List of CategoryEntity objects.
+     * @return List of AbstractCategoryEntity objects.
      */
-    public List<CategoryEntity> findAllCategories() {
-        return categoryRepo.findAll();
-    }
-
-    /**
-     * Return all entities in the database.
-     *
-     * @return List of SubCategoryEntity objects.
-     */
-    public List<SubCategoryEntity> findAllSubCategories() {
-        return subCategoryRepo.findAll();
+    public List<T> findAll() {
+        return repo.findAll();
     }
 
     /**
      * Delete an entity from the database by its ID - if it exists.
      *
-     * @param id ID of the CategoryEntity.
+     * @param id ID of the AbstractCategoryEntity.
      */
-    public void deleteCategory(long id) {
-        categoryRepo.deleteById(id);
-    }
-
-    /**
-     * Delete an entity from the database by its ID - if it exists.
-     *
-     * @param id ID of the SubCategoryEntity.
-     */
-    public void deleteSubCategory(long id) {
-        subCategoryRepo.deleteById(id);
+    public void delete(@NonNull Long id) {
+        repo.deleteById(id);
     }
 }
