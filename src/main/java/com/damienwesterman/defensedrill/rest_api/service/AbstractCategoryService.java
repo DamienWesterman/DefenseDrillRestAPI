@@ -29,13 +29,11 @@ package com.damienwesterman.defensedrill.rest_api.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.lang.NonNull;
 
 import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.repository.AbstractCategoryRepo;
-import jakarta.validation.ConstraintViolationException;
 
 /**
  * Service class for interacting with {@link AbstractCategoryEntity} objects in the database.

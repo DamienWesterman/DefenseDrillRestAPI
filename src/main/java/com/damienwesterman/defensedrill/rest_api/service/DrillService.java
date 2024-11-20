@@ -27,6 +27,7 @@
 package com.damienwesterman.defensedrill.rest_api.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -39,18 +40,21 @@ import com.damienwesterman.defensedrill.rest_api.repository.DrillRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-// TODO: FINISH ME DOC COMMENTS
-// TODO: NonNull annotations
+/**
+ * Service class for interacting with {@link DrillEntity} objects in the database.
+ */
 @Service
 @RequiredArgsConstructor
 public class DrillService {
     private final DrillRepo repo;
-    // TODO: FINISH ME
 
     /**
-     * 
-     * @param drill
-     * @return
+     * Save a DrillEntity into the database.
+     * <br><br>
+     * This can be used for create OR update operations.
+     *
+     * @param drill Entity to save.
+     * @return The saved entity.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
     @Transactional
@@ -75,5 +79,43 @@ public class DrillService {
 
         // Update the existing drill with the instructions
         return ErrorMessageUtils.trySave(repo, returnedDrill);
+    }
+
+    /**
+     * Find an entity in the database by ID - if it exists.
+     *
+     * @param id ID of the DrillEntity.
+     * @return Optional containing the returned entity - if it exists.
+     */
+	public Optional<DrillEntity> find(@NonNull Long id) {
+        return repo.findById(id);
+	}
+
+    /**
+     * Find an entity in the database by name (case insensitive) - if it exists.
+     *
+     * @param name Name of the DrillEntity.
+     * @return Optional containing the returned entity - if it exists.
+     */
+    public Optional<DrillEntity> find(@NonNull String name) {
+        return repo.findByNameIgnoreCase(name);
+    }
+
+    /**
+     * Return all entities in the database.
+     *
+     * @return List of DrillEntity objects.
+     */
+    public List<DrillEntity> findAll() {
+        return repo.findAll();
+    }
+
+    /**
+     * Delete an entity from the database by its ID - if it exists.
+     *
+     * @param id ID of the AbstractCategoryEntity.
+     */
+    public void delete(@NonNull Long id) {
+        repo.deleteById(id);
     }
 }

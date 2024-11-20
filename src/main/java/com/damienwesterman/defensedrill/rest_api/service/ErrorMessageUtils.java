@@ -26,7 +26,9 @@
 
 package com.damienwesterman.defensedrill.rest_api.service;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,8 +75,8 @@ import jakarta.validation.ConstraintViolationException;
      * Wrapper function to call JpaRespository.save(). Handles any exception the database might
      * throw and re-throws it with a user friendly error message.
      *
-     * @param <T> Database Entity.
-     * @param <S> Repository for T entity.
+     * @param <T> T - Database Entity.
+     * @param <S> S - {@link JpaRepository} for T entity.
      * @param entity The entity to attempt to save.
      * @param repo Repository to use for the save operation.
      * @return The saved entity.
@@ -136,7 +138,8 @@ import jakarta.validation.ConstraintViolationException;
      * @param exception {@link ConstraintViolationException} string error message.
      * @return User friendly error message string.
      */
-    private static String jakartaExceptionToErrorMessage(String exception) {StringBuilder errorMessage = new StringBuilder();
+    private static String jakartaExceptionToErrorMessage(String exception) {
+        StringBuilder errorMessage = new StringBuilder();
 
         // Regular expression pattern to match the property path and interpolated message
         Pattern pattern = Pattern.compile("interpolatedMessage='(.*?)',.*?propertyPath=(.*?),");
@@ -158,12 +161,35 @@ import jakarta.validation.ConstraintViolationException;
         }
     }
 
-    // TODO: DOC COMMENTS
+    /**
+     * Convert a TransientException into a user friendly error message.
+     * <br><br>
+     * This exception occurs when an entity with a foreign key is saved with an entity that
+     * does not exist yet.
+     *
+     * @param exception {@link InvalidDataAccessApiUsageException} string error message.
+     * @return User friendly error message string.
+     */
     private static String transientExceptionToErrorMessage(String exception) {
-        // TODO: FINISH ME
-        /*
-         * org.springframework.dao.InvalidDataAccessApiUsageException: org.hibernate.TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing: com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity
-         */
-        return GENERIC_ERROR_MESSAGE;
+        Set<String> errorMessagesSet = new HashSet<>();
+
+        // Use regex to extract the entities that are causing the problem
+        Pattern pattern = Pattern.compile("com.damienwesterman.defensedrill.rest_api.entity.(.*?)Entity");
+        Matcher matcher = pattern.matcher(exception);
+
+        while (matcher.find()) {
+            String entity = matcher.group(1).trim();
+            errorMessagesSet.add(entity);
+        }
+
+        if (0 < errorMessagesSet.size()) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Entity does not exist in database: ");
+            errorMessage.append(String.join(", ", errorMessagesSet));
+
+            return errorMessage.toString();
+        } else {
+            return GENERIC_ERROR_MESSAGE;
+        }
     }
 }
