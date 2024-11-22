@@ -26,10 +26,21 @@
 
 package com.damienwesterman.defensedrill.rest_api.web;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 
@@ -38,15 +49,54 @@ import lombok.extern.slf4j.Slf4j;
 // TODO: DOC COMMENTS
 @ControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    private static final String KEY_ERROR = "error";
+    private static final String KEY_MESSAGE = "message";
+
+    @Override
+    @Nullable
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException ex,
+            @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        Map<String, String> errorBody = new HashMap<>();
+        errorBody.put(KEY_ERROR, "Malformed Argument");
+        StringBuilder errorMessage = new StringBuilder();
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            errorMessage.append(Character.toUpperCase(error.getField().charAt(0)));
+            errorMessage.append(error.getField().substring(1));
+            errorMessage.append(' ');
+            errorMessage.append(error.getDefaultMessage());
+            errorMessage.append(". ");
+        });
+        errorBody.put(KEY_MESSAGE, errorMessage.toString());
+
+        return ResponseEntity.badRequest().body(errorBody);
+    }
+
     @ExceptionHandler(DatabaseInsertException.class)
-    public ResponseEntity<String> handleDatabaseInsertException(DatabaseInsertException die) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(die.getMessage());
+    public ResponseEntity<Map<String, String>> handleDatabaseInsertException(DatabaseInsertException die) {
+        Map<String, String> errorBody = new HashMap<>();
+        errorBody.put(KEY_ERROR, "Database Insert Error");
+        errorBody.put(KEY_MESSAGE, die.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody);
+    }
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<Map<String, String>> handleNoSuchElementException(NoSuchElementException nsee) {
+        Map<String, String> errorBody = new HashMap<>();
+        errorBody.put(KEY_ERROR, "Resource Not Found");
+        errorBody.put(KEY_MESSAGE, nsee.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGenericException(Exception e) {
+    public ResponseEntity<Map<String, String>> handleGenericException(Exception e) {
         log.error("Unhandled Error", e);
-        return ResponseEntity.internalServerError().body("An unexpected error has occurred.");
+
+        Map<String, String> errorBody = new HashMap<>();
+        errorBody.put(KEY_ERROR, "Database Insert Error");
+        errorBody.put(KEY_MESSAGE, "An unexpected error has occurred.");
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorBody);
     }
 }

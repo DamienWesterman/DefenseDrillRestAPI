@@ -34,8 +34,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableDiscoveryClient
 public class DefenseDrillRestApiApplication {
 	// TODO: Doc comments
-	// TODO: swagger comments (@Schema)
-	// TODO: Make DTOs
+	// TODO: swagger comments (@Schema) - Also make sure to say for error return codes and format (error and message)
 
 	public static void main(String[] args) {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
