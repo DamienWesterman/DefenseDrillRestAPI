@@ -29,6 +29,7 @@ package com.damienwesterman.defensedrill.rest_api.web;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 // TODO: DOC COMMENTS
+// TODO: Swagger Comments (on the DTOs?)
+// TODO: ABSTRACT THIS OUT?
 @RestController
 @RequestMapping(CategoryController.ENDPOINT)
 @RequiredArgsConstructor
@@ -71,20 +74,37 @@ public class CategoryController {
             .body(createdCategory);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<CategoryEntity> getCategoryById(@PathVariable Long id) {
         return service.find(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/id/{id}")
     public ResponseEntity<CategoryEntity> updateCategoryById(@PathVariable Long id, @RequestBody @Valid CategoryEntity category) {
+        if (category.getId() == null || category.getId() != id) {
+            return ResponseEntity.badRequest().build();
+        }
+
         if (!service.find(id).isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
         CategoryEntity updateCategory = service.save(category);
         return ResponseEntity.ok(updateCategory);
+    }
+
+    @DeleteMapping("/id/{id}")
+    public ResponseEntity<String> deleteCategoryById(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<CategoryEntity> getCategoryByName(@PathVariable String name) {
+        return service.find(name)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

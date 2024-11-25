@@ -34,9 +34,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,6 +57,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebMvcTest(CategoryController.class)
 @AutoConfigureMockMvc
 public class CategoryControllerTest {
+    // TODO: Make this both category and subcategory
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -69,14 +67,10 @@ public class CategoryControllerTest {
 
     // Control things
     CategoryEntity category1;
-    CategoryEntity category2;
 
     Long id1 = 1L;
     String name1 = "Name 1";
     String description1 = "Despcription 1";
-    Long id2 = 2L;
-    String name2 = "Name 2";
-    String description2 = "Despcription 2";
 
     @BeforeEach
     public void setup() {
@@ -84,12 +78,6 @@ public class CategoryControllerTest {
                         .id(id1)
                         .name(name1)
                         .description(description1)
-                        .build();
-
-        category2 = CategoryEntity.builder()
-                        .id(id2)
-                        .name(name2)
-                        .description(description2)
                         .build();
     }
 
@@ -103,6 +91,14 @@ public class CategoryControllerTest {
 
     @Test
     public void test_rootEndpoint_get_withTwoItemsInDB_returnListOfCategoryDao() throws Exception {
+        Long id2 = 2L;
+        String name2 = "Name 2";
+        String description2 = "Despcription 2";
+        CategoryEntity category2 = CategoryEntity.builder()
+                        .id(id2)
+                        .name(name2)
+                        .description(description2)
+                        .build();
         when(service.findAll()).thenReturn(List.of(category1, category2));
 
         mockMvc.perform(get(CategoryController.ENDPOINT))
@@ -200,7 +196,7 @@ public class CategoryControllerTest {
     public void test_idEndpoint_get_succeedsWithExistingId() throws Exception {
         when(service.find(id1)).thenReturn(Optional.of(category1));
 
-        mockMvc.perform(get(CategoryController.ENDPOINT + "/" + id1))
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/id/" + id1))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(id1))
             .andExpect(jsonPath("$.name").value(name1))
@@ -213,7 +209,7 @@ public class CategoryControllerTest {
     public void test_idEndpoint_get_returns404WithNonExistentId() throws Exception {
         when(service.find(id1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get(CategoryController.ENDPOINT + "/" + id1))
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/id/" + id1))
             .andExpect(status().isNotFound());
 
         verify(service).find(id1);
@@ -221,13 +217,13 @@ public class CategoryControllerTest {
 
     @Test
     public void test_idEndpoint_put_invalidArgumentWithNoObject() throws Exception {
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/" + id1))
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1))
             .andExpect(status().isBadRequest());
     }
 
     @Test
     public void test_idEndpoint_put_invalidArgumentWithEmptyObject() throws Exception {
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isBadRequest());
@@ -235,7 +231,7 @@ public class CategoryControllerTest {
 
     @Test
     public void test_idEndpoint_put_invalidArgumentWithWrongObject() throws Exception {
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"wrong\":\"field\"}"))
             .andExpect(status().isBadRequest());
@@ -246,7 +242,7 @@ public class CategoryControllerTest {
         when(service.save(category1)).thenReturn(category1);
         when(service.find(id1)).thenReturn(Optional.of(category1));
 
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isOk())
@@ -262,7 +258,7 @@ public class CategoryControllerTest {
         when(service.save(category1)).thenReturn(category1);
         when(service.find(id1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isNotFound());
@@ -271,36 +267,114 @@ public class CategoryControllerTest {
     }
 
     @Test
+    public void test_idEndpoint_put_entityIdNull() throws Exception {
+        category1.setId(null);
+
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(category1)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.id").doesNotExist())
+            .andExpect(jsonPath("$.name").doesNotExist())
+            .andExpect(jsonPath("$.description").doesNotExist());
+
+        verify(service, times(0)).save(category1);
+    }
+
+    @Test
     public void test_idEndpoint_put_idMismatchFromPathAndBody() throws Exception {
-        // TODO: FINISH
-        fail();
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + (id1 + 1))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(category1)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.id").doesNotExist())
+            .andExpect(jsonPath("$.name").doesNotExist())
+            .andExpect(jsonPath("$.description").doesNotExist());
+
+        verify(service, times(0)).save(category1);
     }
 
     @Test
     public void test_idEndpoint_put_jakartaCosntraintViolation_fails() throws Exception {
-        // TODO: FINISH
-        fail();
+        category1.setName("");
+
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(category1)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.id").doesNotExist())
+            .andExpect(jsonPath("$.name").doesNotExist())
+            .andExpect(jsonPath("$.description").doesNotExist());
+
+        verify(service, times(0)).save(category1);
     }
 
     @Test
     public void test_idEndpoint_put_uniqueConstraintViolation_fails() throws Exception {
-        // TODO: FINISH
-        fail();
+        when(service.save(category1)).thenThrow(new DatabaseInsertException("Unique Cosntraint Violation"));
+        when(service.find(id1)).thenReturn(Optional.of(category1));
+
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(category1)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.id").doesNotExist())
+            .andExpect(jsonPath("$.name").doesNotExist())
+            .andExpect(jsonPath("$.description").doesNotExist());
     }
 
     @Test
     public void test_idEndpoint_post_fails() throws Exception {
-        // TODO: FINISH
-        fail();
+        mockMvc.perform(post(CategoryController.ENDPOINT + "/id/" + id1))
+            .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void test_idEndpoint_delete_alwaysSucceeds204() throws Exception {
-        // TODO: FINISH
-        fail();
+        mockMvc.perform(delete(CategoryController.ENDPOINT + "/id/" + id1))
+            .andExpect(status().isNoContent());
+
+        verify(service, times(1)).delete(id1);
     }
 
-    // TODO: GET TESTS ON /name? (error handling etc.)
-    // TODO: PUT/POST TESTS ON /name? (fail)
-    // TODO: DELETE TESTS ON /name? (always 204)
+    @Test
+    public void test_nameEndpoint_get_succeedsWithExistingName() throws Exception {
+        when(service.find(name1)).thenReturn(Optional.of(category1));
+
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/name/" + name1))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(id1))
+            .andExpect(jsonPath("$.name").value(name1))
+            .andExpect(jsonPath("$.description").value(description1));
+
+        verify(service).find(name1);
+    }
+
+    @Test
+    public void test_nameEndpoint_get_returns404WithNonExistentName() throws Exception {
+        when(service.find(name1)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/name/" + name1))
+            .andExpect(status().isNotFound());
+
+        verify(service).find(name1);
+    }
+
+    @Test
+    public void test_nameEndpoint_put_fails() throws Exception {
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/name/" + name1))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_nameEndpoint_post_fails() throws Exception {
+        mockMvc.perform(post(CategoryController.ENDPOINT + "/name/" + name1))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_nameEndpoint_delete_fails() throws Exception {
+        mockMvc.perform(delete(CategoryController.ENDPOINT + "/name/" + name1))
+            .andExpect(status().isMethodNotAllowed());
+    }
 }
