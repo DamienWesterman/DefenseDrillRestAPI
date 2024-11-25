@@ -24,27 +24,10 @@
  * limitations under the License.
  */
 
-package com.damienwesterman.defensedrill.rest_api.web;
+package com.damienwesterman.defensedrill.rest_api.integration;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
-import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
-
-// TODO: DOC COMMENTS
-// TODO: Swagger Comments (on the DTOs?)
-@RestController
-@RequestMapping(SubCategoryController.ENDPOINT)
-public class SubCategoryController extends AbstractCategoryController<SubCategoryEntity, SubCategorySerivce> {
-    public final static String ENDPOINT = "/sub_category";
-
-    public SubCategoryController(SubCategorySerivce subCategorySerivce) {
-        super(subCategorySerivce);
-    }
-
-    @Override
-    protected String getEndpoint() {
-        return ENDPOINT;
-    }
+public class SubCategoryControllerTest {
+    // I'm going to be lazy on this one for now. No tests are needed unless
+    // CategoryController or SubCategoryController implement anything outside
+    // of AbstractCategoryController's functionality
 }
