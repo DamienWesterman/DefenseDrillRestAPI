@@ -38,10 +38,10 @@ import com.damienwesterman.defensedrill.rest_api.repository.AbstractCategoryRepo
 /**
  * Service class for interacting with {@link AbstractCategoryEntity} objects in the database.
  */
-public abstract class AbstractCategoryService<T extends AbstractCategoryEntity, S extends AbstractCategoryRepo<T>> {
-    protected final S repo;
+public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, R extends AbstractCategoryRepo<E>> {
+    protected final R repo;
 
-    public AbstractCategoryService(S repo) {
+    public AbstractCategoryService(R repo) {
         this.repo = repo;
     }
 
@@ -54,7 +54,7 @@ public abstract class AbstractCategoryService<T extends AbstractCategoryEntity, 
      * @return The saved entity.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
-    public T save(@NonNull T abstractCategory) throws DatabaseInsertException {
+    public E save(@NonNull E abstractCategory) throws DatabaseInsertException {
         return ErrorMessageUtils.trySave(repo, abstractCategory);
     }
 
@@ -64,7 +64,7 @@ public abstract class AbstractCategoryService<T extends AbstractCategoryEntity, 
      * @param id ID of the AbstractCategoryEntity.
      * @return Optional containing the returned entity - if it exists.
      */
-    public Optional<T> find(@NonNull Long id) {
+    public Optional<E> find(@NonNull Long id) {
         return repo.findById(id);
     }
 
@@ -74,7 +74,7 @@ public abstract class AbstractCategoryService<T extends AbstractCategoryEntity, 
      * @param name Name of the AbstractCategoryEntity.
      * @return Optional containing the returned entity - if it exists.
      */
-    public Optional<T> find(@NonNull String name) {
+    public Optional<E> find(@NonNull String name) {
         return repo.findByNameIgnoreCase(name);
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractCategoryService<T extends AbstractCategoryEntity, 
      *
      * @return List of AbstractCategoryEntity objects.
      */
-    public List<T> findAll() {
+    public List<E> findAll() {
         return repo.findAll();
     }
 

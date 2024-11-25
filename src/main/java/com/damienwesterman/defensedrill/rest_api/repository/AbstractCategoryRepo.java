@@ -37,6 +37,6 @@ import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
  * Interface for an {@link AbstractCategoryEntity}.
  */
 @NoRepositoryBean
-public interface AbstractCategoryRepo<T extends AbstractCategoryEntity> extends JpaRepository<T, Long> {
-    Optional<T> findByNameIgnoreCase(String name);
+public interface AbstractCategoryRepo<E extends AbstractCategoryEntity> extends JpaRepository<E, Long> {
+    Optional<E> findByNameIgnoreCase(String name);
 }

@@ -57,7 +57,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebMvcTest(CategoryController.class)
 @AutoConfigureMockMvc
 public class CategoryControllerTest {
-    // TODO: Make this both category and subcategory
     @Autowired
     MockMvc mockMvc;
     @Autowired
