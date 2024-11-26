@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,5 +76,12 @@ public class DrillController {
         return ResponseEntity
             .created(URI.create(ENDPOINT + "/" + createdDrill.getId()))
             .body(new DrillResponseDTO(createdDrill));
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<DrillResponseDTO> getDrillByName(@PathVariable String name) {
+        return service.find(name)
+                    .map(foundDrill -> ResponseEntity.ok(new DrillResponseDTO(foundDrill)))
+                    .orElse(ResponseEntity.notFound().build());
     }
 }

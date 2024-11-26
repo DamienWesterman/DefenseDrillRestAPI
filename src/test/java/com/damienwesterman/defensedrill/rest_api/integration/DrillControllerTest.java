@@ -40,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -243,7 +244,46 @@ public class DrillControllerTest {
             .andExpect(status().isMethodNotAllowed());
     }
 
-    // TODO: nameEndpoint (follow CategoryControllerTest, make sure limited returns?)
+    @Test
+    public void test_nameEndpoint_get_succeedsWithExistingName() throws Exception {
+        when(service.find(DRILL_NAME_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/name/" + DRILL_NAME_1))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(DRILL_ID_1))
+            .andExpect(jsonPath("$.name").value(DRILL_NAME_1));
+
+        verify(service, times(1)).find(DRILL_NAME_1);
+    }
+
+    @Test
+    public void test_nameEndpoint_get_returns404WithNonExistentName() throws Exception {
+        when(service.find(DRILL_NAME_1)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/name/" + DRILL_NAME_1))
+            .andExpect(status().isNotFound());
+
+        verify(service).find(DRILL_NAME_1);
+    }
+
+    @Test
+    public void test_nameEndpoint_put_fails() throws Exception {
+        mockMvc.perform(put(DrillController.ENDPOINT + "/name/" + DRILL_NAME_1))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_nameEndpoint_post_fails() throws Exception {
+        mockMvc.perform(post(DrillController.ENDPOINT + "/name/" + DRILL_NAME_1))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_nameEndpoint_delete_fails() throws Exception {
+        mockMvc.perform(delete(DrillController.ENDPOINT + "/name/" + DRILL_NAME_1))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
     // TODO: idEndpoint (follow CategoryControllerTest, make sure limited returns?) - put should have error handling for not found foreign keys, also instructions stuff
     // TODO: Also refer to DrillServiceTest to see if there's anything there that we want to include, specifically about adding/updating drills etc
 }
