@@ -67,16 +67,16 @@ public class CategoryControllerTest {
     // Control things
     CategoryEntity category1;
 
-    Long id1 = 1L;
-    String name1 = "Name 1";
-    String description1 = "Despcription 1";
+    final Long ID_1 = 1L;
+    final String NAME_1 = "Name 1";
+    final String DESCRIPTION_1 = "Despcription 1";
 
     @BeforeEach
     public void setup() {
         category1 = CategoryEntity.builder()
-                        .id(id1)
-                        .name(name1)
-                        .description(description1)
+                        .id(ID_1)
+                        .name(NAME_1)
+                        .description(DESCRIPTION_1)
                         .build();
     }
 
@@ -89,7 +89,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void test_rootEndpoint_get_withTwoItemsInDB_returnListOfCategoryDao() throws Exception {
+    public void test_rootEndpoint_get_withTwoItemsInDB_returnList() throws Exception {
         Long id2 = 2L;
         String name2 = "Name 2";
         String description2 = "Despcription 2";
@@ -104,9 +104,9 @@ public class CategoryControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$.length()").value(2))
-            .andExpect(jsonPath("$[0].id").value(id1))
-            .andExpect(jsonPath("$[0].name").value(name1))
-            .andExpect(jsonPath("$[0].description").value(description1))
+            .andExpect(jsonPath("$[0].id").value(ID_1))
+            .andExpect(jsonPath("$[0].name").value(NAME_1))
+            .andExpect(jsonPath("$[0].description").value(DESCRIPTION_1))
             .andExpect(jsonPath("$[1].id").value(id2))
             .andExpect(jsonPath("$[1].name").value(name2))
             .andExpect(jsonPath("$[1].description").value(description2));
@@ -138,8 +138,8 @@ public class CategoryControllerTest {
     public void test_rootEndpoint_post_shouldSucceedWithCorrectFields() throws Exception {
         CategoryEntity entityToSave = CategoryEntity.builder()
                                         .id(null)
-                                        .name(name1)
-                                        .description(description1)
+                                        .name(NAME_1)
+                                        .description(DESCRIPTION_1)
                                         .build();
         when(service.save(entityToSave)).thenReturn(category1);
 
@@ -147,9 +147,9 @@ public class CategoryControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(entityToSave)))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(id1))
-            .andExpect(jsonPath("$.name").value(name1))
-            .andExpect(jsonPath("$.description").value(description1))
+            .andExpect(jsonPath("$.id").value(ID_1))
+            .andExpect(jsonPath("$.name").value(NAME_1))
+            .andExpect(jsonPath("$.description").value(DESCRIPTION_1))
             .andExpect(header().string("Location", CategoryController.ENDPOINT + "/" + category1.getId()));
 
         verify(service).save(entityToSave);
@@ -161,7 +161,7 @@ public class CategoryControllerTest {
         CategoryEntity entityToSave = CategoryEntity.builder()
                                         .id(null)
                                         .name("")
-                                        .description(description1)
+                                        .description(DESCRIPTION_1)
                                         .build();
 
         mockMvc.perform(post(CategoryController.ENDPOINT)
@@ -193,36 +193,36 @@ public class CategoryControllerTest {
 
     @Test
     public void test_idEndpoint_get_succeedsWithExistingId() throws Exception {
-        when(service.find(id1)).thenReturn(Optional.of(category1));
+        when(service.find(ID_1)).thenReturn(Optional.of(category1));
 
-        mockMvc.perform(get(CategoryController.ENDPOINT + "/id/" + id1))
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/id/" + ID_1))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(id1))
-            .andExpect(jsonPath("$.name").value(name1))
-            .andExpect(jsonPath("$.description").value(description1));
+            .andExpect(jsonPath("$.id").value(ID_1))
+            .andExpect(jsonPath("$.name").value(NAME_1))
+            .andExpect(jsonPath("$.description").value(DESCRIPTION_1));
 
-        verify(service).find(id1);
+        verify(service).find(ID_1);
     }
 
     @Test
     public void test_idEndpoint_get_returns404WithNonExistentId() throws Exception {
-        when(service.find(id1)).thenReturn(Optional.empty());
+        when(service.find(ID_1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get(CategoryController.ENDPOINT + "/id/" + id1))
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/id/" + ID_1))
             .andExpect(status().isNotFound());
 
-        verify(service).find(id1);
+        verify(service).find(ID_1);
     }
 
     @Test
     public void test_idEndpoint_put_invalidArgumentWithNoObject() throws Exception {
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1))
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1))
             .andExpect(status().isBadRequest());
     }
 
     @Test
     public void test_idEndpoint_put_invalidArgumentWithEmptyObject() throws Exception {
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isBadRequest());
@@ -230,7 +230,7 @@ public class CategoryControllerTest {
 
     @Test
     public void test_idEndpoint_put_invalidArgumentWithWrongObject() throws Exception {
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"wrong\":\"field\"}"))
             .andExpect(status().isBadRequest());
@@ -239,15 +239,15 @@ public class CategoryControllerTest {
     @Test
     public void test_idEndpoint_put_shouldSucceedWithCorrectFieldsAndExistingId() throws Exception {
         when(service.save(category1)).thenReturn(category1);
-        when(service.find(id1)).thenReturn(Optional.of(category1));
+        when(service.find(ID_1)).thenReturn(Optional.of(category1));
 
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(id1))
-            .andExpect(jsonPath("$.name").value(name1))
-            .andExpect(jsonPath("$.description").value(description1));
+            .andExpect(jsonPath("$.id").value(ID_1))
+            .andExpect(jsonPath("$.name").value(NAME_1))
+            .andExpect(jsonPath("$.description").value(DESCRIPTION_1));
 
         verify(service).save(category1);
     }
@@ -255,9 +255,9 @@ public class CategoryControllerTest {
     @Test
     public void test_idEndpoint_put_nonExistentIdFails() throws Exception {
         when(service.save(category1)).thenReturn(category1);
-        when(service.find(id1)).thenReturn(Optional.empty());
+        when(service.find(ID_1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isNotFound());
@@ -269,7 +269,7 @@ public class CategoryControllerTest {
     public void test_idEndpoint_put_entityIdNull() throws Exception {
         category1.setId(null);
 
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isBadRequest())
@@ -282,7 +282,7 @@ public class CategoryControllerTest {
 
     @Test
     public void test_idEndpoint_put_idMismatchFromPathAndBody() throws Exception {
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + (id1 + 1))
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + (ID_1 + 1))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isBadRequest())
@@ -297,7 +297,7 @@ public class CategoryControllerTest {
     public void test_idEndpoint_put_jakartaCosntraintViolation_fails() throws Exception {
         category1.setName("");
 
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isBadRequest())
@@ -311,9 +311,9 @@ public class CategoryControllerTest {
     @Test
     public void test_idEndpoint_put_uniqueConstraintViolation_fails() throws Exception {
         when(service.save(category1)).thenThrow(new DatabaseInsertException("Unique Cosntraint Violation"));
-        when(service.find(id1)).thenReturn(Optional.of(category1));
+        when(service.find(ID_1)).thenReturn(Optional.of(category1));
 
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + id1)
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isBadRequest())
@@ -324,56 +324,56 @@ public class CategoryControllerTest {
 
     @Test
     public void test_idEndpoint_post_fails() throws Exception {
-        mockMvc.perform(post(CategoryController.ENDPOINT + "/id/" + id1))
+        mockMvc.perform(post(CategoryController.ENDPOINT + "/id/" + ID_1))
             .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void test_idEndpoint_delete_alwaysSucceeds204() throws Exception {
-        mockMvc.perform(delete(CategoryController.ENDPOINT + "/id/" + id1))
+        mockMvc.perform(delete(CategoryController.ENDPOINT + "/id/" + ID_1))
             .andExpect(status().isNoContent());
 
-        verify(service, times(1)).delete(id1);
+        verify(service, times(1)).delete(ID_1);
     }
 
     @Test
     public void test_nameEndpoint_get_succeedsWithExistingName() throws Exception {
-        when(service.find(name1)).thenReturn(Optional.of(category1));
+        when(service.find(NAME_1)).thenReturn(Optional.of(category1));
 
-        mockMvc.perform(get(CategoryController.ENDPOINT + "/name/" + name1))
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/name/" + NAME_1))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(id1))
-            .andExpect(jsonPath("$.name").value(name1))
-            .andExpect(jsonPath("$.description").value(description1));
+            .andExpect(jsonPath("$.id").value(ID_1))
+            .andExpect(jsonPath("$.name").value(NAME_1))
+            .andExpect(jsonPath("$.description").value(DESCRIPTION_1));
 
-        verify(service).find(name1);
+        verify(service).find(NAME_1);
     }
 
     @Test
     public void test_nameEndpoint_get_returns404WithNonExistentName() throws Exception {
-        when(service.find(name1)).thenReturn(Optional.empty());
+        when(service.find(NAME_1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get(CategoryController.ENDPOINT + "/name/" + name1))
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/name/" + NAME_1))
             .andExpect(status().isNotFound());
 
-        verify(service).find(name1);
+        verify(service).find(NAME_1);
     }
 
     @Test
     public void test_nameEndpoint_put_fails() throws Exception {
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/name/" + name1))
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/name/" + NAME_1))
             .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void test_nameEndpoint_post_fails() throws Exception {
-        mockMvc.perform(post(CategoryController.ENDPOINT + "/name/" + name1))
+        mockMvc.perform(post(CategoryController.ENDPOINT + "/name/" + NAME_1))
             .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void test_nameEndpoint_delete_fails() throws Exception {
-        mockMvc.perform(delete(CategoryController.ENDPOINT + "/name/" + name1))
+        mockMvc.perform(delete(CategoryController.ENDPOINT + "/name/" + NAME_1))
             .andExpect(status().isMethodNotAllowed());
     }
 }

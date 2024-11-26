@@ -26,15 +26,54 @@
 
 package com.damienwesterman.defensedrill.rest_api.web;
 
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
+import com.damienwesterman.defensedrill.rest_api.service.DrillService;
+import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
+// TODO: DOC COMMENTS
+// TODO: Swagger comments (DTOs as well? Other DTOs/@Data objects? / Jakarta constraint messages on the DTOs)
 @RestController
-@RequestMapping("/drill")
+@RequestMapping(DrillController.ENDPOINT)
 @RequiredArgsConstructor
 public class DrillController {
-    // TODO: FINISH ME
+    public static final String ENDPOINT = "/drill";
+    private final DrillService service;
+
+    @GetMapping
+    public ResponseEntity<List<DrillResponseDTO>> getAll() {
+        List<DrillEntity> drills = service.findAll();
+
+        if (drills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(
+            drills.stream()
+                .map(DrillResponseDTO::new)
+                .collect(Collectors.toList())
+        );
+    }
+
+    @PostMapping
+    public ResponseEntity<DrillResponseDTO> insertNewDrill(@RequestBody @Valid DrillCreateDTO drill) {
+        DrillEntity createdDrill = service.save(drill.toEntity());
+        return ResponseEntity
+            .created(URI.create(ENDPOINT + "/" + createdDrill.getId()))
+            .body(new DrillResponseDTO(createdDrill));
+    }
 }

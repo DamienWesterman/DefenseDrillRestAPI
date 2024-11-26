@@ -94,7 +94,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Unhandled Error", e);
 
         Map<String, String> errorBody = new HashMap<>();
-        errorBody.put(KEY_ERROR, "Database Insert Error");
+        errorBody.put(KEY_ERROR, "Unknonw Error");
         errorBody.put(KEY_MESSAGE, "An unexpected error has occurred.");
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorBody);
