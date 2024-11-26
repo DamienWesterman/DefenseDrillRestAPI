@@ -52,11 +52,11 @@ public abstract class AbstractCategoryEntity {
 
     @Column(unique = true)
     @NotEmpty
-    @Size(max = 255, min = 1)
+    @Size(min = 1, max = 255)
     protected String name;
 
     @Column
     @NotEmpty
-    @Size(max = 511, min = 1)
+    @Size(min = 1, max = 511)
     protected String description;
 }

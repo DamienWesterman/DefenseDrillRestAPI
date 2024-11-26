@@ -69,13 +69,13 @@ public class InstructionsEntity {
 
     @Column
     @NotEmpty
-    @Size(max = 511)
+    @Size(min = 1, max = 511)
     private String description;
 
     @Column
     @NotEmpty
-    @Size(max = 4095)
-    /** Pipeling delimited string of steps */
+    @Size(min = 1, max = 4095)
+    /** Pipe delimited string of steps */
     private String steps;
 
     @Column

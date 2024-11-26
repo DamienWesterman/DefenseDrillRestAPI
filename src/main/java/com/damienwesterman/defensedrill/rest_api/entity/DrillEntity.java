@@ -66,7 +66,7 @@ public class DrillEntity {
 
     @Column(unique = true)
     @NotEmpty
-    @Size(max = 255)
+    @Size(min = 1, max = 255)
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)
