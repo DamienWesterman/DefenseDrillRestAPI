@@ -88,6 +88,16 @@ public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, 
     }
 
     /**
+     * Return all entities in the database that are in the list of IDs.
+     *
+     * @param ids List of AbstractCategoryEntity IDs.
+     * @return List of AbstractCategoryEntity objects.
+     */
+    public List<E> findAll(List<Long> ids) {
+        return repo.findAllById(ids);
+    }
+
+    /**
      * Delete an entity from the database by its ID - if it exists.
      *
      * @param id ID of the AbstractCategoryEntity.
