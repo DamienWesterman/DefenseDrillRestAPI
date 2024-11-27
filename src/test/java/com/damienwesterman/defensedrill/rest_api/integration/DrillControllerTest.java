@@ -404,17 +404,42 @@ public class DrillControllerTest {
 
     @Test
     public void test_idEndpoint_put_nonExistentIdFails() throws Exception {
-        fail();
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.empty());
+        DrillUpdateDTO drillToUpdate = new DrillUpdateDTO();
+        drillToUpdate.setId(drill1.getId());
+        drillToUpdate.setName(drill1.getName());
+
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(drillToUpdate)))
+            .andExpect(status().isNotFound());
+
+        verify(drillService, times(0)).save(any());
     }
 
     @Test
     public void test_idEndpoint_put_entityIdNull() throws Exception {
-        fail();
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new DrillUpdateDTO())))
+            .andExpect(status().isBadRequest());
+
+        verify(drillService, times(0)).save(any());
     }
 
     @Test
     public void test_idEndpoint_put_idMismatchFromPathAndBody() throws Exception {
-        fail();
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.empty());
+        DrillUpdateDTO drillToUpdate = new DrillUpdateDTO();
+        drillToUpdate.setId(drill1.getId() + 1);
+        drillToUpdate.setName(drill1.getName());
+
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(drillToUpdate)))
+            .andExpect(status().isBadRequest());
+
+        verify(drillService, times(0)).save(any());
     }
 
     @Test
@@ -439,12 +464,16 @@ public class DrillControllerTest {
 
     @Test
     public void test_idEndpoint_post_fails() throws Exception {
-        fail();
+        mockMvc.perform(post(DrillController.ENDPOINT + "/id/" + DRILL_ID_1))
+            .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void test_idEndpoint_delete_alwaysSucceeds204() throws Exception {
-        fail();
+        mockMvc.perform(delete(DrillController.ENDPOINT + "/id/" + DRILL_ID_1))
+            .andExpect(status().isNoContent());
+
+            verify(drillService, times(1)).delete(DRILL_ID_1);
     }
 
     // TODO: /id/{id}/how-to
