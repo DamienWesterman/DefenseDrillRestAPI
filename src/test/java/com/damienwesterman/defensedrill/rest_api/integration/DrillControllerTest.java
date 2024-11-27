@@ -56,9 +56,13 @@ import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
+import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.service.DrillService;
+import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.web.DrillController;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(DrillController.class)
@@ -69,7 +73,11 @@ public class DrillControllerTest {
     @Autowired
     ObjectMapper objectMapper;
     @MockBean
-    DrillService service;
+    DrillService drillService;
+    @MockBean
+    CategorySerivce categorySerivce;
+    @MockBean
+    SubCategorySerivce subCategorySerivce;
 
     // TODO: Check what is needed in the end
     DrillEntity drill1;
@@ -81,7 +89,7 @@ public class DrillControllerTest {
     final Long DRILL_ID_1 = 1L;
     final Long CATEGORY_ID_1 = 11L;
     final Long SUB_CATEGORY_ID_1 = 111L;
-    final Long NUMBER_1 = 10L;
+    final Long NUMBER_1 = 0L;
     final Long RELATED_DRILL_ID = 2L;
     final String DRILL_NAME_1 = "Drill Name 1";
     final String CATEGORY_NAME_1 = "Category Name 1";
@@ -128,7 +136,7 @@ public class DrillControllerTest {
 
     @Test
     public void test_rootEndpoint_get_withNoItemsInDB_returnsStatus204() throws Exception {
-        when(service.findAll()).thenReturn(List.of());
+        when(drillService.findAll()).thenReturn(List.of());
 
         mockMvc.perform(get(DrillController.ENDPOINT))
             .andExpect(status().isNoContent());
@@ -141,7 +149,7 @@ public class DrillControllerTest {
         drill1.getSubCategories().add(subCategory1);
         drill1.getRelatedDrills().add(RELATED_DRILL_ID);
         drill1.getInstructions().add(instructions1);
-        when(service.findAll()).thenReturn(List.of(drill1));
+        when(drillService.findAll()).thenReturn(List.of(drill1));
 
         mockMvc.perform(get(DrillController.ENDPOINT))
             .andExpect(status().isOk())
@@ -172,7 +180,7 @@ public class DrillControllerTest {
     public void test_rootEndpoint_post_invalidArgumentWithNoObject() throws Exception {
         mockMvc.perform(post(DrillController.ENDPOINT))
             .andExpect(status().isBadRequest());
-        verify(service, times(0)).save(any());
+        verify(drillService, times(0)).save(any());
     }
 
     @Test
@@ -181,7 +189,7 @@ public class DrillControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isBadRequest());
-        verify(service, times(0)).save(any());
+        verify(drillService, times(0)).save(any());
     }
 
     @Test
@@ -190,7 +198,7 @@ public class DrillControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"wrong\":\"field\"}"))
             .andExpect(status().isBadRequest());
-        verify(service, times(0)).save(any());
+        verify(drillService, times(0)).save(any());
     }
 
     @Test
@@ -198,7 +206,7 @@ public class DrillControllerTest {
         DrillEntity entityToSave = DrillEntity.builder()
                                     .name(DRILL_NAME_1)
                                     .build();
-        when(service.save(entityToSave)).thenReturn(drill1);
+        when(drillService.save(entityToSave)).thenReturn(drill1);
 
         mockMvc.perform(post(DrillController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -207,7 +215,7 @@ public class DrillControllerTest {
             .andExpect(jsonPath("$.id").value(DRILL_ID_1))
             .andExpect(jsonPath("$.name").value(DRILL_NAME_1));
 
-        verify(service, times(1)).save(entityToSave);
+        verify(drillService, times(1)).save(entityToSave);
     }
 
     @Test
@@ -219,12 +227,12 @@ public class DrillControllerTest {
                 .content(objectMapper.writeValueAsString(dtoToSend)))
             .andExpect(status().isBadRequest());
 
-        verify(service, times(0)).save(any());
+        verify(drillService, times(0)).save(any());
     }
 
     @Test
     public void test_rootEndpoint_post_uniqueConstraintViolation_fails() throws Exception {
-        when(service.save(any())).thenThrow(new DatabaseInsertException("Unique Cosntraint Violation"));
+        when(drillService.save(any())).thenThrow(new DatabaseInsertException("Unique Cosntraint Violation"));
 
         mockMvc.perform(post(DrillController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -246,24 +254,24 @@ public class DrillControllerTest {
 
     @Test
     public void test_nameEndpoint_get_succeedsWithExistingName() throws Exception {
-        when(service.find(DRILL_NAME_1)).thenReturn(Optional.of(drill1));
+        when(drillService.find(DRILL_NAME_1)).thenReturn(Optional.of(drill1));
 
         mockMvc.perform(get(DrillController.ENDPOINT + "/name/" + DRILL_NAME_1))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(DRILL_ID_1))
             .andExpect(jsonPath("$.name").value(DRILL_NAME_1));
 
-        verify(service, times(1)).find(DRILL_NAME_1);
+        verify(drillService, times(1)).find(DRILL_NAME_1);
     }
 
     @Test
     public void test_nameEndpoint_get_returns404WithNonExistentName() throws Exception {
-        when(service.find(DRILL_NAME_1)).thenReturn(Optional.empty());
+        when(drillService.find(DRILL_NAME_1)).thenReturn(Optional.empty());
 
         mockMvc.perform(get(DrillController.ENDPOINT + "/name/" + DRILL_NAME_1))
             .andExpect(status().isNotFound());
 
-        verify(service).find(DRILL_NAME_1);
+        verify(drillService).find(DRILL_NAME_1);
     }
 
     @Test
@@ -284,6 +292,162 @@ public class DrillControllerTest {
             .andExpect(status().isMethodNotAllowed());
     }
 
-    // TODO: idEndpoint (follow CategoryControllerTest, make sure limited returns?) - put should have error handling for not found foreign keys, also instructions stuff
-    // TODO: Also refer to DrillServiceTest to see if there's anything there that we want to include, specifically about adding/updating drills etc
+    @Test
+    public void test_idEndpoint_get_succeedsWithExistingId() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/id/" + DRILL_ID_1))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(DRILL_ID_1))
+            .andExpect(jsonPath("$.name").value(DRILL_NAME_1));
+
+        verify(drillService, times(1)).find(DRILL_ID_1);
+    }
+
+    @Test
+    public void test_idEndpoint_get_returns404WithNonExistentId() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/id/" + DRILL_ID_1))
+            .andExpect(status().isNotFound());
+
+        verify(drillService, times(1)).find(DRILL_ID_1);
+    }
+
+    @Test
+    public void test_idEndpoint_put_invalidArgumentWithNoObject() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1))
+            .andExpect(status().isBadRequest());
+
+        verify(drillService, times(0)).find(DRILL_ID_1);
+    }
+
+    @Test
+    public void test_idEndpoint_put_invalidArgumentWithEmptyObject() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+            .andExpect(status().isBadRequest());
+
+        verify(drillService, times(0)).find(DRILL_ID_1);
+    }
+
+    @Test
+    public void test_idEndpoint_put_invalidArgumentWithWrongObject() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"bad\":\"argument\"}"))
+            .andExpect(status().isBadRequest());
+
+        verify(drillService, times(0)).find(DRILL_ID_1);
+    }
+
+    @Test
+    public void test_idEndpoint_put_shouldSucceedWithCorrectFieldsAndExistingId() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        // Set up drill transfer object
+        DrillUpdateDTO drillToUpdate = new DrillUpdateDTO();
+        drillToUpdate.setId(drill1.getId());
+        drillToUpdate.setName(drill1.getName());
+        drillToUpdate.setCategoryIds(List.of(category1.getId()));
+        drillToUpdate.setSubCategoryIds(List.of(subCategory1.getId()));
+        drillToUpdate.setRelatedDrills(List.of(RELATED_DRILL_ID));
+        InstructionsDTO instructionsToAdd = new InstructionsDTO();
+        instructionsToAdd.setDescription(instructions1.getDescription());
+        instructionsToAdd.setSteps(instructions1.getStepsAsList());
+        instructionsToAdd.setVideoId(instructions1.getVideoId());
+        drillToUpdate.setInstructions(List.of(instructionsToAdd));
+
+        // Set up drill return value
+        drill1.getCategories().add(category1);
+        drill1.getSubCategories().add(subCategory1);
+        drill1.getRelatedDrills().add(RELATED_DRILL_ID);
+        drill1.getInstructions().add(instructions1);
+        when(categorySerivce.findAll(List.of(CATEGORY_ID_1))).thenReturn(List.of(category1));
+        when(subCategorySerivce.findAll(List.of(SUB_CATEGORY_ID_1))).thenReturn(List.of(subCategory1));
+        when(drillService.save(drill1)).thenReturn(drill1);
+
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(drillToUpdate)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(DRILL_ID_1))
+            .andExpect(jsonPath("$.name").value(DRILL_NAME_1))
+            .andExpect(jsonPath("$.categories").isArray())
+            .andExpect(jsonPath("$.categories.length()").value(1))
+            // For categories, we only want to return their ID, and NOTHING else
+            .andExpect(jsonPath("$.categories[0]").value(CATEGORY_ID_1))
+            .andExpect(jsonPath("$.categories[0].name").doesNotExist())
+            .andExpect(jsonPath("$.sub_categories").isArray())
+            .andExpect(jsonPath("$.sub_categories.length()").value(1))
+            // For sub-categories, we only want to return their ID, and NOTHING else
+            .andExpect(jsonPath("$.sub_categories[0]").value(SUB_CATEGORY_ID_1))
+            .andExpect(jsonPath("$.sub_categories[0].name").doesNotExist())
+            .andExpect(jsonPath("$.related_drills").isArray())
+            .andExpect(jsonPath("$.related_drills.length()").value(1))
+            // For related drills, we only want to return their ID, and NOTHING else
+            .andExpect(jsonPath("$.related_drills[0]").value(RELATED_DRILL_ID))
+            .andExpect(jsonPath("$.related_drills[0].name").doesNotExist())
+            // We DO NOT want to include any instructions at this point, that is for a different endpoint
+            .andExpect(jsonPath("$.instructions").doesNotExist());
+
+        verify(drillService, times(1)).find(DRILL_ID_1);
+        verify(drillService, times(1)).save(drill1);
+    }
+
+    @Test
+    public void test_idEndpoint_put_nonExistentIdFails() throws Exception {
+        fail();
+    }
+
+    @Test
+    public void test_idEndpoint_put_entityIdNull() throws Exception {
+        fail();
+    }
+
+    @Test
+    public void test_idEndpoint_put_idMismatchFromPathAndBody() throws Exception {
+        fail();
+    }
+
+    @Test
+    public void test_idEndpoint_put_jakartaCosntraintViolation_fails() throws Exception {
+        fail();
+    }
+
+    @Test
+    public void test_idEndpoint_put_uniqueConstraintViolation_fails() throws Exception {
+        fail();
+    }
+
+    @Test
+    public void test_idEndpoint_put_badInstructionsViolation_fails() throws Exception {
+        fail();
+    }
+
+    @Test
+    public void test_idEndpoint_put_badForeignKeyViolation_fails() throws Exception {
+        fail();
+    }
+
+    @Test
+    public void test_idEndpoint_post_fails() throws Exception {
+        fail();
+    }
+
+    @Test
+    public void test_idEndpoint_delete_alwaysSucceeds204() throws Exception {
+        fail();
+    }
+
+    // TODO: /id/{id}/how-to
+    // TODO: /id/{id}/how-to/{number}
+    // TODO: /id/{id}/video
 }

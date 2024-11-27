@@ -78,7 +78,7 @@ public abstract class AbstractCategoryController
     @PutMapping("/id/{id}")
     public ResponseEntity<E> updateAbstractCategoryById(
             @PathVariable Long id, @RequestBody @Valid E abstractCategory) {
-        if (abstractCategory.getId() == null || abstractCategory.getId() != id) {
+        if (null == abstractCategory.getId() || abstractCategory.getId() != id) {
             return ResponseEntity.badRequest().build();
         }
 

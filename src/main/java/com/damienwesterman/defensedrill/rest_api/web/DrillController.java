@@ -28,20 +28,25 @@ package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
+import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.service.DrillService;
+import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,11 +58,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DrillController {
     public static final String ENDPOINT = "/drill";
-    private final DrillService service;
+    private final DrillService drillService;
+    private final CategorySerivce categorySerivce;
+    private final SubCategorySerivce subCategorySerivce;
 
     @GetMapping
     public ResponseEntity<List<DrillResponseDTO>> getAll() {
-        List<DrillEntity> drills = service.findAll();
+        List<DrillEntity> drills = drillService.findAll();
 
         if (drills.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -72,7 +79,7 @@ public class DrillController {
 
     @PostMapping
     public ResponseEntity<DrillResponseDTO> insertNewDrill(@RequestBody @Valid DrillCreateDTO drill) {
-        DrillEntity createdDrill = service.save(drill.toEntity());
+        DrillEntity createdDrill = drillService.save(drill.toEntity());
         return ResponseEntity
             .created(URI.create(ENDPOINT + "/" + createdDrill.getId()))
             .body(new DrillResponseDTO(createdDrill));
@@ -80,8 +87,35 @@ public class DrillController {
 
     @GetMapping("/name/{name}")
     public ResponseEntity<DrillResponseDTO> getDrillByName(@PathVariable String name) {
-        return service.find(name)
+        return drillService.find(name)
                     .map(foundDrill -> ResponseEntity.ok(new DrillResponseDTO(foundDrill)))
                     .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<DrillResponseDTO> getDrillById(@PathVariable Long id) {
+        return drillService.find(id)
+                    .map(foundDrill -> ResponseEntity.ok(new DrillResponseDTO(foundDrill)))
+                    .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/id/{id}")
+    public ResponseEntity<DrillResponseDTO> updateDrillById(
+        @PathVariable Long id, @RequestBody @Valid DrillUpdateDTO drill) {
+        if (null == drill.getId() || drill.getId() != id) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (!drillService.find(id).isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        DrillEntity drillToSave = drill.toEntity();
+        drillToSave.setCategories(categorySerivce.findAll(drill.getCategoryIds()));
+        drillToSave.setSubCategories(subCategorySerivce.findAll(drill.getSubCategoryIds()));
+
+        DrillEntity savedDrill = drillService.save(drillToSave);
+
+        return ResponseEntity.ok(new DrillResponseDTO(savedDrill));
     }
 }
