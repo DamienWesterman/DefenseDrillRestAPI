@@ -50,6 +50,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
@@ -444,22 +445,27 @@ public class DrillControllerTest {
 
     @Test
     public void test_idEndpoint_put_jakartaCosntraintViolation_fails() throws Exception {
-        fail();
+        dtoToSend.setName("");
+
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dtoToSend)))
+            .andExpect(status().isBadRequest());
+
+        verify(drillService, times(0)).save(any());
     }
 
+    /* DatabaseInsertException occurs for: bad instruction (TransactionSystemException),
+     * unique constraint, or bad foreign key
+    */
     @Test
-    public void test_idEndpoint_put_uniqueConstraintViolation_fails() throws Exception {
-        fail();
-    }
+    public void test_idEndpoint_put_databaseInsertViolation_fails() throws Exception {
+        when(drillService.save(any())).thenThrow(new DatabaseInsertException("Specific Error message"));
 
-    @Test
-    public void test_idEndpoint_put_badInstructionsViolation_fails() throws Exception {
-        fail();
-    }
-
-    @Test
-    public void test_idEndpoint_put_badForeignKeyViolation_fails() throws Exception {
-        fail();
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dtoToSend)))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -476,7 +482,101 @@ public class DrillControllerTest {
             verify(drillService, times(1)).delete(DRILL_ID_1);
     }
 
-    // TODO: /id/{id}/how-to
-    // TODO: /id/{id}/how-to/{number}
-    // TODO: /id/{id}/video
+    @Test
+    public void test_idHowToEndpoint_get_returnsJustTheDescriptionOfAllInstructions_withInstructionsPresent() throws Exception {
+        drill1.getInstructions().add(instructions1);
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0]").value(INSTRUCTIONS_DESCRIPTION_1));
+    }
+
+    @Test
+    public void test_idHowToEndpoint_get_returns204_withNoInstructions() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to"))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void test_idHowToEndpoint_get_failsForNonExistentDrill() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void test_idHowToEndpoint_post_fails() throws Exception {
+        mockMvc.perform(post(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to"))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_idHowToEndpoint_put_fails() throws Exception {
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to"))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_idHowToEndpoint_delete_fails() throws Exception {
+        mockMvc.perform(delete(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to"))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_idHowToNumberEndpoint_get_returnsDescriptionAndListOfSteps() throws Exception {
+        drill1.getInstructions().add(instructions1);
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to/" + NUMBER_1))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.description").value(INSTRUCTIONS_DESCRIPTION_1))
+            .andExpect(jsonPath("$.steps").isArray())
+            .andExpect(jsonPath("$.steps.length()").value(3))
+            .andExpect(jsonPath("$.steps[0]").value(STEP_ONE))
+            .andExpect(jsonPath("$.steps[1]").value(STEP_TWO))
+            .andExpect(jsonPath("$.steps[2]").value(STEP_THREE))
+            .andExpect(jsonPath("$.video_id").value(VIDEO_ID_1));
+    }
+
+    @Test
+    public void test_idHowToNumberEndpoint_get_returns404_whenGivenNonExistentNumber() throws Exception {
+        drill1.getInstructions().add(instructions1);
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to/" + (NUMBER_1 + 1)))
+            .andExpect(status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void test_idHowToNumberEndpoint_get_failsForNonExistentDrill() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to/" + NUMBER_1))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void test_idHowToNumberEndpoint_post_fails() throws Exception {
+        mockMvc.perform(post(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to/" + NUMBER_1))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_idHowToNumberEndpoint_put_fails() throws Exception {
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to/" + NUMBER_1))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_idHowToNumberEndpoint_delete_fails() throws Exception {
+        mockMvc.perform(delete(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to/" + NUMBER_1))
+            .andExpect(status().isMethodNotAllowed());
+    }
 }

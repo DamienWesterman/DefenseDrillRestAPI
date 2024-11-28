@@ -28,14 +28,17 @@ package com.damienwesterman.defensedrill.rest_api.web.dto;
 
 import java.util.List;
 
+import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 // TODO: DOC COMMENTS / USAGE
 @Data
+@RequiredArgsConstructor
 public class InstructionsDTO {
     @NotEmpty
     @Size(min = 1, max = 511)
@@ -46,4 +49,10 @@ public class InstructionsDTO {
 
     @JsonProperty("video_id")
     private String videoId;
+
+    public InstructionsDTO(InstructionsEntity instructions) {
+        this.description = instructions.getDescription();
+        this.steps = instructions.getStepsAsList();
+        this.videoId = instructions.getVideoId();
+    }
 }

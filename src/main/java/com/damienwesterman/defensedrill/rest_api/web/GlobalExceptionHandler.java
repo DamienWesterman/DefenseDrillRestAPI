@@ -80,11 +80,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody);
     }
+
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Map<String, String>> handleNoSuchElementException(NoSuchElementException nsee) {
         Map<String, String> errorBody = new HashMap<>();
         errorBody.put(KEY_ERROR, "Resource Not Found");
         errorBody.put(KEY_MESSAGE, nsee.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody);
+    }
+
+    @ExceptionHandler(IndexOutOfBoundsException.class)
+    public ResponseEntity<Map<String, String>> handleIndexOutOfBoundsException(IndexOutOfBoundsException ioobe) {
+        Map<String, String> errorBody = new HashMap<>();
+        errorBody.put(KEY_ERROR, "Index Out Of Bounds");
+        errorBody.put(KEY_MESSAGE, ioobe.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody);
     }

@@ -42,12 +42,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
+import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.service.DrillService;
 import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -124,5 +126,42 @@ public class DrillController {
     public ResponseEntity<String> deleteDrillById(@PathVariable Long id) {
         drillService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/id/{id}/how-to")
+    public ResponseEntity<List<String>> getInstructionsByDrillId(@PathVariable Long id) {
+        Optional<DrillEntity> optDrill = drillService.find(id);
+
+        if (!optDrill.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        DrillEntity drill = optDrill.get();
+
+        if (drill.getInstructions().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(
+            drill.getInstructions().stream()
+                .map(InstructionsEntity::getDescription)
+                .collect(Collectors.toList())
+        );
+    }
+
+    @GetMapping("/id/{id}/how-to/{number}")
+    public ResponseEntity<InstructionsDTO> getInstructionDetails(
+            @PathVariable Long id, @PathVariable Long number) {
+        Optional<DrillEntity> optDrill = drillService.find(id);
+
+        if (!optDrill.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(
+            new InstructionsDTO(
+                optDrill.get().getInstructions().get(number.intValue())
+            )
+        );
     }
 }
