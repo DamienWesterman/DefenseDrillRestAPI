@@ -34,19 +34,25 @@ import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 // TODO: Doc Comments - to be used for returned drills, NO validation so only should go out
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DrillResponseDTO {
-    private final Long id;
-    private final String name;
+    private Long id;
+    private String name;
     @JsonProperty("categories")
-    private final List<Long> categoryIds;
+    private List<Long> categoryIds;
     @JsonProperty("sub_categories")
-    private final List<Long> subCategoryIds;
+    private List<Long> subCategoryIds;
     @JsonProperty("related_drills")
-    private final List<Long> relatedDrillIds;
+    private List<Long> relatedDrillIds;
 
     public DrillResponseDTO(DrillEntity drill) {
         this.id = drill.getId();

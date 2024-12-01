@@ -16,6 +16,8 @@
 
 package com.damienwesterman.defensedrill.rest_api.web.dto;
 
+import java.util.ArrayList;
+
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -32,6 +34,10 @@ public class DrillCreateDTO {
     public DrillEntity toEntity() {
         return DrillEntity.builder()
                 .name(this.name)
+                .categories(new ArrayList<>())
+                .subCategories(new ArrayList<>())
+                .relatedDrills(new ArrayList<>())
+                .instructions(new ArrayList<>())
                 .build();
     }
 }

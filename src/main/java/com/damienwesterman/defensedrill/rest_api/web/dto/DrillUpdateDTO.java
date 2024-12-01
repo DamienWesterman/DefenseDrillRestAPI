@@ -28,8 +28,6 @@ package com.damienwesterman.defensedrill.rest_api.web.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
