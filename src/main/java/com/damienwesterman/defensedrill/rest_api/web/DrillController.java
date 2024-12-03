@@ -27,6 +27,7 @@
 package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -51,6 +52,7 @@ import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -103,19 +105,58 @@ public class DrillController {
     }
 
     @PutMapping("/id/{id}")
+    @Transactional
     public ResponseEntity<DrillResponseDTO> updateDrillById(
         @PathVariable Long id, @RequestBody @Valid DrillUpdateDTO drill) {
-        if (null == drill.getId() || drill.getId() != id) {
+        if (null == drill.getId() || 0 != drill.getId().compareTo(id)) {
             return ResponseEntity.badRequest().build();
         }
 
-        if (!drillService.find(id).isPresent()) {
+        Optional<DrillEntity> optExistingDrill = drillService.find(id);
+        if (!optExistingDrill.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        DrillEntity drillToSave = drill.toEntity();
-        drillToSave.setCategories(categorySerivce.findAll(drill.getCategoryIds()));
-        drillToSave.setSubCategories(subCategorySerivce.findAll(drill.getSubCategoryIds()));
+        DrillEntity drillToSave = optExistingDrill.get();
+
+        // Set Categories
+        drillToSave.getCategories().clear();
+        if (null != drill.getCategoryIds() && 0 < drill.getCategoryIds().size()) {
+            drillToSave.getCategories().addAll(categorySerivce.findAll(drill.getCategoryIds()));
+        }
+
+        // Set SubCategories
+        drillToSave.getSubCategories().clear();
+        if (null != drill.getSubCategoryIds() && 0 < drill.getSubCategoryIds().size()) {
+            drillToSave.getSubCategories().addAll(subCategorySerivce.findAll(drill.getSubCategoryIds()));
+        }
+
+        // Set RelatedDrills
+        drillToSave.getRelatedDrills().clear();
+        if (null != drill.getRelatedDrills() && 0 < drill.getRelatedDrills().size()) {
+            drillToSave.getRelatedDrills().addAll(drill.getRelatedDrills());
+        }
+
+        // Set Instructions
+        drillToSave.getInstructions().clear();
+        List<InstructionsDTO> instructions = drill.getInstructions();
+        if (null != instructions && 0 < instructions.size()) {
+            List<InstructionsEntity> instructionEntities = new ArrayList<>();
+
+            for (int i = 0; i < instructions.size(); i++) {
+                instructionEntities.add(InstructionsEntity.builder()
+                    .drillId(id)
+                    .number((long) i)
+                    .description(instructions.get(i).getDescription())
+                    .steps(null)
+                    .videoId(instructions.get(i).getVideoId())
+                    .build());
+                instructionEntities.get(i)
+                    .setStepsFromList(instructions.get(i).getSteps());
+            }
+
+            drillToSave.getInstructions().addAll(instructionEntities);
+        }
 
         DrillEntity savedDrill = drillService.save(drillToSave);
 

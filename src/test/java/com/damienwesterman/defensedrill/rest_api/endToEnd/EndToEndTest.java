@@ -26,7 +26,9 @@
 
 package com.damienwesterman.defensedrill.rest_api.endToEnd;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.URI;
@@ -38,6 +40,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -52,10 +56,13 @@ import com.damienwesterman.defensedrill.rest_api.repository.SubCategoryRepo;
 import com.damienwesterman.defensedrill.rest_api.web.DrillController;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EndToEndTest {
     // TODO: Make sure that inserting, updating, adding, and removing instructions AND steps always properly indexes and re-numbers them
+    // TODO: Anything that was mocked/stubbed using mock.when().then() should be tested here
     @Autowired
     TestRestTemplate restTemplate;
     @Autowired
@@ -73,11 +80,6 @@ public class EndToEndTest {
     InstructionsEntity instructions1;
     DrillCreateDTO dtoToSend;
 
-    final Long DRILL_ID_1 = 1L;
-    final Long CATEGORY_ID_1 = 11L;
-    final Long SUB_CATEGORY_ID_1 = 111L;
-    final Long NUMBER_1 = 0L;
-    final Long RELATED_DRILL_ID = 2L;
     final String DRILL_NAME_1 = "Drill Name 1";
     final String CATEGORY_NAME_1 = "Category Name 1";
     final String SUB_CATEGORY_NAME_1 = "Sub-Category Name 1";
@@ -98,7 +100,7 @@ public class EndToEndTest {
         subCategoryRepo.deleteAll();
 
         drill1 = DrillEntity.builder()
-                            .id(DRILL_ID_1)
+                            .id(null)
                             .name(DRILL_NAME_1)
                             .categories(new ArrayList<>())
                             .subCategories(new ArrayList<>())
@@ -106,18 +108,18 @@ public class EndToEndTest {
                             .relatedDrills(new ArrayList<>())
                             .build();
         category1 = CategoryEntity.builder()
-                            .id(CATEGORY_ID_1)
+                            .id(null)
                             .name(CATEGORY_NAME_1)
                             .description(CATEGORY_DESCRIPTION_1)
                             .build();
         subCategory1 = SubCategoryEntity.builder()
-                            .id(SUB_CATEGORY_ID_1)
+                            .id(null)
                             .name(SUB_CATEGORY_NAME_1)
                             .description(SUB_CATEGORY_DESCRIPTION_1)
                             .build();
         instructions1 = InstructionsEntity.builder()
-                            .drillId(DRILL_ID_1)
-                            .number(NUMBER_1)
+                            .drillId(null)
+                            .number(null)
                             .description(INSTRUCTIONS_DESCRIPTION_1)
                             .steps(INSTRUCTION_STEPS_1)
                             .videoId(VIDEO_ID_1)
@@ -143,14 +145,31 @@ public class EndToEndTest {
         ResponseEntity<DrillResponseDTO[]> response =
             restTemplate.getForEntity(URI.create(DrillController.ENDPOINT), DrillResponseDTO[].class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(DRILL_ID_1, response.getBody()[0].getId());
         assertEquals(DRILL_NAME_1, response.getBody()[0].getName());
     }
 
     @Test
     public void test_instructions_databaseSavesProperly() {
-        fail();
+        DrillEntity savedDrill = drillRepo.save(drill1);
+        DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
+        updatedDrill.setId(savedDrill.getId());
+        updatedDrill.setName(savedDrill.getName());
+        updatedDrill.setInstructions(List.of(new InstructionsDTO(instructions1)));
+
+        ResponseEntity<DrillResponseDTO> response =
+            restTemplate.exchange(
+                URI.create(DrillController.ENDPOINT + "/id/" + savedDrill.getId()),
+                HttpMethod.PUT,
+                new HttpEntity<>(updatedDrill),
+                DrillResponseDTO.class
+            );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, instructionsRepo.count());
+        assertEquals(INSTRUCTIONS_DESCRIPTION_1, instructionsRepo.findAll().get(0).getDescription());
     }
+
+    // TODO: TESTS ADDING RELATED DRILLS AND CATEGORIES, AS WELL AS REMOVING
 
     @Test
     public void test_instructions_databaseReturesProperly() {

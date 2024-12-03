@@ -26,6 +26,7 @@
 
 package com.damienwesterman.defensedrill.rest_api.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,14 +69,14 @@ public class DrillService {
          * to remove them for the initial save, retrieve the drill ID, then update the
          * saved drill to include the instructions.
         */
-        List<InstructionsEntity> instructions = drill.getInstructions();
+        List<InstructionsEntity> instructions = new ArrayList<>(drill.getInstructions());
         drill.getInstructions().clear();
         DrillEntity returnedDrill = ErrorMessageUtils.trySave(repo, drill);
 
         instructions.forEach(instructionsEntity ->
             instructionsEntity.setDrillId(returnedDrill.getId())
         );
-        returnedDrill.setInstructions(instructions);
+        returnedDrill.getInstructions().addAll(instructions);
 
         // Update the existing drill with the instructions
         return ErrorMessageUtils.trySave(repo, returnedDrill);

@@ -204,6 +204,10 @@ public class DrillControllerTest {
     public void test_rootEndpoint_post_shouldSucceedWithCorrectFields() throws Exception {
         DrillEntity entityToSave = DrillEntity.builder()
                                     .name(DRILL_NAME_1)
+                                    .categories(new ArrayList<>())
+                                    .subCategories(new ArrayList<>())
+                                    .relatedDrills(new ArrayList<>())
+                                    .instructions(new ArrayList<>())
                                     .build();
         when(drillService.save(entityToSave)).thenReturn(drill1);
 
