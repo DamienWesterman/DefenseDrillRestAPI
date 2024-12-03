@@ -26,7 +26,10 @@
 
 package com.damienwesterman.defensedrill.rest_api.web.dto;
 
+import java.util.ArrayList;
 import java.util.List;
+import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
+import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.annotation.Nullable;
@@ -59,4 +62,32 @@ public class DrillUpdateDTO {
 
     @Nullable
     private List<InstructionsDTO> instructions;
+
+    // TODO: NOTE THAT THIS DOES NOT SET categories or subCategories list
+    public DrillEntity toEntity() {
+        // Set up the list of InstructionEntity objects
+        List<InstructionsEntity> instructionEntities = new ArrayList<>();
+        if (null != this.instructions && 0 < this.instructions.size()) {
+            for (int i = 0; i < this.instructions.size(); i++) {
+                instructionEntities.add(InstructionsEntity.builder()
+                    .drillId(this.id)
+                    .number((long) i)
+                    .description(instructions.get(i).getDescription())
+                    .steps(null)
+                    .videoId(instructions.get(i).getVideoId())
+                    .build());
+                instructionEntities.get(i)
+                    .setStepsFromList(instructions.get(i).getSteps());
+            }
+        }
+
+        return DrillEntity.builder()
+            .id(this.id)
+            .name(this.name)
+            .categories(new ArrayList<>())
+            .subCategories(new ArrayList<>())
+            .relatedDrills(this.relatedDrills)
+            .instructions(instructionEntities)
+            .build();
+    }
 }

@@ -112,55 +112,25 @@ public class DrillController {
             return ResponseEntity.badRequest().build();
         }
 
-        Optional<DrillEntity> optExistingDrill = drillService.find(id);
-        if (!optExistingDrill.isPresent()) {
+        if (!drillService.find(id).isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        DrillEntity drillToSave = optExistingDrill.get();
+        DrillEntity drillToUpdate = drill.toEntity();
 
         // Set Categories
-        drillToSave.getCategories().clear();
         if (null != drill.getCategoryIds() && 0 < drill.getCategoryIds().size()) {
-            drillToSave.getCategories().addAll(categorySerivce.findAll(drill.getCategoryIds()));
+            drillToUpdate.setCategories(categorySerivce.findAll(drill.getCategoryIds()));
         }
 
         // Set SubCategories
-        drillToSave.getSubCategories().clear();
         if (null != drill.getSubCategoryIds() && 0 < drill.getSubCategoryIds().size()) {
-            drillToSave.getSubCategories().addAll(subCategorySerivce.findAll(drill.getSubCategoryIds()));
+            drillToUpdate.setSubCategories(subCategorySerivce.findAll(drill.getSubCategoryIds()));
         }
 
-        // Set RelatedDrills
-        drillToSave.getRelatedDrills().clear();
-        if (null != drill.getRelatedDrills() && 0 < drill.getRelatedDrills().size()) {
-            drillToSave.getRelatedDrills().addAll(drill.getRelatedDrills());
-        }
+        DrillEntity updatedDrill = drillService.save(drillToUpdate);
 
-        // Set Instructions
-        drillToSave.getInstructions().clear();
-        List<InstructionsDTO> instructions = drill.getInstructions();
-        if (null != instructions && 0 < instructions.size()) {
-            List<InstructionsEntity> instructionEntities = new ArrayList<>();
-
-            for (int i = 0; i < instructions.size(); i++) {
-                instructionEntities.add(InstructionsEntity.builder()
-                    .drillId(id)
-                    .number((long) i)
-                    .description(instructions.get(i).getDescription())
-                    .steps(null)
-                    .videoId(instructions.get(i).getVideoId())
-                    .build());
-                instructionEntities.get(i)
-                    .setStepsFromList(instructions.get(i).getSteps());
-            }
-
-            drillToSave.getInstructions().addAll(instructionEntities);
-        }
-
-        DrillEntity savedDrill = drillService.save(drillToSave);
-
-        return ResponseEntity.ok(new DrillResponseDTO(savedDrill));
+        return ResponseEntity.ok(new DrillResponseDTO(updatedDrill));
     }
 
     @DeleteMapping("/id/{id}")
