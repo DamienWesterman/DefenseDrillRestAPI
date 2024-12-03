@@ -26,9 +26,7 @@
 
 package com.damienwesterman.defensedrill.rest_api.endToEnd;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.URI;
@@ -149,12 +147,74 @@ public class EndToEndTest {
     }
 
     @Test
+    public void test_drill_addingACategory_databaseReturnsProperly() {
+        Long categoryId = categoryRepo.save(category1).getId();
+        DrillEntity savedDrill = drillRepo.save(drill1);
+        DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
+        updatedDrill.setId(savedDrill.getId());
+        updatedDrill.setName(savedDrill.getName());
+        updatedDrill.setCategoryIds(List.of(categoryId));
+
+        // Sanity check
+        assertEquals(0, drillRepo.findAll().get(0).getCategories().size());
+
+        ResponseEntity<DrillResponseDTO> response =
+            restTemplate.exchange(
+                URI.create(DrillController.ENDPOINT + "/id/" + savedDrill.getId()),
+                HttpMethod.PUT,
+                new HttpEntity<>(updatedDrill),
+                DrillResponseDTO.class
+            );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, drillRepo.findAll().get(0).getCategories().size());
+        assertEquals(
+            CATEGORY_NAME_1,
+            drillRepo.findAll().get(0).getCategories().get(0).getName()
+        );
+    }
+
+    @Test
+    public void test_drill_addingRelatedDrill_databaseReturnsProperly() {
+        DrillEntity relatedDrill = DrillEntity.builder()
+                                    .name("Related Name")
+                                    .build();
+        Long relatedDrillId = drillRepo.save(relatedDrill).getId();
+        DrillEntity savedDrill = drillRepo.save(drill1);
+        DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
+        updatedDrill.setId(savedDrill.getId());
+        updatedDrill.setName(savedDrill.getName());
+        updatedDrill.setRelatedDrills(List.of(relatedDrillId));
+
+        // Sanity check
+        assertEquals(0, drillRepo.findById(savedDrill.getId()).get().getRelatedDrills().size());
+
+        ResponseEntity<DrillResponseDTO> response =
+            restTemplate.exchange(
+                URI.create(DrillController.ENDPOINT + "/id/" + savedDrill.getId()),
+                HttpMethod.PUT,
+                new HttpEntity<>(updatedDrill),
+                DrillResponseDTO.class
+            );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, drillRepo.findById(savedDrill.getId()).get().getRelatedDrills().size());
+        assertEquals(
+            relatedDrillId,
+            drillRepo.findById(savedDrill.getId()).get().getRelatedDrills().get(0)
+        );
+    }
+
+    @Test
     public void test_instructions_databaseSavesProperly() {
         DrillEntity savedDrill = drillRepo.save(drill1);
         DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
         updatedDrill.setId(savedDrill.getId());
         updatedDrill.setName(savedDrill.getName());
         updatedDrill.setInstructions(List.of(new InstructionsDTO(instructions1)));
+
+        // Sanity check
+        assertEquals(0, instructionsRepo.count());
 
         ResponseEntity<DrillResponseDTO> response =
             restTemplate.exchange(
@@ -168,8 +228,6 @@ public class EndToEndTest {
         assertEquals(1, instructionsRepo.count());
         assertEquals(INSTRUCTIONS_DESCRIPTION_1, instructionsRepo.findAll().get(0).getDescription());
     }
-
-    // TODO: TESTS ADDING RELATED DRILLS AND CATEGORIES, AS WELL AS REMOVING
 
     @Test
     public void test_instructions_databaseReturesProperly() {
