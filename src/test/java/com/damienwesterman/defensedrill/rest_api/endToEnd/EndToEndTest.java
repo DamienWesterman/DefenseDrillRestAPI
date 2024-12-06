@@ -51,6 +51,7 @@ import com.damienwesterman.defensedrill.rest_api.repository.CategoryRepo;
 import com.damienwesterman.defensedrill.rest_api.repository.DrillRepo;
 import com.damienwesterman.defensedrill.rest_api.repository.InstructionsRepo;
 import com.damienwesterman.defensedrill.rest_api.repository.SubCategoryRepo;
+import com.damienwesterman.defensedrill.rest_api.web.CategoryController;
 import com.damienwesterman.defensedrill.rest_api.web.DrillController;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
@@ -59,7 +60,6 @@ import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EndToEndTest {
-    // TODO: Make sure that inserting, updating, adding, and removing instructions AND steps always properly indexes and re-numbers them
     // TODO: Anything that was mocked/stubbed using mock.when().then() should be tested here
     @Autowired
     TestRestTemplate restTemplate;
@@ -229,19 +229,59 @@ public class EndToEndTest {
         assertEquals(INSTRUCTIONS_DESCRIPTION_1, instructionsRepo.findAll().get(0).getDescription());
     }
 
+    @SuppressWarnings("null")
     @Test
     public void test_instructions_databaseReturesProperly() {
-        fail();
+        DrillEntity savedDrill = drillRepo.save(drill1);
+        instructions1.setDrillId(savedDrill.getId());
+        instructions1.setNumber(0L);
+        instructionsRepo.save(instructions1);
+
+        ResponseEntity<String[]> response1 =
+            restTemplate.getForEntity(
+                URI.create(DrillController.ENDPOINT + "/id/" + savedDrill.getId() + "/how-to"),
+                String[].class);
+
+        assertEquals(HttpStatus.OK, response1.getStatusCode());
+        assertEquals(INSTRUCTIONS_DESCRIPTION_1, response1.getBody()[0]);
+
+        ResponseEntity<InstructionsDTO> response2 =
+            restTemplate.getForEntity(
+                URI.create(DrillController.ENDPOINT + "/id/" + savedDrill.getId() + "/how-to/0"),
+                InstructionsDTO.class);
+
+        assertEquals(HttpStatus.OK, response2.getStatusCode());
+        assertEquals(INSTRUCTIONS_DESCRIPTION_1, response2.getBody().getDescription());
+        assertEquals(STEP_ONE, response2.getBody().getSteps().get(0));
+        assertEquals(STEP_TWO, response2.getBody().getSteps().get(1));
+        assertEquals(STEP_THREE, response2.getBody().getSteps().get(2));
+        assertEquals(VIDEO_ID_1, response2.getBody().getVideoId());
     }
 
+    @SuppressWarnings("null")
     @Test
     public void test_categories_databaseSavesProperly() {
-        fail();
+        ResponseEntity<CategoryEntity> response =
+            restTemplate.postForEntity(
+                CategoryController.ENDPOINT,
+                category1,
+                CategoryEntity.class);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(CATEGORY_NAME_1, response.getBody().getName());
     }
 
+    @SuppressWarnings("null")
     @Test
     public void test_categories_databaseReturnsProperly() {
-        fail();
+        categoryRepo.save(category1);
+        ResponseEntity<CategoryEntity[]> response =
+            restTemplate.getForEntity(
+                CategoryController.ENDPOINT,
+                CategoryEntity[].class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(CATEGORY_NAME_1, response.getBody()[0].getName());
     }
 
     @Test
@@ -252,5 +292,76 @@ public class EndToEndTest {
     @Test
     public void test_subCategories_databaseReturnsProperly() {
         // No need to implement until SubCategoryController diverges from CategoryController
+    }
+
+    @Test
+    public void test_categories_withNonUniqueName_returnsError() {
+        categoryRepo.save(category1);
+        /*
+         * When we call save, category1 becomes a managed entity with an ID.
+         * Then when save() is called in the controller, since it has a valid ID,
+         * it is treated as an update and is successful.
+         */
+        category1.setId(null);
+        ResponseEntity<CategoryEntity> response =
+            restTemplate.postForEntity(
+                CategoryController.ENDPOINT,
+                category1,
+                CategoryEntity.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void test_drill_withNonUniqueName_returnsError() {
+        drillRepo.save(drill1);
+        ResponseEntity<DrillResponseDTO> response =
+            restTemplate.postForEntity(
+                URI.create(DrillController.ENDPOINT),
+                dtoToSend,
+                DrillResponseDTO.class);
+        System.out.println(response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @SuppressWarnings("null")
+    @Test
+    public void test_drill_withNonExistentCategory_ignoresNonExistentCategory() {
+        Long categoryId = categoryRepo.save(category1).getId();
+        DrillEntity savedDrill = drillRepo.save(drill1);
+        DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
+        updatedDrill.setId(savedDrill.getId());
+        updatedDrill.setName(savedDrill.getName());
+        updatedDrill.setCategoryIds(List.of(categoryId + 1));
+
+        ResponseEntity<DrillResponseDTO> response =
+            restTemplate.exchange(
+                URI.create(DrillController.ENDPOINT + "/id/" + savedDrill.getId()),
+                HttpMethod.PUT,
+                new HttpEntity<>(updatedDrill),
+                DrillResponseDTO.class
+            );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(0, response.getBody().getCategoryIds().size());
+    }
+
+    @Test
+    public void test_category_withNonExistentId_returns404() {
+        ResponseEntity<CategoryEntity[]> response =
+            restTemplate.getForEntity(
+                CategoryController.ENDPOINT + "/id/0",
+                CategoryEntity[].class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void test_drill_withNonExistentId_returns404() {
+        ResponseEntity<DrillResponseDTO[]> response =
+            restTemplate.getForEntity(
+                URI.create(DrillController.ENDPOINT + "/id/0"),
+                DrillResponseDTO[].class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }
