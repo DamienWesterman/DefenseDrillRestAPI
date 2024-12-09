@@ -41,14 +41,23 @@ import com.damienwesterman.defensedrill.rest_api.service.AbstractCategoryService
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-// TODO: DOC COMMENTS
 // TODO: Swagger Comments (on the DTOs?)
+/**
+ * Abstract superclass for {@link CategoryController} and {@link SubCategoryController}.
+ * <br><br>
+ * Responsible for CRUD operations for {@link AbstractCategoryEntity} objects with validation.
+ */
 @RequiredArgsConstructor
 public abstract class AbstractCategoryController
         <E extends AbstractCategoryEntity,
         S extends AbstractCategoryService<E, ? extends AbstractCategoryRepo<E>>> {
     protected final S service;
 
+    /**
+     * Endpoint to return all AbstractCategoryEntity objects.
+     *
+     * @return ResponseEntity with List of the AbstractCategoryEntity objects.
+     */
     @GetMapping
     public ResponseEntity<List<E>> getAll() {
         List<E> abstractCategories = service.findAll();
@@ -60,6 +69,12 @@ public abstract class AbstractCategoryController
         return ResponseEntity.ok(abstractCategories);
     }
 
+    /**
+     * Endpoint to insert a new AbstractCategoryEntity into the database. With validation.
+     *
+     * @param abstractCategory Entity to create.
+     * @return ResponseEntity containing the created entity.
+     */
     @PostMapping
     public ResponseEntity<E> insertNewAbstractCategory(@RequestBody @Valid E abstractCategory) {
         E createdAbstractCategory = service.save(abstractCategory);
@@ -68,6 +83,12 @@ public abstract class AbstractCategoryController
             .body(createdAbstractCategory);
     }
 
+    /**
+     * Endpoint to find an AbstractCategoryEntity by its ID.
+     *
+     * @param id ID of the AbstractCategoryEntity.
+     * @return ResponseEntity containing the found entity.
+     */
     @GetMapping("/id/{id}")
     public ResponseEntity<E> getAbstractCategoryById(@PathVariable Long id) {
         return service.find(id)
@@ -75,15 +96,27 @@ public abstract class AbstractCategoryController
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // TODO: Swagger - abstractCategory.getID() MUST equal id, or be null
+    /**
+     * Endpoint to update an AbstractCategoryEntity by its ID.
+     *
+     * @param id
+     * @param abstractCategory
+     * @return
+     */
     @PutMapping("/id/{id}")
     public ResponseEntity<E> updateAbstractCategoryById(
             @PathVariable Long id, @RequestBody @Valid E abstractCategory) {
-        if (null == abstractCategory.getId() || abstractCategory.getId() != id) {
+        if (null != abstractCategory.getId() && abstractCategory.getId() != id) {
             return ResponseEntity.badRequest().build();
         }
 
         if (!service.find(id).isPresent()) {
             return ResponseEntity.notFound().build();
+        }
+
+        if (null == abstractCategory.getId()) {
+            abstractCategory.setId(id);
         }
 
         E updatedAbstractCategory = service.save(abstractCategory);

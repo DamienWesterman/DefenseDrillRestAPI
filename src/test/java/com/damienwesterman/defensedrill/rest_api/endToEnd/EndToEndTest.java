@@ -27,8 +27,6 @@
 package com.damienwesterman.defensedrill.rest_api.endToEnd;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +58,6 @@ import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EndToEndTest {
-    // TODO: Anything that was mocked/stubbed using mock.when().then() should be tested here
     @Autowired
     TestRestTemplate restTemplate;
     @Autowired

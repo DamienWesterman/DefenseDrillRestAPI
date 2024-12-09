@@ -253,6 +253,27 @@ public class CategoryControllerTest {
     }
 
     @Test
+    public void test_idEndpoint_put_entityIdNull_stillSucceedsEverythingElseValid() throws Exception {
+        CategoryEntity entityToSend = CategoryEntity.builder()
+                                        .id(null)
+                                        .name(NAME_1)
+                                        .description(DESCRIPTION_1)
+                                        .build();
+        when(service.save(category1)).thenReturn(category1);
+        when(service.find(ID_1)).thenReturn(Optional.of(category1));
+
+        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(entityToSend)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(ID_1))
+            .andExpect(jsonPath("$.name").value(NAME_1))
+            .andExpect(jsonPath("$.description").value(DESCRIPTION_1));
+
+        verify(service, times(1)).save(category1);
+    }
+
+    @Test
     public void test_idEndpoint_put_nonExistentIdFails() throws Exception {
         when(service.save(category1)).thenReturn(category1);
         when(service.find(ID_1)).thenReturn(Optional.empty());
@@ -261,21 +282,6 @@ public class CategoryControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(category1)))
             .andExpect(status().isNotFound());
-
-        verify(service, times(0)).save(category1);
-    }
-
-    @Test
-    public void test_idEndpoint_put_entityIdNull() throws Exception {
-        category1.setId(null);
-
-        mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(category1)))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.id").doesNotExist())
-            .andExpect(jsonPath("$.name").doesNotExist())
-            .andExpect(jsonPath("$.description").doesNotExist());
 
         verify(service, times(0)).save(category1);
     }
