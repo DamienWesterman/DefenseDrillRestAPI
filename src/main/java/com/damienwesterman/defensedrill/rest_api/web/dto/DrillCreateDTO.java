@@ -24,13 +24,22 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-// TODO: Doc comments / usage
+/**
+ * DTO for creating a {@link DrillEntity}.
+ * <br><br>
+ * Used for incoming requests. Basically only contains a String name with validation.
+ */
 @Data
 public class DrillCreateDTO {
     @NotEmpty
     @Size(min = 1, max = 255)
     private String name;
 
+    /**
+     * Convert the DTO into its equivalent {@link DrillEntity} representation.
+     *
+     * @return DrillEntity object.
+     */
     public DrillEntity toEntity() {
         return DrillEntity.builder()
                 .name(this.name)

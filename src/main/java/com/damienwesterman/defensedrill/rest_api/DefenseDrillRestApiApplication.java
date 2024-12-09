@@ -33,7 +33,6 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class DefenseDrillRestApiApplication {
-	// TODO: Doc comments
 	// TODO: swagger comments (@Schema) - Also make sure to say for error return codes and format (error and message)
 
 	public static void main(String[] args) {

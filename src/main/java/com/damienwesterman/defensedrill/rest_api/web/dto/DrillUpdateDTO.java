@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
+import com.damienwesterman.defensedrill.rest_api.service.AbstractCategoryService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.annotation.Nullable;
@@ -38,9 +39,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-// TODO: DOC COMMENTS / USAGE
+/**
+ * DTO for updating a {@link DrillEntity}.
+ * <br><br>
+ * Used for incoming requests.
+ */
 @Data
 public class DrillUpdateDTO {
+    // TODO: Refactor and take this out
     @NotNull
     private Long id;
 
@@ -63,7 +69,17 @@ public class DrillUpdateDTO {
     @Nullable
     private List<InstructionsDTO> instructions;
 
-    // TODO: NOTE THAT THIS DOES NOT SET categories or subCategories list
+    /**
+     * Convert the DTO into its equivalent {@link DrillEntity} representation.
+     * <br><br>
+     * <b>NOTE:</b> This does not populate the categories or subCategories list.
+     * Caller must populate the returned DrillEntity's lists by using the IDs provided in
+     * {@link #getCategoryIds()} and {@link #getSubCategoryIds()}.
+     *
+     * @see {@link AbstractCategoryService#findAll(List)}
+     *
+     * @return DrillEntity object.
+     */
     public DrillEntity toEntity() {
         // Set up the list of InstructionEntity objects
         List<InstructionsEntity> instructionEntities = new ArrayList<>();

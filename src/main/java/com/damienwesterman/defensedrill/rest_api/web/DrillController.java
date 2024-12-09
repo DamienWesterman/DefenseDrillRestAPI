@@ -27,7 +27,6 @@
 package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,8 +55,11 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-// TODO: DOC COMMENTS
 // TODO: Swagger comments (DTOs as well? Other DTOs/@Data objects? / Jakarta constraint messages on the DTOs)
+/**
+ * Controller responsible for CRUD operations for {@link DrillEntity} objects with validation.
+ * Extends to control over {@link InstructionsEntity} held within the DrillEntity.
+ */
 @RestController
 @RequestMapping(DrillController.ENDPOINT)
 @RequiredArgsConstructor
@@ -67,6 +69,11 @@ public class DrillController {
     private final CategorySerivce categorySerivce;
     private final SubCategorySerivce subCategorySerivce;
 
+    /**
+     * Endpoint to return all DrillEntity objects.
+     *
+     * @return ResponseEntity with List of the DrillEntity objects.
+     */
     @GetMapping
     public ResponseEntity<List<DrillResponseDTO>> getAll() {
         List<DrillEntity> drills = drillService.findAll();
@@ -82,6 +89,17 @@ public class DrillController {
         );
     }
 
+    // TODO: Swagger comments that this is essentially just the name and to use the other endpoint for the lists of things.
+    /**
+     * Endpoint to insert a new DrillEntity into the database.
+     * <br><br>
+     * This essentially creates an empty drill with only a name. To include any realted drills,
+     * categories, subCategories, or instructions, see
+     * {@link #updateDrillById(Long, DrillUpdateDTO)}.
+     *
+     * @param drill
+     * @return
+     */
     @PostMapping
     public ResponseEntity<DrillResponseDTO> insertNewDrill(@RequestBody @Valid DrillCreateDTO drill) {
         DrillEntity createdDrill = drillService.save(drill.toEntity());
@@ -120,11 +138,13 @@ public class DrillController {
 
         // Set Categories
         if (null != drill.getCategoryIds() && 0 < drill.getCategoryIds().size()) {
+            // IDs that are not in the database are ignored
             drillToUpdate.setCategories(categorySerivce.findAll(drill.getCategoryIds()));
         }
 
         // Set SubCategories
         if (null != drill.getSubCategoryIds() && 0 < drill.getSubCategoryIds().size()) {
+            // IDs that are not in the database are ignored
             drillToUpdate.setSubCategories(subCategorySerivce.findAll(drill.getSubCategoryIds()));
         }
 

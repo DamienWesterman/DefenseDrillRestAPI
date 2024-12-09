@@ -100,9 +100,9 @@ public abstract class AbstractCategoryController
     /**
      * Endpoint to update an AbstractCategoryEntity by its ID.
      *
-     * @param id
-     * @param abstractCategory
-     * @return
+     * @param id ID of the entity to update.
+     * @param abstractCategory Entity to udpate.
+     * @return ResponseEntity with the updated entity.
      */
     @PutMapping("/id/{id}")
     public ResponseEntity<E> updateAbstractCategoryById(
@@ -123,12 +123,24 @@ public abstract class AbstractCategoryController
         return ResponseEntity.ok(updatedAbstractCategory);
     }
 
+    /**
+     * Endpoint to delete an AbstractCategoryEntity by its ID.
+     *
+     * @param id ID of the entity to delete.
+     * @return Empty ResponseEntity.
+     */
     @DeleteMapping("/id/{id}")
     public ResponseEntity<String> deleteAbstractCategoryById(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Endpoint to find an AbstractCategoryEntity by its name. Case INsensitive.
+     *
+     * @param name Name of the AbstractCategoryEntity.
+     * @return ResponseEntity containing the found entity.
+     */
     @GetMapping("/name/{name}")
     public ResponseEntity<E> getAbstractCategoryByName(@PathVariable String name) {
         return service.find(name)

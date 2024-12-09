@@ -36,7 +36,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-// TODO: DOC COMMENTS / USAGE
+/**
+ * DTO for all requests involving {@link InstructionsEntity}.
+ * <br><br>
+ * Used for incoming and outgoing requests to represent instructionsEntity objects.
+ */
 @Data
 @RequiredArgsConstructor
 public class InstructionsDTO {
@@ -50,6 +54,11 @@ public class InstructionsDTO {
     @JsonProperty("video_id")
     private String videoId;
 
+    /**
+     * Convert the DTO into its equivalent {@link InstructionsEntity} representation.
+     *
+     * @param instructions InstructionsEntity object.
+     */
     public InstructionsDTO(InstructionsEntity instructions) {
         this.description = instructions.getDescription();
         this.steps = instructions.getStepsAsList();

@@ -39,7 +39,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// TODO: Doc Comments - to be used for returned drills, NO validation so only should go out
+/**
+ * DTO for responses of {@link DrillEntity} types.
+ * <br><br>
+ * This DTO should only be outbound, <b><i>NEVER</b></i> inbound requests as it contains no
+ * input validation.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -54,6 +59,11 @@ public class DrillResponseDTO {
     @JsonProperty("related_drills")
     private List<Long> relatedDrillIds;
 
+    /**
+     * Parameterized constructor using a DrillEntity object.
+     *
+     * @param drill DrillEntity object to represent in a DTO.
+     */
     public DrillResponseDTO(DrillEntity drill) {
         this.id = drill.getId();
         this.name = drill.getName();

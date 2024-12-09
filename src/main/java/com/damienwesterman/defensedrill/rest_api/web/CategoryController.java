@@ -32,8 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
 
-// TODO: DOC COMMENTS
 // TODO: Swagger Comments (on the DTOs?)
+/**
+ * Controller responsible for CRUD operations for {@link CategoryEntity} objects with validation.
+ */
 @RestController
 @RequestMapping(CategoryController.ENDPOINT)
 public class CategoryController extends AbstractCategoryController<CategoryEntity, CategorySerivce> {
