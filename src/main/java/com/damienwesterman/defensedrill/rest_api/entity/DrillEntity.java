@@ -28,6 +28,8 @@ package com.damienwesterman.defensedrill.rest_api.entity;
 
 import java.util.List;
 
+import org.springframework.lang.Nullable;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -69,6 +71,7 @@ public class DrillEntity {
     @Size(min = 1, max = 255)
     private String name;
 
+    @Nullable
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "drill_category_join",
@@ -77,6 +80,7 @@ public class DrillEntity {
     )
     private List<CategoryEntity> categories;
 
+    @Nullable
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "drill_sub_category_join",
@@ -85,6 +89,7 @@ public class DrillEntity {
     )
     private List<SubCategoryEntity> subCategories;
 
+    @Nullable
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "related_drills",
@@ -93,6 +98,7 @@ public class DrillEntity {
     @Column(name = "related_drill_id")
     private List<Long> relatedDrills;
 
+    @Nullable
     @OneToMany(
         mappedBy = "drillId",
         cascade = CascadeType.ALL,

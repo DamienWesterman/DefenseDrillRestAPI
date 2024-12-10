@@ -26,6 +26,7 @@
 
 package com.damienwesterman.defensedrill.rest_api.web.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,12 +68,23 @@ public class DrillResponseDTO {
     public DrillResponseDTO(DrillEntity drill) {
         this.id = drill.getId();
         this.name = drill.getName();
-        this.categoryIds = drill.getCategories().stream()
-                                .map(CategoryEntity::getId)
-                                .collect(Collectors.toList());
-        this.subCategoryIds = drill.getSubCategories().stream()
-                                .map(SubCategoryEntity::getId)
-                                .collect(Collectors.toList());
+
+        if (null == drill.getCategories()) {
+            this.categoryIds = new ArrayList<>();
+        } else {
+            this.categoryIds = drill.getCategories().stream()
+                                    .map(CategoryEntity::getId)
+                                    .collect(Collectors.toList());
+        }
+
+        if (null == drill.getSubCategories()) {
+            this.subCategoryIds = new ArrayList<>();
+        } else {
+            this.subCategoryIds = drill.getSubCategories().stream()
+                                    .map(SubCategoryEntity::getId)
+                                    .collect(Collectors.toList());
+        }
+
         this.relatedDrillIds = drill.getRelatedDrills();
     }
 }

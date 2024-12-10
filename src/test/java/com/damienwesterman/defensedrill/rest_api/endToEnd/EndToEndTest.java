@@ -56,6 +56,7 @@ import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 
+@SuppressWarnings("null")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EndToEndTest {
     @Autowired
@@ -133,7 +134,6 @@ public class EndToEndTest {
         assertEquals(DRILL_NAME_1, drillRepo.findAll().get(0).getName());
     }
 
-    @SuppressWarnings("null")
     @Test
     public void test_drill_databaseReturnsProperly() {
         drillRepo.save(drill1);
@@ -223,7 +223,6 @@ public class EndToEndTest {
         assertEquals(INSTRUCTIONS_DESCRIPTION_1, instructionsRepo.findAll().get(0).getDescription());
     }
 
-    @SuppressWarnings("null")
     @Test
     public void test_instructions_databaseReturesProperly() {
         DrillEntity savedDrill = drillRepo.save(drill1);
@@ -252,7 +251,6 @@ public class EndToEndTest {
         assertEquals(VIDEO_ID_1, response2.getBody().getVideoId());
     }
 
-    @SuppressWarnings("null")
     @Test
     public void test_categories_databaseSavesProperly() {
         ResponseEntity<CategoryEntity> response =
@@ -265,7 +263,6 @@ public class EndToEndTest {
         assertEquals(CATEGORY_NAME_1, response.getBody().getName());
     }
 
-    @SuppressWarnings("null")
     @Test
     public void test_categories_databaseReturnsProperly() {
         categoryRepo.save(category1);
@@ -318,7 +315,6 @@ public class EndToEndTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
-    @SuppressWarnings("null")
     @Test
     public void test_drill_withNonExistentCategory_ignoresNonExistentCategory() {
         Long categoryId = categoryRepo.save(category1).getId();

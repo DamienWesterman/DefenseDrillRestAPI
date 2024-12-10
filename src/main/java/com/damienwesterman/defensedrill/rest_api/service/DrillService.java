@@ -60,7 +60,11 @@ public class DrillService {
      */
     @Transactional
     public DrillEntity save(@NonNull DrillEntity drill) throws DatabaseInsertException {
-        if (0 == drill.getInstructions().size()) {
+        /*
+         * Compiler is generating a warning for each call to drill.getInstructions(). We can safely
+         * ignore this because of this first null check here.
+         */
+        if (null == drill.getInstructions() || drill.getInstructions().isEmpty()) {
             return ErrorMessageUtils.trySave(repo, drill);
         }
 
