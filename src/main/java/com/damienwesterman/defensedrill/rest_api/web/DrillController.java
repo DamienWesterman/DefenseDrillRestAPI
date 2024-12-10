@@ -49,8 +49,15 @@ import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.ErrorMessageDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +70,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping(DrillController.ENDPOINT)
 @RequiredArgsConstructor
+@Tag(
+    name = "Drill Controller",
+    description = "Offers all CRUD operations for Drills in the database."
+)
 public class DrillController {
     public static final String ENDPOINT = "/drill";
     private final DrillService drillService;
@@ -75,6 +86,15 @@ public class DrillController {
      * @return ResponseEntity with List of the DrillEntity objects.
      */
     @GetMapping
+    @Operation(
+        summary = "Retrieve all Drills.",
+        description = "Returns a list of all Drills in the database."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Drills exist in the database and were returned"),
+        @ApiResponse(responseCode = "204", description = "No Drills exist in the database",
+            content = @Content(/* No Content */))
+    })
     public ResponseEntity<List<DrillResponseDTO>> getAll() {
         List<DrillEntity> drills = drillService.findAll();
 

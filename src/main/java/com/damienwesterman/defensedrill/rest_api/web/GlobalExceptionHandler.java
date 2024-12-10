@@ -53,6 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    // TODO: FIXME: Start here, replace everything with ErrorMessageDTO
     private static final String KEY_ERROR = "error";
     private static final String KEY_MESSAGE = "message";
 
