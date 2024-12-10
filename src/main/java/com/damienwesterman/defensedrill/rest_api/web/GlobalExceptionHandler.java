@@ -36,6 +36,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -99,6 +100,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         errorBody.put(KEY_MESSAGE, ioobe.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, String>> handleLockingFailureException(ObjectOptimisticLockingFailureException oolfe) {
+        Map<String, String> errorBody = new HashMap<>();
+        errorBody.put(KEY_ERROR, "Update Conflict");
+        errorBody.put(KEY_MESSAGE, "Old data: please refresh and try again");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody);
     }
 
     @ExceptionHandler(Exception.class)

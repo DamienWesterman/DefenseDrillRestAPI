@@ -145,7 +145,7 @@ public class DrillController {
     @Transactional
     public ResponseEntity<DrillResponseDTO> updateDrillById(
         @PathVariable Long id, @RequestBody @Valid DrillUpdateDTO drill) {
-        if (!drillService.find(id).isPresent()) {
+        if (drillService.find(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
@@ -190,13 +190,17 @@ public class DrillController {
     public ResponseEntity<List<String>> getInstructionsByDrillId(@PathVariable Long id) {
         Optional<DrillEntity> optDrill = drillService.find(id);
 
-        if (!optDrill.isPresent()) {
+        if (optDrill.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         DrillEntity drill = optDrill.get();
 
-        if (drill.getInstructions().isEmpty()) {
+        /*
+         * Compiler is generating a warning for each call to drill.getInstructions(). We can safely
+         * ignore this because of this first null check here.
+         */
+        if (null == drill.getInstructions() || drill.getInstructions().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
@@ -223,13 +227,24 @@ public class DrillController {
             @PathVariable Long id, @PathVariable Long number) {
         Optional<DrillEntity> optDrill = drillService.find(id);
 
-        if (!optDrill.isPresent()) {
+        if (optDrill.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        DrillEntity drill = optDrill.get();
+
+        /*
+         * Compiler is generating a warning for each call to drill.getInstructions(). We can safely
+         * ignore this because of this first null check here.
+         */
+        if (null == drill.getInstructions() || drill.getInstructions().isEmpty()
+                || number >= drill.getInstructions().size()) {
             return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok(
             new InstructionsDTO(
-                optDrill.get().getInstructions().get(number.intValue())
+                drill.getInstructions().get(number.intValue())
             )
         );
     }

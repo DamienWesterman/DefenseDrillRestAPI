@@ -625,15 +625,29 @@ public class DefenseDrillRestApiDatabaseTests {
     }
 
     @Test
-    public void test_drillRepo_save_nonExistentCategories_fails() {
-        // CategoryEntity
+    public void test_drillRepo_save_nonExistentCategory_fails() {
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
                                     .name("New Category Name")
                                     .description("New Category Description")
                                     .build();
 
-        // SubCategoryEntity
+        DrillEntity drill = DrillEntity.builder()
+                                .id(null)
+                                .name("New Drill")
+                                .categories(null)
+                                .subCategories(null)
+                                .relatedDrills(null)
+                                .instructions(null)
+                                .build();
+
+        drill.setCategories(List.of(category));
+        assertThrows(InvalidDataAccessApiUsageException.class,
+            () -> drillRepo.save(drill));
+    }
+
+    @Test
+    public void test_drillRepo_save_nonExistentSubCategory_fails() {
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
                                             .name("New SubCategory Name")
@@ -649,12 +663,6 @@ public class DefenseDrillRestApiDatabaseTests {
                                 .instructions(null)
                                 .build();
 
-        // Non existent category
-        drill.setCategories(List.of(category));
-        assertThrows(InvalidDataAccessApiUsageException.class,
-            () -> drillRepo.save(drill));
-
-        // Non existent sub category
         drill.setCategories(null);
         drill.setSubCategories(List.of(subCategory));
         assertThrows(InvalidDataAccessApiUsageException.class,

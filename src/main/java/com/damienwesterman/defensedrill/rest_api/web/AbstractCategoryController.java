@@ -111,7 +111,7 @@ public abstract class AbstractCategoryController
             return ResponseEntity.badRequest().build();
         }
 
-        if (!service.find(id).isPresent()) {
+        if (service.find(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
