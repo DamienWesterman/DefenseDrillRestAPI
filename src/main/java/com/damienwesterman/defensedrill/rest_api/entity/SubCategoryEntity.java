@@ -26,6 +26,7 @@
 
 package com.damienwesterman.defensedrill.rest_api.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -43,6 +44,10 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @SuperBuilder
+@Schema(
+    name = "SubCategory",
+    description = "More specific type of category for a Drill, such as a Strike or Kick."
+)
 public class SubCategoryEntity extends AbstractCategoryEntity {
     public SubCategoryEntity() {}
 }

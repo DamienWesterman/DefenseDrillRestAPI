@@ -22,6 +22,7 @@ import org.springframework.lang.NonNull;
 
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -32,9 +33,17 @@ import lombok.Data;
  * Used for incoming requests. Basically only contains a String name with validation.
  */
 @Data
+@Schema(
+    name = "DrillCreateObject",
+    description = "Object to create a new Drill."
+)
 public class DrillCreateDTO {
     @NotEmpty
     @Size(min = 1, max = 255)
+    @Schema(
+        description = "Name of the Drill. Must be unique.",
+        example = "Round Kick"
+    )
     private String name;
 
     /**

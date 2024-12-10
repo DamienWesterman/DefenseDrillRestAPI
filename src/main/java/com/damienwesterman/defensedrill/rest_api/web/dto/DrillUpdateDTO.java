@@ -36,6 +36,7 @@ import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.damienwesterman.defensedrill.rest_api.service.AbstractCategoryService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -47,24 +48,47 @@ import lombok.Data;
  * Used for incoming requests.
  */
 @Data
+@Schema(
+    name = "DrillUpdateObject",
+    description = "Information needed to update a Drill."
+)
 public class DrillUpdateDTO {
     @NotEmpty
     @Size(min = 1, max = 255)
+    @Schema(
+        description = "Existing or new name of the Drill",
+        example = "Round Kick"
+    )
     private String name;
 
     @Nullable
     @JsonProperty("categories")
+    @Schema(
+        description = "List of Category IDs the Drill belongs to.",
+        example = "[1,2,3,4,5]"
+    )
     private List<Long> categoryIds;
 
     @Nullable
     @JsonProperty("sub_categories")
+    @Schema(
+        description = "List of SubCategory IDs the Drill belongs to.",
+        example = "[1,2,3,4,5]"
+    )
     private List<Long> subCategoryIds;
 
     @Nullable
     @JsonProperty("related_drills")
+    @Schema(
+        description = "List of Drill IDs this Drill mentions.",
+        example = "[6,7,8,9,0]"
+    )
     private List<Long> relatedDrills;
 
     @Nullable
+    @Schema(
+        description = "List of different instructions to perform this drill."
+    )
     private List<InstructionsDTO> instructions;
 
     /**

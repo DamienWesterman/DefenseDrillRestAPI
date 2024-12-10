@@ -37,6 +37,7 @@ import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,14 +53,42 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(
+    name = "DrillInfo",
+    description = "All information relating to a Drill."
+)
 public class DrillResponseDTO {
+    @Schema(
+        description = "Database generated ID.",
+        example = "12345"
+    )
     private Long id;
+
+    @Schema(
+        description = "Name of the Drill.",
+        example = "Round Kick"
+    )
     private String name;
+
     @JsonProperty("categories")
+    @Schema(
+        description = "List of Category IDs the Drill belongs to.",
+        example = "[1,2,3,4,5]"
+    )
     private List<Long> categoryIds;
+
     @JsonProperty("sub_categories")
+    @Schema(
+        description = "List of SubCategory IDs the Drill belongs to.",
+        example = "[1,2,3,4,5]"
+    )
     private List<Long> subCategoryIds;
+
     @JsonProperty("related_drills")
+    @Schema(
+        description = "List of Drill IDs this Drill mentions.",
+        example = "[6,7,8,9,0]"
+    )
     private List<Long> relatedDrillIds;
 
     /**

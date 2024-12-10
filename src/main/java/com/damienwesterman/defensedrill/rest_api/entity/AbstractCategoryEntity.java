@@ -26,6 +26,7 @@
 
 package com.damienwesterman.defensedrill.rest_api.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -48,15 +49,27 @@ public abstract class AbstractCategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     // @NotNull -> This can (and should) be null when creating a new entity
+    @Schema(
+        description = "Database generated ID.",
+        example = "12345"
+    )
     protected Long id;
 
     @Column(unique = true)
     @NotEmpty
     @Size(min = 1, max = 255)
+    @Schema(
+        description = "Consice category name.",
+        example = "Strikes"
+    )
     protected String name;
 
     @Column
     @NotEmpty
     @Size(min = 1, max = 511)
+    @Schema(
+        description = "Detailed category description.",
+        example = "Using your arms and hands to strike your opponent."
+    )
     protected String description;
 }

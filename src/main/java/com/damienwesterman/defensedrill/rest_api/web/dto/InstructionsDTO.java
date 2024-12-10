@@ -33,6 +33,7 @@ import org.springframework.lang.NonNull;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -45,15 +46,31 @@ import lombok.RequiredArgsConstructor;
  */
 @Data
 @RequiredArgsConstructor
+@Schema(
+    name = "Instructions",
+    description = "Detailed Instructions to perform a Drill."
+)
 public class InstructionsDTO {
     @NotEmpty
     @Size(min = 1, max = 511)
+    @Schema(
+        description = "Description of the Instructions.",
+        example = "Pluck then Strike"
+    )
     private String description;
 
     @NotEmpty
+    @Schema(
+        description = "List of steps. No numbers needed.",
+        example = "[\"Pluck\",\"Strike\"]"
+    )
     private List<String> steps;
 
     @JsonProperty("video_id")
+    @Schema(
+        description = "Jellyfin Item ID.",
+        example = "abcdefg123456789"
+    )
     private String videoId;
 
     /**
