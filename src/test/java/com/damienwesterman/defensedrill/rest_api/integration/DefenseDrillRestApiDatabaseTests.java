@@ -54,6 +54,7 @@ import com.damienwesterman.defensedrill.rest_api.repository.SubCategoryRepo;
 
 import jakarta.validation.ConstraintViolationException;
 
+@SuppressWarnings("null")
 @SpringBootTest
 public class DefenseDrillRestApiDatabaseTests {
     @Autowired

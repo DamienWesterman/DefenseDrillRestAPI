@@ -46,8 +46,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -65,6 +65,7 @@ import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@SuppressWarnings("null")
 @WebMvcTest(DrillController.class)
 @AutoConfigureMockMvc
 public class DrillControllerTest {
@@ -72,11 +73,11 @@ public class DrillControllerTest {
     MockMvc mockMvc;
     @Autowired
     ObjectMapper objectMapper;
-    @MockBean
+    @MockitoBean
     DrillService drillService;
-    @MockBean
+    @MockitoBean
     CategorySerivce categorySerivce;
-    @MockBean
+    @MockitoBean
     SubCategorySerivce subCategorySerivce;
 
     DrillEntity drill1;
