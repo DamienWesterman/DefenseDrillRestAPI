@@ -28,6 +28,9 @@ package com.damienwesterman.defensedrill.rest_api.web.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.lang.NonNull;
+
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.damienwesterman.defensedrill.rest_api.service.AbstractCategoryService;
@@ -35,7 +38,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -46,10 +48,6 @@ import lombok.Data;
  */
 @Data
 public class DrillUpdateDTO {
-    // TODO: Refactor and take this out
-    @NotNull
-    private Long id;
-
     @NotEmpty
     @Size(min = 1, max = 255)
     private String name;
@@ -80,13 +78,13 @@ public class DrillUpdateDTO {
      *
      * @return DrillEntity object.
      */
-    public DrillEntity toEntity() {
+    public DrillEntity toEntity(@NonNull Long id) {
         // Set up the list of InstructionEntity objects
         List<InstructionsEntity> instructionEntities = new ArrayList<>();
         if (null != this.instructions && 0 < this.instructions.size()) {
             for (int i = 0; i < this.instructions.size(); i++) {
                 instructionEntities.add(InstructionsEntity.builder()
-                    .drillId(this.id)
+                    .drillId(id)
                     .number((long) i)
                     .description(instructions.get(i).getDescription())
                     .steps(null)
@@ -98,7 +96,7 @@ public class DrillUpdateDTO {
         }
 
         return DrillEntity.builder()
-            .id(this.id)
+            .id(id)
             .name(this.name)
             .categories(new ArrayList<>())
             .subCategories(new ArrayList<>())

@@ -148,7 +148,6 @@ public class EndToEndTest {
         Long categoryId = categoryRepo.save(category1).getId();
         DrillEntity savedDrill = drillRepo.save(drill1);
         DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
-        updatedDrill.setId(savedDrill.getId());
         updatedDrill.setName(savedDrill.getName());
         updatedDrill.setCategoryIds(List.of(categoryId));
 
@@ -179,7 +178,6 @@ public class EndToEndTest {
         Long relatedDrillId = drillRepo.save(relatedDrill).getId();
         DrillEntity savedDrill = drillRepo.save(drill1);
         DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
-        updatedDrill.setId(savedDrill.getId());
         updatedDrill.setName(savedDrill.getName());
         updatedDrill.setRelatedDrills(List.of(relatedDrillId));
 
@@ -206,7 +204,6 @@ public class EndToEndTest {
     public void test_instructions_databaseSavesProperly() {
         DrillEntity savedDrill = drillRepo.save(drill1);
         DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
-        updatedDrill.setId(savedDrill.getId());
         updatedDrill.setName(savedDrill.getName());
         updatedDrill.setInstructions(List.of(new InstructionsDTO(instructions1)));
 
@@ -327,7 +324,6 @@ public class EndToEndTest {
         Long categoryId = categoryRepo.save(category1).getId();
         DrillEntity savedDrill = drillRepo.save(drill1);
         DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
-        updatedDrill.setId(savedDrill.getId());
         updatedDrill.setName(savedDrill.getName());
         updatedDrill.setCategoryIds(List.of(categoryId + 1));
 

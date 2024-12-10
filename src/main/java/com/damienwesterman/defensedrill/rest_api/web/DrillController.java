@@ -145,15 +145,11 @@ public class DrillController {
     @Transactional
     public ResponseEntity<DrillResponseDTO> updateDrillById(
         @PathVariable Long id, @RequestBody @Valid DrillUpdateDTO drill) {
-        if (null == drill.getId() || 0 != drill.getId().compareTo(id)) {
-            return ResponseEntity.badRequest().build();
-        }
-
         if (!drillService.find(id).isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        DrillEntity drillToUpdate = drill.toEntity();
+        DrillEntity drillToUpdate = drill.toEntity(id);
 
         // Set Categories
         if (null != drill.getCategoryIds() && 0 < drill.getCategoryIds().size()) {

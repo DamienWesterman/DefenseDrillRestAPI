@@ -357,7 +357,6 @@ public class DrillControllerTest {
 
         // Set up drill transfer object
         DrillUpdateDTO drillToUpdate = new DrillUpdateDTO();
-        drillToUpdate.setId(drill1.getId());
         drillToUpdate.setName(drill1.getName());
         drillToUpdate.setCategoryIds(List.of(category1.getId()));
         drillToUpdate.setSubCategoryIds(List.of(subCategory1.getId()));
@@ -409,7 +408,6 @@ public class DrillControllerTest {
     public void test_idEndpoint_put_nonExistentIdFails() throws Exception {
         when(drillService.find(DRILL_ID_1)).thenReturn(Optional.empty());
         DrillUpdateDTO drillToUpdate = new DrillUpdateDTO();
-        drillToUpdate.setId(drill1.getId());
         drillToUpdate.setName(drill1.getName());
 
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
@@ -421,32 +419,8 @@ public class DrillControllerTest {
     }
 
     @Test
-    public void test_idEndpoint_put_entityIdNull() throws Exception {
-        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new DrillUpdateDTO())))
-            .andExpect(status().isBadRequest());
-
-        verify(drillService, times(0)).save(any());
-    }
-
-    @Test
-    public void test_idEndpoint_put_idMismatchFromPathAndBody() throws Exception {
-        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.empty());
-        DrillUpdateDTO drillToUpdate = new DrillUpdateDTO();
-        drillToUpdate.setId(drill1.getId() + 1);
-        drillToUpdate.setName(drill1.getName());
-
-        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(drillToUpdate)))
-            .andExpect(status().isBadRequest());
-
-        verify(drillService, times(0)).save(any());
-    }
-
-    @Test
     public void test_idEndpoint_put_jakartaCosntraintViolation_fails() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
         dtoToSend.setName("");
 
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
@@ -462,6 +436,7 @@ public class DrillControllerTest {
     */
     @Test
     public void test_idEndpoint_put_databaseInsertViolation_fails() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
         when(drillService.save(any())).thenThrow(new DatabaseInsertException("Specific Error message"));
 
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
