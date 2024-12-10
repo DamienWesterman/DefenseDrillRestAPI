@@ -46,7 +46,9 @@ import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertExcepti
 
 import lombok.extern.slf4j.Slf4j;
 
-// TODO: DOC COMMENTS
+/**
+ * Error handling controller for all exceptions.
+ */
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {

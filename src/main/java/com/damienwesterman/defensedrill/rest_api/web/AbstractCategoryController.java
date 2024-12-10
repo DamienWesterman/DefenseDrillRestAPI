@@ -136,7 +136,7 @@ public abstract class AbstractCategoryController
     }
 
     /**
-     * Endpoint to find an AbstractCategoryEntity by its name. Case INsensitive.
+     * Endpoint to find an AbstractCategoryEntity by its name. Case insensitive.
      *
      * @param name Name of the AbstractCategoryEntity.
      * @return ResponseEntity containing the found entity.

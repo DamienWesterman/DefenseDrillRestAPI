@@ -108,6 +108,12 @@ public class DrillController {
             .body(new DrillResponseDTO(createdDrill));
     }
 
+    /**
+     * Endpoint to find a DrillEntity by its name. Case insensitive.
+     *
+     * @param name Name of the DrillEntity
+     * @return ResponseEntity containing the found entity;
+     */
     @GetMapping("/name/{name}")
     public ResponseEntity<DrillResponseDTO> getDrillByName(@PathVariable String name) {
         return drillService.find(name)
@@ -115,6 +121,12 @@ public class DrillController {
                     .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Endpoint to find a DrillEntity by its ID.
+     *
+     * @param id ID of the DrillEntity.
+     * @return ResponseEntity containing the found entity.
+     */
     @GetMapping("/id/{id}")
     public ResponseEntity<DrillResponseDTO> getDrillById(@PathVariable Long id) {
         return drillService.find(id)
@@ -122,6 +134,13 @@ public class DrillController {
                     .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Endpoint to update a DrillEntity by its ID.
+     *
+     * @param id ID of the entity to update.
+     * @param drill Entity to update.
+     * @return ReponseEntity with the updated entity.
+     */
     @PutMapping("/id/{id}")
     @Transactional
     public ResponseEntity<DrillResponseDTO> updateDrillById(
@@ -153,12 +172,24 @@ public class DrillController {
         return ResponseEntity.ok(new DrillResponseDTO(updatedDrill));
     }
 
+    /**
+     * Endpoint to delete a DrillEntity by its ID.
+     *
+     * @param id ID of the entity to delete.
+     * @return Empty ResponseEntity.
+     */
     @DeleteMapping("/id/{id}")
     public ResponseEntity<String> deleteDrillById(@PathVariable Long id) {
         drillService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Endpoint to return a list of instruction descriptions of a DrillEntity by the drill's ID.
+     *
+     * @param id ID of the DrillEntity to retrieve the list of instruction descriptions.
+     * @return ResponseEntity with a List of Strings.
+     */
     @GetMapping("/id/{id}/how-to")
     public ResponseEntity<List<String>> getInstructionsByDrillId(@PathVariable Long id) {
         Optional<DrillEntity> optDrill = drillService.find(id);
@@ -180,6 +211,17 @@ public class DrillController {
         );
     }
 
+    /**
+     * Endpoint to retrieve InstructionEntity details of a given DrillEntity.
+     * <br><br>
+     * Specify the instructions to retrieve by the DrillEntity's ID and the index of the
+     * instructions in the drill's instructions list, retrieved in another endpoint.
+     *
+     * @param id ID of the DrillEntity.
+     * @param number The number of the instructions relative to the drill's instructions list.
+     * @return ResponseEntity containing the instruction details.
+     * @see {@link #getInstructionsByDrillId(Long)}
+     */
     @GetMapping("/id/{id}/how-to/{number}")
     public ResponseEntity<InstructionsDTO> getInstructionDetails(
             @PathVariable Long id, @PathVariable Long number) {
