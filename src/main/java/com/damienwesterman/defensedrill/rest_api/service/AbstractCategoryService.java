@@ -54,6 +54,7 @@ public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, 
      * @return The saved entity.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
+    @NonNull
     public E save(@NonNull E abstractCategory) throws DatabaseInsertException {
         return ErrorMessageUtils.trySave(repo, abstractCategory);
     }
@@ -83,6 +84,7 @@ public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, 
      *
      * @return List of AbstractCategoryEntity objects.
      */
+    @NonNull
     public List<E> findAll() {
         return repo.findAll();
     }
@@ -93,7 +95,8 @@ public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, 
      * @param ids List of AbstractCategoryEntity IDs.
      * @return List of AbstractCategoryEntity objects.
      */
-    public List<E> findAll(List<Long> ids) {
+    @NonNull
+    public List<E> findAll(@NonNull List<Long> ids) {
         return repo.findAllById(ids);
     }
 

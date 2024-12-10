@@ -82,6 +82,7 @@ import jakarta.validation.ConstraintViolationException;
      * @return The saved entity.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
+    @NonNull
     public static <T, S extends JpaRepository<T, Long>> T trySave(@NonNull S repo, @NonNull T entity) throws DatabaseInsertException {
         try {
             return repo.save(entity);
@@ -101,6 +102,7 @@ import jakarta.validation.ConstraintViolationException;
      * @param e Thrown exception.
      * @return User friendly error message string.
      */
+    @NonNull
     private static String exceptionToErrorMessage(@NonNull Exception e) {
         if (e instanceof DataIntegrityViolationException) {
             return sqlExceptionToString(e.getLocalizedMessage());
@@ -120,6 +122,7 @@ import jakarta.validation.ConstraintViolationException;
      * @param exception {@link DataIntegrityViolationException} or {@link TransactionSystemException} string error message.
      * @return User friendly error message string.
      */
+    @NonNull
     private static String sqlExceptionToString(String exception) {
         // Need to parse the exception to find the sql named constraint that was violated
         for (String constraintKey : constraintErrorMessageMap.keySet()) {
@@ -138,6 +141,7 @@ import jakarta.validation.ConstraintViolationException;
      * @param exception {@link ConstraintViolationException} string error message.
      * @return User friendly error message string.
      */
+    @NonNull
     private static String jakartaExceptionToErrorMessage(String exception) {
         StringBuilder errorMessage = new StringBuilder();
 
@@ -170,6 +174,7 @@ import jakarta.validation.ConstraintViolationException;
      * @param exception {@link InvalidDataAccessApiUsageException} string error message.
      * @return User friendly error message string.
      */
+    @NonNull
     private static String transientExceptionToErrorMessage(String exception) {
         Set<String> errorMessagesSet = new HashSet<>();
 

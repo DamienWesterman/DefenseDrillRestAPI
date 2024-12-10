@@ -28,6 +28,8 @@ package com.damienwesterman.defensedrill.rest_api.web.dto;
 
 import java.util.List;
 
+import org.springframework.lang.NonNull;
+
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -59,7 +61,7 @@ public class InstructionsDTO {
      *
      * @param instructions InstructionsEntity object.
      */
-    public InstructionsDTO(InstructionsEntity instructions) {
+    public InstructionsDTO(@NonNull InstructionsEntity instructions) {
         this.description = instructions.getDescription();
         this.steps = instructions.getStepsAsList();
         this.videoId = instructions.getVideoId();

@@ -78,6 +78,7 @@ public class DrillUpdateDTO {
      *
      * @return DrillEntity object.
      */
+    @NonNull
     public DrillEntity toEntity(@NonNull Long id) {
         // Set up the list of InstructionEntity objects
         List<InstructionsEntity> instructionEntities = new ArrayList<>();

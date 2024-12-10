@@ -18,6 +18,8 @@ package com.damienwesterman.defensedrill.rest_api.web.dto;
 
 import java.util.ArrayList;
 
+import org.springframework.lang.NonNull;
+
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -40,6 +42,7 @@ public class DrillCreateDTO {
      *
      * @return DrillEntity object.
      */
+    @NonNull
     public DrillEntity toEntity() {
         return DrillEntity.builder()
                 .name(this.name)

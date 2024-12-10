@@ -30,6 +30,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.lang.NonNull;
+
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -79,11 +82,12 @@ public class InstructionsEntity {
     private String steps;
 
     @Column
+    @Nullable
     @Size(max = 127)
     /** Video ID correlates to the Jellyfin Item ID */
     private String videoId;
 
-    public void setStepsFromList(List<String> stepsList) {
+    public void setStepsFromList(@NonNull List<String> stepsList) {
         this.steps = String.join("|", stepsList);
     }
 
@@ -94,6 +98,7 @@ public class InstructionsEntity {
      *         will NOT modify the internal state. {@link #setStepsFromList(List)}
      *         must be called to save any state changes.
      */
+    @NonNull
     public List<String> getStepsAsList() {
         // Make sure it is a mutable array
         return new ArrayList<String>(List.of(steps.split("\\|")));

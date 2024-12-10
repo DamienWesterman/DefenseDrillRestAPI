@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.lang.NonNull;
+
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
@@ -65,7 +67,7 @@ public class DrillResponseDTO {
      *
      * @param drill DrillEntity object to represent in a DTO.
      */
-    public DrillResponseDTO(DrillEntity drill) {
+    public DrillResponseDTO(@NonNull DrillEntity drill) {
         this.id = drill.getId();
         this.name = drill.getName();
 

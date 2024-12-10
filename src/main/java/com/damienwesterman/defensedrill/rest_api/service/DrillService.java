@@ -59,6 +59,7 @@ public class DrillService {
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
     @Transactional
+    @NonNull
     public DrillEntity save(@NonNull DrillEntity drill) throws DatabaseInsertException {
         /*
          * Compiler is generating a warning for each call to drill.getInstructions(). We can safely
@@ -111,6 +112,7 @@ public class DrillService {
      *
      * @return List of DrillEntity objects.
      */
+    @NonNull
     public List<DrillEntity> findAll() {
         return repo.findAll();
     }
