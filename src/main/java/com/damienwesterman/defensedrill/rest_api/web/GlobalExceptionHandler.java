@@ -26,8 +26,6 @@
 
 package com.damienwesterman.defensedrill.rest_api.web;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpHeaders;
@@ -44,6 +42,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
+import com.damienwesterman.defensedrill.rest_api.web.dto.ErrorMessageDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,16 +52,10 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    // TODO: FIXME: Start here, replace everything with ErrorMessageDTO
-    private static final String KEY_ERROR = "error";
-    private static final String KEY_MESSAGE = "message";
-
     @Override
     @Nullable
     protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException ex,
             @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
-        Map<String, String> errorBody = new HashMap<>();
-        errorBody.put(KEY_ERROR, "Malformed Argument");
         StringBuilder errorMessage = new StringBuilder();
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             errorMessage.append(Character.toUpperCase(error.getField().charAt(0)));
@@ -71,55 +64,56 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             errorMessage.append(error.getDefaultMessage());
             errorMessage.append(". ");
         });
-        errorBody.put(KEY_MESSAGE, errorMessage.toString());
 
-        return ResponseEntity.badRequest().body(errorBody);
+        return ResponseEntity.badRequest()
+            .body(ErrorMessageDTO.builder()
+                    .error("Malformed Argument")
+                    .message(errorMessage.toString())
+                    .build());
     }
 
     @ExceptionHandler(DatabaseInsertException.class)
-    public ResponseEntity<Map<String, String>> handleDatabaseInsertException(DatabaseInsertException die) {
-        Map<String, String> errorBody = new HashMap<>();
-        errorBody.put(KEY_ERROR, "Database Insert Error");
-        errorBody.put(KEY_MESSAGE, die.getMessage());
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody);
+    public ResponseEntity<ErrorMessageDTO> handleDatabaseInsertException(DatabaseInsertException die) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorMessageDTO.builder()
+                    .error("Database Insert Error")
+                    .message(die.getMessage())
+                    .build());
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Map<String, String>> handleNoSuchElementException(NoSuchElementException nsee) {
-        Map<String, String> errorBody = new HashMap<>();
-        errorBody.put(KEY_ERROR, "Resource Not Found");
-        errorBody.put(KEY_MESSAGE, nsee.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody);
+    public ResponseEntity<ErrorMessageDTO> handleNoSuchElementException(NoSuchElementException nsee) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorMessageDTO.builder()
+                    .error("Resource Not Found")
+                    .message(nsee.getMessage())
+                    .build());
     }
 
     @ExceptionHandler(IndexOutOfBoundsException.class)
-    public ResponseEntity<Map<String, String>> handleIndexOutOfBoundsException(IndexOutOfBoundsException ioobe) {
-        Map<String, String> errorBody = new HashMap<>();
-        errorBody.put(KEY_ERROR, "Index Out Of Bounds");
-        errorBody.put(KEY_MESSAGE, ioobe.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody);
+    public ResponseEntity<ErrorMessageDTO> handleIndexOutOfBoundsException(IndexOutOfBoundsException ioobe) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorMessageDTO.builder()
+                    .error("Index Out Of Bounds")
+                    .message(ioobe.getMessage())
+                    .build());
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
-    public ResponseEntity<Map<String, String>> handleLockingFailureException(ObjectOptimisticLockingFailureException oolfe) {
-        Map<String, String> errorBody = new HashMap<>();
-        errorBody.put(KEY_ERROR, "Update Conflict");
-        errorBody.put(KEY_MESSAGE, "Old data: please refresh and try again");
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody);
+    public ResponseEntity<ErrorMessageDTO> handleLockingFailureException(ObjectOptimisticLockingFailureException oolfe) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(ErrorMessageDTO.builder()
+                    .error("Update Conflict")
+                    .message("Old data: please refresh and try again")
+                    .build());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGenericException(Exception e) {
-        log.error("Unhandled Error", e);
-
-        Map<String, String> errorBody = new HashMap<>();
-        errorBody.put(KEY_ERROR, "Unknonw Error");
-        errorBody.put(KEY_MESSAGE, "An unexpected error has occurred.");
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorBody);
+    public ResponseEntity<ErrorMessageDTO> handleGenericException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ErrorMessageDTO.builder()
+                    .error("Unknonw Error")
+                    .message("An unexpected error has occurred.")
+                    .build());
     }
 }
