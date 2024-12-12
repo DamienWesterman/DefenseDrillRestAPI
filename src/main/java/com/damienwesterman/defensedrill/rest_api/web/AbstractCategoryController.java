@@ -38,10 +38,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.repository.AbstractCategoryRepo;
 import com.damienwesterman.defensedrill.rest_api.service.AbstractCategoryService;
+import com.damienwesterman.defensedrill.rest_api.web.dto.ErrorMessageDTO;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-// TODO: Swagger Comments (on the DTOs?)
 /**
  * Abstract superclass for {@link CategoryController} and {@link SubCategoryController}.
  * <br><br>
@@ -58,6 +64,15 @@ public abstract class AbstractCategoryController
      *
      * @return ResponseEntity with List of the AbstractCategoryEntity objects.
      */
+    @Operation(
+        summary = "Retrieve all categories.",
+        description = "Returns a list of all categories in the database."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categories exist in the database and were returned."),
+        @ApiResponse(responseCode = "204", description = "No categories exist in the database.",
+            content = @Content(/* No Content */))
+    })
     @GetMapping
     public ResponseEntity<List<E>> getAll() {
         List<E> abstractCategories = service.findAll();
@@ -75,6 +90,15 @@ public abstract class AbstractCategoryController
      * @param abstractCategory Entity to create.
      * @return ResponseEntity containing the created entity.
      */
+    @Operation(
+        summary = "Insert a new category.",
+        description = "Create a new category in the database. Returns the newly created category."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Category was created successfully."),
+        @ApiResponse(responseCode = "400", description = "Issue with request, check returned error message for details.",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDTO.class)))
+    })
     @PostMapping
     public ResponseEntity<E> insertNewAbstractCategory(@RequestBody @Valid E abstractCategory) {
         E createdAbstractCategory = service.save(abstractCategory);
@@ -89,6 +113,15 @@ public abstract class AbstractCategoryController
      * @param id ID of the AbstractCategoryEntity.
      * @return ResponseEntity containing the found entity.
      */
+    @Operation(
+        summary = "Find a category by its ID.",
+        description = "Search to see if a category exists by the given ID."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Category was found by the given ID."),
+        @ApiResponse(responseCode = "404", description = "No category exists with the given ID.",
+            content = @Content(/* No Content */))
+    })
     @GetMapping("/id/{id}")
     public ResponseEntity<E> getAbstractCategoryById(@PathVariable Long id) {
         return service.find(id)
@@ -96,7 +129,6 @@ public abstract class AbstractCategoryController
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // TODO: Swagger - abstractCategory.getID() MUST equal id, or be null
     /**
      * Endpoint to update an AbstractCategoryEntity by its ID.
      *
@@ -104,6 +136,18 @@ public abstract class AbstractCategoryController
      * @param abstractCategory Entity to udpate.
      * @return ResponseEntity with the updated entity.
      */
+    @Operation(
+        summary = "Update a category by its ID",
+        description = "Update a category. ID must equal the path ID or be left null in the object. "
+            + "Returns the newly updated category."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Category was updated successfully."),
+        @ApiResponse(responseCode = "400", description = "Issue with request, check returned error message for details.",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDTO.class))),
+        @ApiResponse(responseCode = "404", description = "No category exists with the given ID.",
+            content = @Content(/* No Content */))
+    })
     @PutMapping("/id/{id}")
     public ResponseEntity<E> updateAbstractCategoryById(
             @PathVariable Long id, @RequestBody @Valid E abstractCategory) {
@@ -129,6 +173,14 @@ public abstract class AbstractCategoryController
      * @param id ID of the entity to delete.
      * @return Empty ResponseEntity.
      */
+    @Operation(
+        summary = "Delete a category by its ID.",
+        description = "Remove a category from the database using the category ID."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Deletion was successful or ID did not exist anyway.",
+            content = @Content(/* No Content */))
+    })
     @DeleteMapping("/id/{id}")
     public ResponseEntity<String> deleteAbstractCategoryById(@PathVariable Long id) {
         service.delete(id);
@@ -141,6 +193,15 @@ public abstract class AbstractCategoryController
      * @param name Name of the AbstractCategoryEntity.
      * @return ResponseEntity containing the found entity.
      */
+    @Operation(
+        summary = "Find a category by its name.",
+        description = "Search to see if a category exists by the given name. Case insensitive."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Category was found by the given name."),
+        @ApiResponse(responseCode = "404", description = "No category exists with the given name.",
+            content = @Content(/* No Content */))
+    })
     @GetMapping("/name/{name}")
     public ResponseEntity<E> getAbstractCategoryByName(@PathVariable String name) {
         return service.find(name)

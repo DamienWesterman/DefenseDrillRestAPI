@@ -32,10 +32,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
 
-// TODO: Swagger Comments (on the DTOs?)
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * Controller responsible for CRUD operations for {@link SubCategoryEntity} objects with validation.
  */
+@Tag(
+    name = "SubCategory Controller",
+    description = "Offers all CRUD operations for SubCategories in the database."
+)
 @RestController
 @RequestMapping(SubCategoryController.ENDPOINT)
 public class SubCategoryController extends AbstractCategoryController<SubCategoryEntity, SubCategorySerivce> {

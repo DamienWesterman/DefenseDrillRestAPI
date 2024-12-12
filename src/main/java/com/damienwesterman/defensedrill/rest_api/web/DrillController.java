@@ -41,8 +41,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
@@ -64,18 +62,17 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-// TODO: Swagger comments (DTOs as well? Other DTOs/@Data objects? / Jakarta constraint messages on the DTOs)
 /**
  * Controller responsible for CRUD operations for {@link DrillEntity} objects with validation.
  * Extends to control over {@link InstructionsEntity} held within the DrillEntity.
  */
-@RestController
-@RequestMapping(DrillController.ENDPOINT)
-@RequiredArgsConstructor
 @Tag(
     name = "Drill Controller",
     description = "Offers all CRUD operations for Drills in the database."
 )
+@RestController
+@RequestMapping(DrillController.ENDPOINT)
+@RequiredArgsConstructor
 public class DrillController {
     public static final String ENDPOINT = "/drill";
     private final DrillService drillService;
