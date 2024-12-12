@@ -46,30 +46,30 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public abstract class AbstractCategoryEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // @NotNull -> This can (and should) be null when creating a new entity
     @Schema(
         description = "Database generated ID.",
         example = "12345"
     )
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @NotNull -> This can (and should) be null when creating a new entity
     protected Long id;
 
-    @Column(unique = true)
-    @NotEmpty
-    @Size(min = 1, max = 255)
     @Schema(
         description = "Consice category name.",
         example = "Strikes"
     )
+    @Column(unique = true)
+    @NotEmpty
+    @Size(min = 1, max = 255)
     protected String name;
 
-    @Column
-    @NotEmpty
-    @Size(min = 1, max = 511)
     @Schema(
         description = "Detailed category description.",
         example = "Using your arms and hands to strike your opponent."
     )
+    @Column
+    @NotEmpty
+    @Size(min = 1, max = 511)
     protected String description;
 }

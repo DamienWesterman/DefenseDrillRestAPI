@@ -32,18 +32,18 @@ import lombok.Data;
  * <br><br>
  * Used for incoming requests. Basically only contains a String name with validation.
  */
-@Data
 @Schema(
     name = "DrillCreateObject",
     description = "Object to create a new Drill."
 )
+@Data
 public class DrillCreateDTO {
-    @NotEmpty
-    @Size(min = 1, max = 255)
     @Schema(
         description = "Name of the Drill. Must be unique.",
         example = "Round Kick"
     )
+    @NotEmpty
+    @Size(min = 1, max = 255)
     private String name;
 
     /**

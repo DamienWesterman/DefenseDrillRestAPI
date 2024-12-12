@@ -47,48 +47,48 @@ import lombok.Data;
  * <br><br>
  * Used for incoming requests.
  */
-@Data
 @Schema(
     name = "DrillUpdateObject",
     description = "Information needed to update a Drill."
 )
+@Data
 public class DrillUpdateDTO {
-    @NotEmpty
-    @Size(min = 1, max = 255)
     @Schema(
         description = "Existing or new name of the Drill",
         example = "Round Kick"
     )
+    @NotEmpty
+    @Size(min = 1, max = 255)
     private String name;
 
-    @Nullable
-    @JsonProperty("categories")
     @Schema(
         description = "List of Category IDs the Drill belongs to.",
         example = "[1,2,3,4,5]"
     )
+    @Nullable
+    @JsonProperty("categories")
     private List<Long> categoryIds;
 
-    @Nullable
-    @JsonProperty("sub_categories")
     @Schema(
         description = "List of SubCategory IDs the Drill belongs to.",
         example = "[1,2,3,4,5]"
     )
+    @Nullable
+    @JsonProperty("sub_categories")
     private List<Long> subCategoryIds;
 
-    @Nullable
-    @JsonProperty("related_drills")
     @Schema(
         description = "List of Drill IDs this Drill mentions.",
         example = "[6,7,8,9,0]"
     )
+    @Nullable
+    @JsonProperty("related_drills")
     private List<Long> relatedDrills;
 
-    @Nullable
     @Schema(
         description = "List of different instructions to perform this drill."
     )
+    @Nullable
     private List<InstructionsDTO> instructions;
 
     /**

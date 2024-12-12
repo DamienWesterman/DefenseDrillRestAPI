@@ -44,33 +44,33 @@ import lombok.RequiredArgsConstructor;
  * <br><br>
  * Used for incoming and outgoing requests to represent instructionsEntity objects.
  */
-@Data
-@RequiredArgsConstructor
 @Schema(
     name = "Instructions",
     description = "Detailed Instructions to perform a Drill."
 )
+@Data
+@RequiredArgsConstructor
 public class InstructionsDTO {
-    @NotEmpty
-    @Size(min = 1, max = 511)
     @Schema(
         description = "Description of the Instructions.",
         example = "Pluck then Strike"
     )
+    @NotEmpty
+    @Size(min = 1, max = 511)
     private String description;
 
-    @NotEmpty
     @Schema(
         description = "List of steps. No numbers needed.",
         example = "[\"Pluck\",\"Strike\"]"
     )
+    @NotEmpty
     private List<String> steps;
 
-    @JsonProperty("video_id")
     @Schema(
         description = "Jellyfin Item ID.",
         example = "abcdefg123456789"
     )
+    @JsonProperty("video_id")
     private String videoId;
 
     /**

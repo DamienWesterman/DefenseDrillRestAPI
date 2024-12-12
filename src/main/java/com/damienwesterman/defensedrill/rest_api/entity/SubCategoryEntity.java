@@ -38,16 +38,16 @@ import lombok.experimental.SuperBuilder;
 /**
  * Database Entity to contain all the information for a drill SubCategory.
  */
+@Schema(
+    name = "SubCategory",
+    description = "More specific type of category for a Drill, such as a Strike or Kick."
+)
 @Entity
 @Data
 @Table(name = "sub_categories")
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @SuperBuilder
-@Schema(
-    name = "SubCategory",
-    description = "More specific type of category for a Drill, such as a Strike or Kick."
-)
 public class SubCategoryEntity extends AbstractCategoryEntity {
     public SubCategoryEntity() {}
 }

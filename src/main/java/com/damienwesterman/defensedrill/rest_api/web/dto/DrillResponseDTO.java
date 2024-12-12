@@ -49,14 +49,14 @@ import lombok.Setter;
  * This DTO should only be outbound, <b><i>NEVER</b></i> inbound requests as it contains no
  * input validation.
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Schema(
     name = "DrillInfo",
     description = "All information relating to a Drill."
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DrillResponseDTO {
     @Schema(
         description = "Database generated ID.",
@@ -70,25 +70,25 @@ public class DrillResponseDTO {
     )
     private String name;
 
-    @JsonProperty("categories")
     @Schema(
         description = "List of Category IDs the Drill belongs to.",
         example = "[1,2,3,4,5]"
     )
+    @JsonProperty("categories")
     private List<Long> categoryIds;
 
-    @JsonProperty("sub_categories")
     @Schema(
         description = "List of SubCategory IDs the Drill belongs to.",
         example = "[1,2,3,4,5]"
     )
+    @JsonProperty("sub_categories")
     private List<Long> subCategoryIds;
 
-    @JsonProperty("related_drills")
     @Schema(
         description = "List of Drill IDs this Drill mentions.",
         example = "[6,7,8,9,0]"
     )
+    @JsonProperty("related_drills")
     private List<Long> relatedDrillIds;
 
     /**

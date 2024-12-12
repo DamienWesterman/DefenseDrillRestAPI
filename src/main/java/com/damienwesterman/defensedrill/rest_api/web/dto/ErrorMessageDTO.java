@@ -31,13 +31,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Builder
-@Getter
-@Setter
 @Schema(
     name = "ErrorMessage",
     description = "Error message containing user friendly message."
 )
+@Builder
+@Getter
+@Setter
 public class ErrorMessageDTO {
     @Schema(
         description = "Error type.",
