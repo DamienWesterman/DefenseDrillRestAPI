@@ -34,7 +34,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
 
 /**
- * Interface for an {@link AbstractCategoryEntity}.
+ * Interface for an {@link AbstractCategoryEntity} database repository.
  */
 @NoRepositoryBean
 public interface AbstractCategoryRepo<E extends AbstractCategoryEntity> extends JpaRepository<E, Long> {

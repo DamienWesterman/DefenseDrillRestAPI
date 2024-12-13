@@ -31,6 +31,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * DTO to send descriptive error messages back to caller.
+ * <br><br>
+ * This is an outbound request only.
+ */
 @Schema(
     name = "ErrorMessage",
     description = "Error message containing user friendly message."
@@ -44,6 +49,7 @@ public class ErrorMessageDTO {
         example = "Malformed Argument"
     )
     private String error;
+
     @Schema(
         description = "Detailed user friendly error message.",
         example = "Name must not be empty."

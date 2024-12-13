@@ -1,3 +1,13 @@
+/****************************\
+ *      ________________      *
+ *     /  _             \     *
+ *     \   \ |\   _  \  /     *
+ *      \  / | \ / \  \/      *
+ *      /  \ | / | /  /\      *
+ *     /  _/ |/  \__ /  \     *
+ *     \________________/     *
+ *                            *
+ \****************************/
 /*
  * Copyright 2024 Damien Westerman
  *
@@ -30,7 +40,7 @@ import lombok.Data;
 /**
  * DTO for creating a {@link DrillEntity}.
  * <br><br>
- * Used for incoming requests. Basically only contains a String name with validation.
+ * Used for incoming requests. Only contains a String name with validation.
  */
 @Schema(
     name = "DrillCreateObject",

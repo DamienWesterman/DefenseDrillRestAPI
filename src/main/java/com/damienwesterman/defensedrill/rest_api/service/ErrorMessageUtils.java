@@ -72,18 +72,19 @@ import jakarta.validation.ConstraintViolationException;
     private ErrorMessageUtils() { }
 
     /**
-     * Wrapper function to call JpaRespository.save(). Handles any exception the database might
+     * Wrapper function to call {@link JpaRepository#save(Object)}. Handles any exception the database might
      * throw and re-throws it with a user friendly error message.
      *
-     * @param <T> T - Database Entity.
-     * @param <S> S - {@link JpaRepository} for T entity.
+     * @param <E> E - Database Entity.
+     * @param <R> R - {@link JpaRepository} for E entity.
      * @param entity The entity to attempt to save.
      * @param repo Repository to use for the save operation.
      * @return The saved entity.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
     @NonNull
-    public static <T, S extends JpaRepository<T, Long>> T trySave(@NonNull S repo, @NonNull T entity) throws DatabaseInsertException {
+    public static <E, R extends JpaRepository<E, Long>> E trySave(
+            @NonNull E entity, @NonNull R repo) throws DatabaseInsertException {
         try {
             return repo.save(entity);
         } catch (ConstraintViolationException |

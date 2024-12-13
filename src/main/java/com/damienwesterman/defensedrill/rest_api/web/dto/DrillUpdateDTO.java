@@ -106,13 +106,13 @@ public class DrillUpdateDTO {
     public DrillEntity toEntity(@NonNull Long id) {
         // Set up the list of InstructionEntity objects
         List<InstructionsEntity> instructionEntities = new ArrayList<>();
-        if (null != this.instructions && 0 < this.instructions.size()) {
+        if (null != this.instructions && !this.instructions.isEmpty()) {
             for (int i = 0; i < this.instructions.size(); i++) {
                 instructionEntities.add(InstructionsEntity.builder()
                     .drillId(id)
                     .number((long) i)
                     .description(instructions.get(i).getDescription())
-                    .steps(null)
+                    .steps(null) // Set down below
                     .videoId(instructions.get(i).getVideoId())
                     .build());
                 instructionEntities.get(i)

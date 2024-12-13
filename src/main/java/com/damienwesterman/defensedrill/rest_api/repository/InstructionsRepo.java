@@ -33,6 +33,8 @@ import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 
 /**
  * Database repository for {@link InstructionsEntity}.
+ * <br><br>
+ * Currently unused, Instructions updates mostly go through {@link DrillRepo}.
  */
 @Repository
 public interface InstructionsRepo extends JpaRepository<InstructionsEntity, InstructionsEntity.InstructionId> {

@@ -61,12 +61,26 @@ public class DrillService {
     @Transactional
     @NonNull
     public DrillEntity save(@NonNull DrillEntity drill) throws DatabaseInsertException {
+        // Saving null lists in the database can cause issues
+        if(null == drill.getCategories()) {
+            drill.setCategories(List.of());
+        }
+        if (null == drill.getSubCategories()) {
+            drill.setSubCategories(List.of());
+        }
+        if (null == drill.getRelatedDrills()) {
+            drill.setRelatedDrills(List.of());
+        }
         /*
          * Compiler is generating a warning for each call to drill.getInstructions(). We can safely
          * ignore this because of this first null check here.
          */
-        if (null == drill.getInstructions() || drill.getInstructions().isEmpty()) {
-            return ErrorMessageUtils.trySave(repo, drill);
+        if (null == drill.getInstructions()) {
+            drill.setInstructions(List.of());
+        }
+
+        if (drill.getInstructions().isEmpty()) {
+            return ErrorMessageUtils.trySave(drill, repo);
         }
 
         /*
@@ -76,7 +90,7 @@ public class DrillService {
         */
         List<InstructionsEntity> instructions = new ArrayList<>(drill.getInstructions());
         drill.getInstructions().clear();
-        DrillEntity returnedDrill = ErrorMessageUtils.trySave(repo, drill);
+        DrillEntity returnedDrill = ErrorMessageUtils.trySave(drill, repo);
 
         instructions.forEach(instructionsEntity ->
             instructionsEntity.setDrillId(returnedDrill.getId())
@@ -84,7 +98,7 @@ public class DrillService {
         returnedDrill.getInstructions().addAll(instructions);
 
         // Update the existing drill with the instructions
-        return ErrorMessageUtils.trySave(repo, returnedDrill);
+        return ErrorMessageUtils.trySave(returnedDrill, repo);
     }
 
     /**

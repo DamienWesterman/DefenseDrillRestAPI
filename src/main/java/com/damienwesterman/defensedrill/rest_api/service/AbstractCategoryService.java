@@ -36,7 +36,7 @@ import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertExcepti
 import com.damienwesterman.defensedrill.rest_api.repository.AbstractCategoryRepo;
 
 /**
- * Service class for interacting with {@link AbstractCategoryEntity} objects in the database.
+ * Abstract service superclass for interacting with {@link AbstractCategoryEntity} objects in the database.
  */
 public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, R extends AbstractCategoryRepo<E>> {
     protected final R repo;
@@ -56,7 +56,7 @@ public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, 
      */
     @NonNull
     public E save(@NonNull E abstractCategory) throws DatabaseInsertException {
-        return ErrorMessageUtils.trySave(repo, abstractCategory);
+        return ErrorMessageUtils.trySave(abstractCategory, repo);
     }
 
     /**
