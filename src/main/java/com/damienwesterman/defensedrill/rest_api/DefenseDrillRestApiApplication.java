@@ -29,6 +29,10 @@ package com.damienwesterman.defensedrill.rest_api;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.Bean;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 
 @SpringBootApplication
 @EnableDiscoveryClient
@@ -38,4 +42,13 @@ public class DefenseDrillRestApiApplication {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
 	}
 
+    @Bean
+    OpenAPI swaggerHeader() {
+		return new OpenAPI()
+			.info(new Info()
+				.title("DefenseDrill Rest API")
+				.description("Rest API for managing drills, categories, and instructions.")
+				.version("1.0.0")
+			);
+	}
 }
