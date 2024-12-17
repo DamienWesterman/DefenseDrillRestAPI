@@ -179,7 +179,10 @@ public class DrillControllerTest {
     @Test
     public void test_rootEndpoint_post_invalidArgumentWithNoObject() throws Exception {
         mockMvc.perform(post(DrillController.ENDPOINT))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
         verify(drillService, times(0)).save(any());
     }
 
@@ -188,7 +191,10 @@ public class DrillControllerTest {
         mockMvc.perform(post(DrillController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
         verify(drillService, times(0)).save(any());
     }
 
@@ -197,7 +203,10 @@ public class DrillControllerTest {
         mockMvc.perform(post(DrillController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"wrong\":\"field\"}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
         verify(drillService, times(0)).save(any());
     }
 
@@ -229,7 +238,10 @@ public class DrillControllerTest {
         mockMvc.perform(post(DrillController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dtoToSend)))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
 
         verify(drillService, times(0)).save(any());
     }
@@ -241,7 +253,10 @@ public class DrillControllerTest {
         mockMvc.perform(post(DrillController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dtoToSend)))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -323,7 +338,10 @@ public class DrillControllerTest {
         when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
 
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
 
         verify(drillService, times(0)).find(DRILL_ID_1);
     }
@@ -335,7 +353,10 @@ public class DrillControllerTest {
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
 
         verify(drillService, times(0)).find(DRILL_ID_1);
     }
@@ -347,7 +368,10 @@ public class DrillControllerTest {
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"bad\":\"argument\"}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
 
         verify(drillService, times(0)).find(DRILL_ID_1);
     }
@@ -427,7 +451,10 @@ public class DrillControllerTest {
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dtoToSend)))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
 
         verify(drillService, times(0)).save(any());
     }
@@ -443,7 +470,10 @@ public class DrillControllerTest {
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dtoToSend)))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test

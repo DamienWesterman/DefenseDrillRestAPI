@@ -38,7 +38,6 @@ import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.repository.DrillRepo;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 /**

@@ -34,6 +34,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -115,7 +117,10 @@ public class CategoryControllerTest {
     @Test
     public void test_rootEndpoint_post_invalidArgumentWithNoObject() throws Exception {
         mockMvc.perform(post(CategoryController.ENDPOINT))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -123,7 +128,10 @@ public class CategoryControllerTest {
         mockMvc.perform(post(CategoryController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -131,7 +139,10 @@ public class CategoryControllerTest {
         mockMvc.perform(post(CategoryController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"wrong\":\"field\"}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -167,7 +178,10 @@ public class CategoryControllerTest {
         mockMvc.perform(post(CategoryController.ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(entityToSave)))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -176,7 +190,10 @@ public class CategoryControllerTest {
         mockMvc.perform(post(CategoryController.ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(category1)))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -217,7 +234,10 @@ public class CategoryControllerTest {
     @Test
     public void test_idEndpoint_put_invalidArgumentWithNoObject() throws Exception {
         mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -225,7 +245,10 @@ public class CategoryControllerTest {
         mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -233,7 +256,10 @@ public class CategoryControllerTest {
         mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"wrong\":\"field\"}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -294,7 +320,10 @@ public class CategoryControllerTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.id").doesNotExist())
             .andExpect(jsonPath("$.name").doesNotExist())
-            .andExpect(jsonPath("$.description").doesNotExist());
+            .andExpect(jsonPath("$.description").doesNotExist())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
 
         verify(service, times(0)).save(category1);
     }
@@ -309,7 +338,10 @@ public class CategoryControllerTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.id").doesNotExist())
             .andExpect(jsonPath("$.name").doesNotExist())
-            .andExpect(jsonPath("$.description").doesNotExist());
+            .andExpect(jsonPath("$.description").doesNotExist())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
 
         verify(service, times(0)).save(category1);
     }
@@ -325,7 +357,10 @@ public class CategoryControllerTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.id").doesNotExist())
             .andExpect(jsonPath("$.name").doesNotExist())
-            .andExpect(jsonPath("$.description").doesNotExist());
+            .andExpect(jsonPath("$.description").doesNotExist())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
     }
 
     @Test

@@ -37,6 +37,8 @@ import io.swagger.v3.oas.models.info.Info;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class DefenseDrillRestApiApplication {
+	// TODO: '|' is an invalild character for steps
+	// TODO: check and address any warnings in the spring startup
 
 	public static void main(String[] args) {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);

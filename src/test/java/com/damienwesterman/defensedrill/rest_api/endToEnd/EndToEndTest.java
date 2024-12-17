@@ -27,6 +27,8 @@
 package com.damienwesterman.defensedrill.rest_api.endToEnd;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,7 @@ import com.damienwesterman.defensedrill.rest_api.web.DrillController;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
+import com.damienwesterman.defensedrill.rest_api.web.dto.ErrorMessageDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.InstructionsDTO;
 
 @SuppressWarnings("null")
@@ -294,25 +297,27 @@ public class EndToEndTest {
          * it is treated as an update and is successful.
          */
         category1.setId(null);
-        ResponseEntity<CategoryEntity> response =
+        ResponseEntity<ErrorMessageDTO> response =
             restTemplate.postForEntity(
                 CategoryController.ENDPOINT,
                 category1,
-                CategoryEntity.class);
+                ErrorMessageDTO.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(!response.getBody().getError().isBlank());
     }
 
     @Test
     public void test_drill_withNonUniqueName_returnsError() {
         drillRepo.save(drill1);
-        ResponseEntity<DrillResponseDTO> response =
+        ResponseEntity<ErrorMessageDTO> response =
             restTemplate.postForEntity(
                 URI.create(DrillController.ENDPOINT),
                 dtoToSend,
-                DrillResponseDTO.class);
+                ErrorMessageDTO.class);
         System.out.println(response.getBody());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(!response.getBody().getError().isBlank());
     }
 
     @Test
@@ -337,20 +342,20 @@ public class EndToEndTest {
 
     @Test
     public void test_category_withNonExistentId_returns404() {
-        ResponseEntity<CategoryEntity[]> response =
+        ResponseEntity<Object> response =
             restTemplate.getForEntity(
                 CategoryController.ENDPOINT + "/id/0",
-                CategoryEntity[].class);
+                Object.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
     public void test_drill_withNonExistentId_returns404() {
-        ResponseEntity<DrillResponseDTO[]> response =
+        ResponseEntity<Object> response =
             restTemplate.getForEntity(
                 URI.create(DrillController.ENDPOINT + "/id/0"),
-                DrillResponseDTO[].class);
+                Object.class);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }

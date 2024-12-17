@@ -28,10 +28,12 @@ package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.util.NoSuchElementException;
 
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -56,6 +58,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Nullable
     protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException ex,
             @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        // Ex. user provides bad jakarta constraints and fails validation
         StringBuilder errorMessage = new StringBuilder();
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             errorMessage.append(Character.toUpperCase(error.getField().charAt(0)));
@@ -70,6 +73,30 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                     .error("Malformed Argument")
                     .message(errorMessage.toString())
                     .build());
+    }
+
+    @Override
+    @Nullable
+    protected ResponseEntity<Object> handleTypeMismatch(@NonNull TypeMismatchException ex, @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        // Ex. user provides a String for a Long path ID variable
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorMessageDTO.builder()
+                    .error("Type Mismatch")
+                    .message(ex.getLocalizedMessage())
+                    .build());
+    }
+
+    @Override
+    @Nullable
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException ex,
+            @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        // Ex. user neglects to provide correct body arguments and fails validation
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorMessageDTO.builder()
+                .error("Missing Body")
+                .message("A body is required for this request.")
+                .build());
     }
 
     @ExceptionHandler(DatabaseInsertException.class)
