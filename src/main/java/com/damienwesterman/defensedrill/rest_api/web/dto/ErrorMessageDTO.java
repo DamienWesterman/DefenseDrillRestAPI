@@ -24,32 +24,35 @@
  * limitations under the License.
  */
 
-package com.damienwesterman.defensedrill.rest_api;
+package com.damienwesterman.defensedrill.rest_api.web.dto;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.context.annotation.Bean;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
+/**
+ * DTO to send descriptive error messages back to caller.
+ * <br><br>
+ * This is an outbound request only.
+ */
+@Schema(
+    name = "ErrorMessage",
+    description = "Error message containing user friendly message."
+)
+@Builder
+@Getter
+@Setter
+public class ErrorMessageDTO {
+    @Schema(
+        description = "Error type.",
+        example = "Malformed Argument"
+    )
+    private String error;
 
-@SpringBootApplication
-@EnableDiscoveryClient
-public class DefenseDrillRestApiApplication {
-	// TODO: check and address any warnings in the spring startup
-
-	public static void main(String[] args) {
-		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
-	}
-
-    @Bean
-    OpenAPI swaggerHeader() {
-		return new OpenAPI()
-			.info(new Info()
-				.title("DefenseDrill Rest API")
-				.description("Rest API for managing drills, categories, and instructions.")
-				.version("1.0.0")
-			);
-	}
+    @Schema(
+        description = "Detailed user friendly error message.",
+        example = "Name must not be empty."
+    )
+    private String message;
 }

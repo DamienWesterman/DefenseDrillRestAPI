@@ -24,32 +24,19 @@
  * limitations under the License.
  */
 
-package com.damienwesterman.defensedrill.rest_api;
+package com.damienwesterman.defensedrill.rest_api.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.context.annotation.Bean;
+import java.util.Optional;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-@SpringBootApplication
-@EnableDiscoveryClient
-public class DefenseDrillRestApiApplication {
-	// TODO: check and address any warnings in the spring startup
+import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
 
-	public static void main(String[] args) {
-		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
-	}
-
-    @Bean
-    OpenAPI swaggerHeader() {
-		return new OpenAPI()
-			.info(new Info()
-				.title("DefenseDrill Rest API")
-				.description("Rest API for managing drills, categories, and instructions.")
-				.version("1.0.0")
-			);
-	}
+/**
+ * Interface for an {@link AbstractCategoryEntity} database repository.
+ */
+@NoRepositoryBean
+public interface AbstractCategoryRepo<E extends AbstractCategoryEntity> extends JpaRepository<E, Long> {
+    Optional<E> findByNameIgnoreCase(String name);
 }

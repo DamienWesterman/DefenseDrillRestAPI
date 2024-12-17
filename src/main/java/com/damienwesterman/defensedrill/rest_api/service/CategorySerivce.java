@@ -24,32 +24,20 @@
  * limitations under the License.
  */
 
-package com.damienwesterman.defensedrill.rest_api;
+package com.damienwesterman.defensedrill.rest_api.service;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
+import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
+import com.damienwesterman.defensedrill.rest_api.repository.CategoryRepo;
 
-@SpringBootApplication
-@EnableDiscoveryClient
-public class DefenseDrillRestApiApplication {
-	// TODO: check and address any warnings in the spring startup
 
-	public static void main(String[] args) {
-		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
-	}
-
-    @Bean
-    OpenAPI swaggerHeader() {
-		return new OpenAPI()
-			.info(new Info()
-				.title("DefenseDrill Rest API")
-				.description("Rest API for managing drills, categories, and instructions.")
-				.version("1.0.0")
-			);
-	}
+/**
+ * Service class for interacting with {@link CategoryEntity} objects in the database.
+ */
+@Service
+public class CategorySerivce extends AbstractCategoryService<CategoryEntity, CategoryRepo> {
+    public CategorySerivce(CategoryRepo repo) {
+        super(repo);
+    }
 }
