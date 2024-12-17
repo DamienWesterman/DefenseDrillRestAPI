@@ -28,6 +28,8 @@ package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
 import java.util.List;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -149,10 +151,13 @@ public abstract class AbstractCategoryController
             content = @Content(/* No Content */))
     })
     @PutMapping("/id/{id}")
-    public ResponseEntity<E> updateAbstractCategoryById(
+    public ResponseEntity<Object> updateAbstractCategoryById(
             @PathVariable Long id, @RequestBody @Valid E abstractCategory) {
         if (null != abstractCategory.getId() && abstractCategory.getId() != id) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessageDTO.builder()
+                .error("ID Mismatch")
+                .message("ID provided in path does not match ID provided in request body.")
+                .build());
         }
 
         if (service.find(id).isEmpty()) {
