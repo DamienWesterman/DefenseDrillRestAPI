@@ -209,13 +209,13 @@ public class DrillController {
         DrillEntity drillToUpdate = drill.toEntity(id);
 
         // Set Categories
-        if (null != drill.getCategoryIds() && 0 < drill.getCategoryIds().size()) {
+        if (null != drill.getCategoryIds() && !drill.getCategoryIds().isEmpty()) {
             // IDs that are not in the database are ignored
             drillToUpdate.setCategories(categorySerivce.findAll(drill.getCategoryIds()));
         }
 
         // Set SubCategories
-        if (null != drill.getSubCategoryIds() && 0 < drill.getSubCategoryIds().size()) {
+        if (null != drill.getSubCategoryIds() && !drill.getSubCategoryIds().isEmpty()) {
             // IDs that are not in the database are ignored
             drillToUpdate.setSubCategories(subCategorySerivce.findAll(drill.getSubCategoryIds()));
         }

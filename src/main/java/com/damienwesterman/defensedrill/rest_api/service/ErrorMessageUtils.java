@@ -188,7 +188,7 @@ import jakarta.validation.ConstraintViolationException;
             errorMessagesSet.add(entity);
         }
 
-        if (0 < errorMessagesSet.size()) {
+        if (!errorMessagesSet.isEmpty()) {
             StringBuilder errorMessage = new StringBuilder();
             errorMessage.append("Entity does not exist in database: ");
             errorMessage.append(String.join(", ", errorMessagesSet));
