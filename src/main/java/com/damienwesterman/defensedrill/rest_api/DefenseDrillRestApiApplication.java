@@ -37,7 +37,6 @@ import io.swagger.v3.oas.models.info.Info;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class DefenseDrillRestApiApplication {
-	// TODO: check and address any warnings in the spring startup
 
 	public static void main(String[] args) {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
