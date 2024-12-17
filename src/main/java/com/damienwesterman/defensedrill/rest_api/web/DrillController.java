@@ -208,10 +208,12 @@ public class DrillController {
         }
 
         // Validate steps ('|' must not be used)
-        for (InstructionsDTO instructions : drill.getInstructions()) {
-            for (String step : instructions.getSteps()) {
-                if (step.contains("|")) {
-                    throw new DatabaseInsertException("Invalid character: '|'");
+        if (null != drill.getInstructions() && !drill.getInstructions().isEmpty()) {
+            for (InstructionsDTO instructions : drill.getInstructions()) {
+                for (String step : instructions.getSteps()) {
+                    if (step.contains("|")) {
+                        throw new DatabaseInsertException("Invalid character: '|'");
+                    }
                 }
             }
         }
