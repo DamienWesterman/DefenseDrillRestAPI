@@ -58,7 +58,6 @@ public class DrillService {
      * @return The saved entity.
      * @throws DatabaseInsertException Thrown when there is any issue saving the entity.
      */
-    @Transactional
     @NonNull
     public DrillEntity save(@NonNull DrillEntity drill) throws DatabaseInsertException {
         // Saving null lists in the database can cause issues

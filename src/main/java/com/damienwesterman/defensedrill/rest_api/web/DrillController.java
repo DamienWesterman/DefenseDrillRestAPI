@@ -111,7 +111,7 @@ public class DrillController {
     /**
      * Endpoint to insert a new DrillEntity into the database.
      * <br><br>
-     * This essentially creates an empty drill with only a name. To include any realted drills,
+     * This essentially creates an empty drill with only a name. To include any related drills,
      * categories, subCategories, or instructions, see
      * {@link #updateDrillById(Long, DrillUpdateDTO)}.
      *
@@ -201,7 +201,6 @@ public class DrillController {
             content = @Content(/* No Content */))
     })
     @PutMapping("/id/{id}")
-    @Transactional
     public ResponseEntity<DrillResponseDTO> updateDrillById(
         @PathVariable Long id, @RequestBody @Valid DrillUpdateDTO drill) {
         if (drillService.find(id).isEmpty()) {
