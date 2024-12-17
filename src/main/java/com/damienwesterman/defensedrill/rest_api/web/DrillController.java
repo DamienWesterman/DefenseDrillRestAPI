@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
+import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.service.DrillService;
 import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
@@ -204,6 +205,15 @@ public class DrillController {
         @PathVariable Long id, @RequestBody @Valid DrillUpdateDTO drill) {
         if (drillService.find(id).isEmpty()) {
             return ResponseEntity.notFound().build();
+        }
+
+        // Validate steps ('|' must not be used)
+        for (InstructionsDTO instructions : drill.getInstructions()) {
+            for (String step : instructions.getSteps()) {
+                if (step.contains("|")) {
+                    throw new DatabaseInsertException("Invalid character: '|'");
+                }
+            }
         }
 
         DrillEntity drillToUpdate = drill.toEntity(id);

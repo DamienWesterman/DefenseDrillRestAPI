@@ -477,6 +477,31 @@ public class DrillControllerTest {
     }
 
     @Test
+    public void test_idEndpoint_put_pipeCharacterInSteps_fails() throws Exception {
+        when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
+
+        // Set up drill transfer object
+        DrillUpdateDTO drillToUpdate = new DrillUpdateDTO();
+        drillToUpdate.setName(drill1.getName());
+        drillToUpdate.setCategoryIds(List.of(category1.getId()));
+        drillToUpdate.setSubCategoryIds(List.of(subCategory1.getId()));
+        drillToUpdate.setRelatedDrills(List.of(RELATED_DRILL_ID));
+        InstructionsDTO instructionsToAdd = new InstructionsDTO();
+        instructionsToAdd.setDescription(instructions1.getDescription());
+        instructionsToAdd.setSteps(List.of(STEP_ONE, STEP_TWO, "STEP|THREE"));
+        instructionsToAdd.setVideoId(instructions1.getVideoId());
+        drillToUpdate.setInstructions(List.of(instructionsToAdd));
+
+        mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(drillToUpdate)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
     public void test_idEndpoint_post_fails() throws Exception {
         mockMvc.perform(post(DrillController.ENDPOINT + "/id/" + DRILL_ID_1))
             .andExpect(status().isMethodNotAllowed());
