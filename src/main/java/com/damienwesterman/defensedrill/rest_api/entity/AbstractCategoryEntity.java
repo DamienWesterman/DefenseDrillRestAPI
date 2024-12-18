@@ -40,6 +40,8 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * Abstract superclass for {@link CategoryEntity} and {@link SubCategoryEntity}.
+ * <br><br>
+ * NOTE: Any changes here must also be reflected in the MVC repo.
  */
 @MappedSuperclass
 @Data

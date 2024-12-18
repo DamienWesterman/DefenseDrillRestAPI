@@ -35,6 +35,8 @@ import lombok.Setter;
  * DTO to send descriptive error messages back to caller.
  * <br><br>
  * This is an outbound request only.
+ * <br><br>
+ * NOTE: Any changes here must also be reflected in the MVC repo.
  */
 @Schema(
     name = "ErrorMessage",

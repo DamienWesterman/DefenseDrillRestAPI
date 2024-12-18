@@ -36,6 +36,8 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * Database Entity to contain all the information for a drill Category.
+ * <br><br>
+ * NOTE: Any changes here must also be reflected in the MVC repo.
  */
 @Schema(
     name = "Category",
