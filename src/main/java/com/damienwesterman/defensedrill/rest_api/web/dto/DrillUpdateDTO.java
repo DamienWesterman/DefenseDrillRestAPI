@@ -46,6 +46,8 @@ import lombok.Data;
  * DTO for updating a {@link DrillEntity}.
  * <br><br>
  * Used for incoming requests.
+ * <br><br>
+ * NOTE: Any changes here must also be reflected in the MVC repo.
  */
 @Schema(
     name = "DrillUpdateObject",

@@ -43,6 +43,8 @@ import lombok.RequiredArgsConstructor;
  * DTO for all requests involving {@link InstructionsEntity}.
  * <br><br>
  * Used for incoming and outgoing requests to represent instructionsEntity objects.
+ * <br><br>
+ * NOTE: Any changes here must also be reflected in the MVC repo.
  */
 @Schema(
     name = "Instructions",

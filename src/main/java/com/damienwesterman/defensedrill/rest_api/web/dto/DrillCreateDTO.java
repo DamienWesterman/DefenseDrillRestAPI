@@ -41,6 +41,8 @@ import lombok.Data;
  * DTO for creating a {@link DrillEntity}.
  * <br><br>
  * Used for incoming requests. Only contains a String name with validation.
+ * <br><br>
+ * NOTE: Any changes here must also be reflected in the MVC repo.
  */
 @Schema(
     name = "DrillCreateObject",

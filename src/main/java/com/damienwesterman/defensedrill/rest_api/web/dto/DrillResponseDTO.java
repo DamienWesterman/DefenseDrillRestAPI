@@ -48,6 +48,8 @@ import lombok.Setter;
  * <br><br>
  * This DTO should only be outbound, <b><i>NEVER</b></i> inbound requests as it contains no
  * input validation.
+ * <br><br>
+ * NOTE: Any changes here must also be reflected in the MVC repo.
  */
 @Schema(
     name = "DrillInfo",
