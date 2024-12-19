@@ -93,6 +93,11 @@ public class DrillResponseDTO {
     @JsonProperty("related_drills")
     private List<Long> relatedDrillIds;
 
+    @Schema(
+        description = "List of Instructional how-tos to perform this Drill."
+    )
+    private List<InstructionsDTO> instructions;
+
     /**
      * Parameterized constructor using a DrillEntity object.
      *
@@ -119,5 +124,13 @@ public class DrillResponseDTO {
         }
 
         this.relatedDrillIds = drill.getRelatedDrills();
+
+        if (null == drill.getInstructions()) {
+            this.instructions = new ArrayList<>();
+        } else {
+            this.instructions = drill.getInstructions().stream()
+                                    .map(InstructionsDTO::new)
+                                    .collect(Collectors.toList());
+        }
     }
 }

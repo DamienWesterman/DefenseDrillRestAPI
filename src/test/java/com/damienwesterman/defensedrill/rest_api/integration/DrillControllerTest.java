@@ -172,8 +172,8 @@ public class DrillControllerTest {
             // For related drills, we only want to return their ID, and NOTHING else
             .andExpect(jsonPath("$[0].related_drills[0]").value(RELATED_DRILL_ID))
             .andExpect(jsonPath("$[0].related_drills[0].name").doesNotExist())
-            // We DO NOT want to include any instructions at this point, that is for a different endpoint
-            .andExpect(jsonPath("$[0].instructions").doesNotExist());
+            .andExpect(jsonPath("$[0].instructions").isArray())
+            .andExpect(jsonPath("$[0].instructions.length()").value(1));
     }
 
     @Test
@@ -422,8 +422,8 @@ public class DrillControllerTest {
             // For related drills, we only want to return their ID, and NOTHING else
             .andExpect(jsonPath("$.related_drills[0]").value(RELATED_DRILL_ID))
             .andExpect(jsonPath("$.related_drills[0].name").doesNotExist())
-            // We DO NOT want to include any instructions at this point, that is for a different endpoint
-            .andExpect(jsonPath("$.instructions").doesNotExist());
+            .andExpect(jsonPath("$.instructions").isArray())
+            .andExpect(jsonPath("$.instructions.length()").value(1));
 
         verify(drillService, times(1)).find(DRILL_ID_1);
         verify(drillService, times(1)).save(drill1);
