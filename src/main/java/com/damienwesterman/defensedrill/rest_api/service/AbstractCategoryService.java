@@ -29,6 +29,7 @@ package com.damienwesterman.defensedrill.rest_api.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 
 import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
@@ -80,24 +81,31 @@ public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, 
     }
 
     /**
-     * Return all entities in the database.
+     * Return all entities in the database sorted alphabetically by name.
      *
      * @return List of AbstractCategoryEntity objects.
      */
     @NonNull
     public List<E> findAll() {
-        return repo.findAll();
+        return repo.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
     /**
-     * Return all entities in the database that are in the list of IDs.
+     * Return all entities in the database that are in the list of IDs sorted
+     * alphabetically by name.
      *
      * @param ids List of AbstractCategoryEntity IDs.
      * @return List of AbstractCategoryEntity objects.
      */
     @NonNull
     public List<E> findAll(@NonNull List<Long> ids) {
-        return repo.findAllById(ids);
+        List<E> ret = repo.findAllById(ids);
+        /*
+         * This is okay to do here because drills the list being returned should always be
+         * <25 (and this is generous), so overhead should be insignificant.y
+         */
+        ret.sort((arg0, arg1) -> arg0.getName().compareToIgnoreCase(arg1.getName()));
+        return ret;
     }
 
     /**

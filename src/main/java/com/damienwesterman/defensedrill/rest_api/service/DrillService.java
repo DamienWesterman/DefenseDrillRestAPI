@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -120,13 +121,13 @@ public class DrillService {
     }
 
     /**
-     * Return all entities in the database.
+     * Return all entities in the database sorted alphabetically by name.
      *
      * @return List of DrillEntity objects.
      */
     @NonNull
     public List<DrillEntity> findAll() {
-        return repo.findAll();
+        return repo.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
     /**

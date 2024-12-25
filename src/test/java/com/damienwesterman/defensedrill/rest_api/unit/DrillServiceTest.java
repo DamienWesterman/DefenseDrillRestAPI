@@ -29,6 +29,7 @@ package com.damienwesterman.defensedrill.rest_api.unit;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +45,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.TransactionSystemException;
 
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
@@ -146,9 +148,9 @@ public class DrillServiceTest {
     @Test
     public void test_findAll_callsRepoFindAll() {
         List<DrillEntity> drills = List.of(drill);
-        when(repo.findAll()).thenReturn(drills);
+        when(repo.findAll(any(Sort.class))).thenReturn(drills);
         assertEquals(drills, service.findAll());
-        verify(repo, times(1)).findAll();
+        verify(repo, times(1)).findAll(any(Sort.class));
     }
 
     @Test

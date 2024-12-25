@@ -29,6 +29,7 @@ package com.damienwesterman.defensedrill.rest_api.unit;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,6 +43,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
@@ -129,14 +131,14 @@ public class CategoriesServiceTest {
     @Test
     public void test_findAll_callsCorrectRepoFind() {
         List<CategoryEntity> categoryList = List.of(categoryEntity);
-        when(categoryRepo.findAll()).thenReturn(categoryList);
+        when(categoryRepo.findAll(any(Sort.class))).thenReturn(categoryList);
         assertEquals(categoryList, categorySerivce.findAll());
-        verify(categoryRepo, times(1)).findAll();
+        verify(categoryRepo, times(1)).findAll(any(Sort.class));
 
         List<SubCategoryEntity> subCategoryList = List.of(subCategoryEntity);
-        when(subCategoryRepo.findAll()).thenReturn(subCategoryList);
+        when(subCategoryRepo.findAll(any(Sort.class))).thenReturn(subCategoryList);
         assertEquals(subCategoryList, subCategoryService.findAll());
-        verify(subCategoryRepo, times(1)).findAll();
+        verify(subCategoryRepo, times(1)).findAll(any(Sort.class));
     }
 
     @Test
