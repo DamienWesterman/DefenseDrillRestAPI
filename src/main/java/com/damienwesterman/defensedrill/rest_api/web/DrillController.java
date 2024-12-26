@@ -51,7 +51,6 @@ import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.service.DrillService;
 import com.damienwesterman.defensedrill.rest_api.service.SubCategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillCreateDTO;
-import com.damienwesterman.defensedrill.rest_api.web.dto.DrillRelatedDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillResponseDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.DrillUpdateDTO;
 import com.damienwesterman.defensedrill.rest_api.web.dto.ErrorMessageDTO;
@@ -114,6 +113,11 @@ public class DrillController {
             drills.stream()
                 .map(drill -> {
                     List<DrillEntity> relatedDrills;
+
+                    /*
+                    * Compiler is generating a warning for each call to drill.getRelatedDrills().
+                    * We can safely ignore this because of this first null check here.
+                    */
                     if (null == drill.getRelatedDrills()) {
                         relatedDrills = new ArrayList<>(0);
                     } else {
