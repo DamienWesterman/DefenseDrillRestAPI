@@ -131,6 +131,26 @@ public class DrillService {
     }
 
     /**
+     * Return all entities in the database that are in the list of IDs sorted
+     * alphabetically by name.
+     *
+     * @param ids List of Drill IDs.
+     * @return List of Drill objects.
+     */
+    @NonNull
+    public List<DrillEntity> findAll(List<Long> ids) {
+        List<DrillEntity> ret = repo.findAllById(ids);
+        /*
+         * This is okay to do here because the list being returned should always be
+         * <25 (and this is generous), so overhead should be insignificant.
+         */
+        ret.sort(
+            (drill1, drill2) -> drill1.getName().compareToIgnoreCase(drill2.getName())
+        );
+        return ret;
+    }
+
+    /**
      * Delete an entity from the database by its ID - if it exists.
      *
      * @param id ID of the AbstractCategoryEntity.

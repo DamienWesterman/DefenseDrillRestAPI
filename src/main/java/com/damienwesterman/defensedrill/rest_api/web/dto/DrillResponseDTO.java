@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
@@ -73,25 +74,21 @@ public class DrillResponseDTO {
     private String name;
 
     @Schema(
-        description = "List of Category IDs the Drill belongs to.",
-        example = "[1,2,3,4,5]"
+        description = "List of Category IDs the Drill belongs to."
     )
-    @JsonProperty("categories")
-    private List<Long> categoryIds;
+    private List<CategoryEntity> categories;
 
     @Schema(
-        description = "List of SubCategory IDs the Drill belongs to.",
-        example = "[1,2,3,4,5]"
+        description = "List of SubCategory IDs the Drill belongs to."
     )
     @JsonProperty("sub_categories")
-    private List<Long> subCategoryIds;
+    private List<SubCategoryEntity> subCategories;
 
     @Schema(
-        description = "List of Drill IDs this Drill mentions.",
-        example = "[6,7,8,9,0]"
+        description = "List of Drill IDs this Drill mentions."
     )
     @JsonProperty("related_drills")
-    private List<Long> relatedDrillIds;
+    private List<DrillRelatedDTO> relatedDrills;
 
     @Schema(
         description = "List of Instructional how-tos to perform this Drill."
@@ -104,26 +101,38 @@ public class DrillResponseDTO {
      * @param drill DrillEntity object to represent in a DTO.
      */
     public DrillResponseDTO(@NonNull DrillEntity drill) {
+        this(drill, null);
+    }
+
+    /**
+     * Parameterized constructor using a DrillEntity object.
+     *
+     * @param drill DrillEntity object to represent in a DTO.
+     * @param relatedDrills List of related Drills.
+     */
+    public DrillResponseDTO(@NonNull DrillEntity drill, @Nullable List<DrillEntity> relatedDrills) {
         this.id = drill.getId();
         this.name = drill.getName();
 
         if (null == drill.getCategories()) {
-            this.categoryIds = new ArrayList<>();
+            this.categories = new ArrayList<>();
         } else {
-            this.categoryIds = drill.getCategories().stream()
-                                    .map(CategoryEntity::getId)
-                                    .collect(Collectors.toList());
+            this.categories = drill.getCategories();
         }
 
         if (null == drill.getSubCategories()) {
-            this.subCategoryIds = new ArrayList<>();
+            this.subCategories = new ArrayList<>();
         } else {
-            this.subCategoryIds = drill.getSubCategories().stream()
-                                    .map(SubCategoryEntity::getId)
-                                    .collect(Collectors.toList());
+            this.subCategories = drill.getSubCategories();
         }
 
-        this.relatedDrillIds = drill.getRelatedDrills();
+        if (null == relatedDrills) {
+            this.relatedDrills = new ArrayList<>();
+        } else {
+            this.relatedDrills = relatedDrills.stream()
+                                    .map(DrillRelatedDTO::new)
+                                    .collect(Collectors.toList());
+        }
 
         if (null == drill.getInstructions()) {
             this.instructions = new ArrayList<>();

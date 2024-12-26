@@ -34,6 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,6 +140,21 @@ public class CategoriesServiceTest {
         when(subCategoryRepo.findAll(any(Sort.class))).thenReturn(subCategoryList);
         assertEquals(subCategoryList, subCategoryService.findAll());
         verify(subCategoryRepo, times(1)).findAll(any(Sort.class));
+    }
+
+    @Test
+    public void test_findAll_byIds_callsCorrectRepoFind() {
+        List<CategoryEntity> categoryList = new ArrayList<>(List.of(categoryEntity));
+        List<Long> categoryIds = List.of(categoryEntity.getId());
+        when(categoryRepo.findAllById(categoryIds)).thenReturn(categoryList);
+        assertEquals(categoryList, categorySerivce.findAll(categoryIds));
+        verify(categoryRepo, times(1)).findAllById(categoryIds);
+
+        List<SubCategoryEntity> subCategoryList = new ArrayList<>(List.of(subCategoryEntity));
+        List<Long> subCategoryIds = List.of(subCategoryEntity.getId());
+        when(subCategoryRepo.findAllById(subCategoryIds)).thenReturn(subCategoryList);
+        assertEquals(subCategoryList, subCategoryService.findAll(subCategoryIds));
+        verify(subCategoryRepo, times(1)).findAllById(subCategoryIds);
     }
 
     @Test

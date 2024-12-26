@@ -101,10 +101,12 @@ public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, 
     public List<E> findAll(@NonNull List<Long> ids) {
         List<E> ret = repo.findAllById(ids);
         /*
-         * This is okay to do here because drills the list being returned should always be
-         * <25 (and this is generous), so overhead should be insignificant.y
+         * This is okay to do here because the list being returned should always be
+         * <25 (and this is generous), so overhead should be insignificant.
          */
-        ret.sort((arg0, arg1) -> arg0.getName().compareToIgnoreCase(arg1.getName()));
+        ret.sort(
+            (category1, category2) -> category1.getName().compareToIgnoreCase(category2.getName())
+        );
         return ret;
     }
 
