@@ -138,7 +138,7 @@ public class DrillService {
      * @return List of Drill objects.
      */
     @NonNull
-    public List<DrillEntity> findAll(List<Long> ids) {
+    public List<DrillEntity> findAll(@NonNull List<Long> ids) {
         List<DrillEntity> ret = repo.findAllById(ids);
         /*
          * This is okay to do here because the list being returned should always be

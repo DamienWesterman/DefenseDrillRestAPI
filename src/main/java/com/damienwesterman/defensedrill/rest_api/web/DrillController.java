@@ -111,6 +111,7 @@ public class DrillController {
 
         return ResponseEntity.ok(
             drills.stream()
+                // Extract the related drills from the map to create each DrillResponseDTO
                 .map(drill -> {
                     List<DrillEntity> relatedDrills;
 
@@ -119,14 +120,12 @@ public class DrillController {
                     * We can safely ignore this because of this first null check here.
                     */
                     if (null == drill.getRelatedDrills()) {
-                        relatedDrills = new ArrayList<>(0);
+                        relatedDrills = List.of();
                     } else {
                         relatedDrills = new ArrayList<>(drill.getRelatedDrills().size());
-                        System.out.println(drill.getRelatedDrills());
                         relatedDrills = drill.getRelatedDrills().stream()
-                            .map(id -> {
-                                System.out.println(id);
-                                return drillMap.get(id);
+                            .map(relatedId -> {
+                                return drillMap.get(relatedId);
                             })
                             .collect(Collectors.toList());
                     }
@@ -184,10 +183,18 @@ public class DrillController {
     @Transactional
     public ResponseEntity<DrillResponseDTO> getDrillByName(@PathVariable String name) {
         return drillService.find(name)
-                    .map(foundDrill ->
-                        ResponseEntity.ok(new DrillResponseDTO(
-                            foundDrill,
-                            drillService.findAll(foundDrill.getRelatedDrills()))))
+                    .map(foundDrill -> {
+                        List<Long> relatedDrills = foundDrill.getRelatedDrills();
+                        if (null == relatedDrills || relatedDrills.isEmpty()) {
+                            return ResponseEntity.ok(
+                                new DrillResponseDTO(foundDrill)
+                            );
+                        } else {
+                            return ResponseEntity.ok(new DrillResponseDTO(
+                                foundDrill,
+                                drillService.findAll(relatedDrills)));
+                        }
+                    })
                     .orElse(ResponseEntity.notFound().build());
     }
 
@@ -207,12 +214,21 @@ public class DrillController {
             content = @Content(/* No Content */))
     })
     @GetMapping("/id/{id}")
+    @Transactional
     public ResponseEntity<DrillResponseDTO> getDrillById(@PathVariable Long id) {
         return drillService.find(id)
-                    .map(foundDrill ->
-                        ResponseEntity.ok(new DrillResponseDTO(
-                            foundDrill,
-                            drillService.findAll(foundDrill.getRelatedDrills()))))
+                    .map(foundDrill -> {
+                        List<Long> relatedDrills = foundDrill.getRelatedDrills();
+                        if (null == relatedDrills || relatedDrills.isEmpty()) {
+                            return ResponseEntity.ok(
+                                new DrillResponseDTO(foundDrill)
+                            );
+                        } else {
+                            return ResponseEntity.ok(new DrillResponseDTO(
+                                foundDrill,
+                                drillService.findAll(relatedDrills)));
+                        }
+                    })
                     .orElse(ResponseEntity.notFound().build());
     }
 
@@ -269,11 +285,18 @@ public class DrillController {
 
         DrillEntity updatedDrill = drillService.save(drillToUpdate);
 
-        return ResponseEntity.ok(
-            new DrillResponseDTO(
-                updatedDrill,
-                drillService.findAll(updatedDrill.getRelatedDrills())
-            ));
+        // Null check here, ignore the warnings
+        if (null == updatedDrill.getRelatedDrills() || updatedDrill.getRelatedDrills().isEmpty()) {
+            return ResponseEntity.ok(
+                new DrillResponseDTO(updatedDrill)
+            );
+        } else {
+            return ResponseEntity.ok(
+                new DrillResponseDTO(
+                    updatedDrill,
+                    drillService.findAll(updatedDrill.getRelatedDrills())
+                ));
+        }
     }
 
     /**
