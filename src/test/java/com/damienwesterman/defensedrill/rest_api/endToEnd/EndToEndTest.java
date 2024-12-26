@@ -337,7 +337,7 @@ public class EndToEndTest {
             );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, response.getBody().getCategoryIds().size());
+        assertEquals(0, response.getBody().getCategories().size());
     }
 
     @Test

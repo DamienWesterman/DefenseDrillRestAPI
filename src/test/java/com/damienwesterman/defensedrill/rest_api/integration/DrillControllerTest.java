@@ -81,6 +81,7 @@ public class DrillControllerTest {
     SubCategorySerivce subCategorySerivce;
 
     DrillEntity drill1;
+    DrillEntity relatedDrill;
     CategoryEntity category1;
     SubCategoryEntity subCategory1;
     InstructionsEntity instructions1;
@@ -92,6 +93,7 @@ public class DrillControllerTest {
     final Long NUMBER_1 = 0L;
     final Long RELATED_DRILL_ID = 2L;
     final String DRILL_NAME_1 = "Drill Name 1";
+    final String RELATED_DRILL_NAME = "Related Drill";
     final String CATEGORY_NAME_1 = "Category Name 1";
     final String SUB_CATEGORY_NAME_1 = "Sub-Category Name 1";
     final String CATEGORY_DESCRIPTION_1 = "Category Description 1";
@@ -108,6 +110,14 @@ public class DrillControllerTest {
         drill1 = DrillEntity.builder()
                             .id(DRILL_ID_1)
                             .name(DRILL_NAME_1)
+                            .categories(new ArrayList<>())
+                            .subCategories(new ArrayList<>())
+                            .instructions(new ArrayList<>())
+                            .relatedDrills(new ArrayList<>())
+                            .build();
+        relatedDrill = DrillEntity.builder()
+                            .id(RELATED_DRILL_ID)
+                            .name(RELATED_DRILL_NAME)
                             .categories(new ArrayList<>())
                             .subCategories(new ArrayList<>())
                             .instructions(new ArrayList<>())
@@ -149,31 +159,29 @@ public class DrillControllerTest {
         drill1.getSubCategories().add(subCategory1);
         drill1.getRelatedDrills().add(RELATED_DRILL_ID);
         drill1.getInstructions().add(instructions1);
-        when(drillService.findAll()).thenReturn(List.of(drill1));
+        when(drillService.findAll()).thenReturn(List.of(drill1, relatedDrill));
 
         mockMvc.perform(get(DrillController.ENDPOINT))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$.length()").value(2))
             .andExpect(jsonPath("$[0].id").value(DRILL_ID_1))
             .andExpect(jsonPath("$[0].name").value(DRILL_NAME_1))
             .andExpect(jsonPath("$[0].categories").isArray())
             .andExpect(jsonPath("$[0].categories.length()").value(1))
-            // For categories, we only want to return their ID, and NOTHING else
-            .andExpect(jsonPath("$[0].categories[0]").value(CATEGORY_ID_1))
-            .andExpect(jsonPath("$[0].categories[0].name").doesNotExist())
+            .andExpect(jsonPath("$[0].categories[0].id").value(CATEGORY_ID_1))
+            .andExpect(jsonPath("$[0].categories[0].name").value(CATEGORY_NAME_1))
             .andExpect(jsonPath("$[0].sub_categories").isArray())
             .andExpect(jsonPath("$[0].sub_categories.length()").value(1))
-            // For sub-categories, we only want to return their ID, and NOTHING else
-            .andExpect(jsonPath("$[0].sub_categories[0]").value(SUB_CATEGORY_ID_1))
-            .andExpect(jsonPath("$[0].sub_categories[0].name").doesNotExist())
+            .andExpect(jsonPath("$[0].sub_categories[0].id").value(SUB_CATEGORY_ID_1))
+            .andExpect(jsonPath("$[0].sub_categories[0].name").value(SUB_CATEGORY_NAME_1))
             .andExpect(jsonPath("$[0].related_drills").isArray())
             .andExpect(jsonPath("$[0].related_drills.length()").value(1))
-            // For related drills, we only want to return their ID, and NOTHING else
-            .andExpect(jsonPath("$[0].related_drills[0]").value(RELATED_DRILL_ID))
-            .andExpect(jsonPath("$[0].related_drills[0].name").doesNotExist())
+            .andExpect(jsonPath("$[0].related_drills[0].id").value(RELATED_DRILL_ID))
+            .andExpect(jsonPath("$[0].related_drills[0].name").value(RELATED_DRILL_NAME))
             .andExpect(jsonPath("$[0].instructions").isArray())
             .andExpect(jsonPath("$[0].instructions.length()").value(1));
+            // Drill at $[1] should be the related drill, don't have to go through it all again
     }
 
     @Test
@@ -399,6 +407,7 @@ public class DrillControllerTest {
         drill1.getInstructions().add(instructions1);
         when(categorySerivce.findAll(List.of(CATEGORY_ID_1))).thenReturn(List.of(category1));
         when(subCategorySerivce.findAll(List.of(SUB_CATEGORY_ID_1))).thenReturn(List.of(subCategory1));
+        when(drillService.findAll(List.of(RELATED_DRILL_ID))).thenReturn(List.of(relatedDrill));
         when(drillService.save(drill1)).thenReturn(drill1);
 
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
@@ -409,19 +418,16 @@ public class DrillControllerTest {
             .andExpect(jsonPath("$.name").value(DRILL_NAME_1))
             .andExpect(jsonPath("$.categories").isArray())
             .andExpect(jsonPath("$.categories.length()").value(1))
-            // For categories, we only want to return their ID, and NOTHING else
-            .andExpect(jsonPath("$.categories[0]").value(CATEGORY_ID_1))
-            .andExpect(jsonPath("$.categories[0].name").doesNotExist())
+            .andExpect(jsonPath("$.categories[0].id").value(CATEGORY_ID_1))
+            .andExpect(jsonPath("$.categories[0].name").value(CATEGORY_NAME_1))
             .andExpect(jsonPath("$.sub_categories").isArray())
             .andExpect(jsonPath("$.sub_categories.length()").value(1))
-            // For sub-categories, we only want to return their ID, and NOTHING else
-            .andExpect(jsonPath("$.sub_categories[0]").value(SUB_CATEGORY_ID_1))
-            .andExpect(jsonPath("$.sub_categories[0].name").doesNotExist())
+            .andExpect(jsonPath("$.sub_categories[0].id").value(SUB_CATEGORY_ID_1))
+            .andExpect(jsonPath("$.sub_categories[0].name").value(SUB_CATEGORY_NAME_1))
             .andExpect(jsonPath("$.related_drills").isArray())
             .andExpect(jsonPath("$.related_drills.length()").value(1))
-            // For related drills, we only want to return their ID, and NOTHING else
-            .andExpect(jsonPath("$.related_drills[0]").value(RELATED_DRILL_ID))
-            .andExpect(jsonPath("$.related_drills[0].name").doesNotExist())
+            .andExpect(jsonPath("$.related_drills[0].id").value(RELATED_DRILL_ID))
+            .andExpect(jsonPath("$.related_drills[0].name").value(RELATED_DRILL_NAME))
             .andExpect(jsonPath("$.instructions").isArray())
             .andExpect(jsonPath("$.instructions.length()").value(1));
 

@@ -27,8 +27,11 @@
 package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -59,6 +62,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -101,9 +105,33 @@ public class DrillController {
             return ResponseEntity.noContent().build();
         }
 
+        // Map of Drills by their ID for quick lookup
+        Map<Long, DrillEntity> drillMap = drills.stream()
+            .collect(Collectors.toMap(DrillEntity::getId, Function.identity()));
+
         return ResponseEntity.ok(
             drills.stream()
-                .map(DrillResponseDTO::new)
+                .map(drill -> {
+                    List<DrillEntity> relatedDrills;
+
+                    /*
+                    * Compiler is generating a warning for each call to drill.getRelatedDrills().
+                    * We can safely ignore this because of this first null check here.
+                    */
+                    if (null == drill.getRelatedDrills()) {
+                        relatedDrills = new ArrayList<>(0);
+                    } else {
+                        relatedDrills = new ArrayList<>(drill.getRelatedDrills().size());
+                        System.out.println(drill.getRelatedDrills());
+                        relatedDrills = drill.getRelatedDrills().stream()
+                            .map(id -> {
+                                System.out.println(id);
+                                return drillMap.get(id);
+                            })
+                            .collect(Collectors.toList());
+                    }
+                    return new DrillResponseDTO(drill, relatedDrills);
+                })
                 .collect(Collectors.toList())
         );
     }
@@ -153,9 +181,13 @@ public class DrillController {
             content = @Content(/* No Content */))
     })
     @GetMapping("/name/{name}")
+    @Transactional
     public ResponseEntity<DrillResponseDTO> getDrillByName(@PathVariable String name) {
         return drillService.find(name)
-                    .map(foundDrill -> ResponseEntity.ok(new DrillResponseDTO(foundDrill)))
+                    .map(foundDrill ->
+                        ResponseEntity.ok(new DrillResponseDTO(
+                            foundDrill,
+                            drillService.findAll(foundDrill.getRelatedDrills()))))
                     .orElse(ResponseEntity.notFound().build());
     }
 
@@ -177,7 +209,10 @@ public class DrillController {
     @GetMapping("/id/{id}")
     public ResponseEntity<DrillResponseDTO> getDrillById(@PathVariable Long id) {
         return drillService.find(id)
-                    .map(foundDrill -> ResponseEntity.ok(new DrillResponseDTO(foundDrill)))
+                    .map(foundDrill ->
+                        ResponseEntity.ok(new DrillResponseDTO(
+                            foundDrill,
+                            drillService.findAll(foundDrill.getRelatedDrills()))))
                     .orElse(ResponseEntity.notFound().build());
     }
 
@@ -234,7 +269,11 @@ public class DrillController {
 
         DrillEntity updatedDrill = drillService.save(drillToUpdate);
 
-        return ResponseEntity.ok(new DrillResponseDTO(updatedDrill));
+        return ResponseEntity.ok(
+            new DrillResponseDTO(
+                updatedDrill,
+                drillService.findAll(updatedDrill.getRelatedDrills())
+            ));
     }
 
     /**

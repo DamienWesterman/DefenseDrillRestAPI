@@ -154,6 +154,15 @@ public class DrillServiceTest {
     }
 
     @Test
+    public void test_findAll_byIds_callsRepoFindAll() {
+        List<DrillEntity> drills = new ArrayList<>(List.of(drill));
+        List<Long> drillIds = List.of(drill.getId());
+        when(repo.findAllById(drillIds)).thenReturn(drills);
+        assertEquals(drills, service.findAll(drillIds));
+        verify(repo, times(1)).findAllById(drillIds);
+    }
+
+    @Test
     public void test_delete_callsDeleteById() {
         service.delete(0L);
         verify(repo, times(1)).deleteById(0L);
