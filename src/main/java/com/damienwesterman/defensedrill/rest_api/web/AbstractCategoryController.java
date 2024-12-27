@@ -153,7 +153,7 @@ public abstract class AbstractCategoryController
     @PutMapping("/id/{id}")
     public ResponseEntity<Object> updateAbstractCategoryById(
             @PathVariable Long id, @RequestBody @Valid E abstractCategory) {
-        if (null != abstractCategory.getId() && abstractCategory.getId() != id) {
+        if (null != abstractCategory.getId() && !abstractCategory.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessageDTO.builder()
                 .error("ID Mismatch")
                 .message("ID provided in path does not match ID provided in request body.")
