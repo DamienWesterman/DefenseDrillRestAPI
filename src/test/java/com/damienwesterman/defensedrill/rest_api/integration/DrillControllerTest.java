@@ -26,12 +26,14 @@
 
 package com.damienwesterman.defensedrill.rest_api.integration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -317,6 +319,85 @@ public class DrillControllerTest {
     public void test_nameEndpoint_delete_fails() throws Exception {
         mockMvc.perform(delete(DrillController.ENDPOINT + "/name/" + DRILL_NAME_1))
             .andExpect(status().isMethodNotAllowed());
+    }
+
+    /* Since category and subCategory share the same logic, only have to do this once */
+    @Test
+    public void test_addCategoryEndpoint_patch_succeedsWithExistingIds() throws Exception {
+        List<Long> drillIds = List.of(DRILL_ID_1, RELATED_DRILL_ID);
+        when(categorySerivce.find(CATEGORY_ID_1)).thenReturn(Optional.of(category1));
+        when(drillService.findAll(drillIds)).thenReturn(
+            // Make sure it is mutable
+            new ArrayList<>(List.of(drill1, relatedDrill)));
+        assertEquals(0, drill1.getCategories().size());
+        assertEquals(0, relatedDrill.getCategories().size());
+
+        mockMvc.perform(patch(DrillController.ENDPOINT + "/add_category/" + CATEGORY_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(drillIds)))
+            .andExpect(status().isNoContent());
+
+        verify(drillService, times(1)).findAll(drillIds);
+        verify(drillService, times(2)).save(any());
+        assertEquals(1, drill1.getCategories().size());
+        assertEquals(CATEGORY_ID_1, drill1.getCategories().get(0).getId());
+        assertEquals(1, relatedDrill.getCategories().size());
+        assertEquals(CATEGORY_ID_1, relatedDrill.getCategories().get(0).getId());
+    }
+
+    @Test
+    public void test_addCategoryEndpoint_patch_doesNothingWithEmptyList() throws Exception {
+        List<Long> drillIds = List.of();
+        when(categorySerivce.find(CATEGORY_ID_1)).thenReturn(Optional.of(category1));
+
+        mockMvc.perform(patch(DrillController.ENDPOINT + "/add_category/" + CATEGORY_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(drillIds)))
+            .andExpect(status().isNoContent());
+
+        verify(drillService, times(0)).findAll(drillIds);
+        verify(drillService, times(0)).save(any());
+        assertEquals(0, drill1.getCategories().size());
+        assertEquals(0, relatedDrill.getCategories().size());
+    }
+
+    @Test
+    public void test_addCategoryEndpoint_patch_failsWithNoList() throws Exception {
+        mockMvc.perform(patch(DrillController.ENDPOINT + "/add_category/" + CATEGORY_ID_1))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void test_addCategoryEndpoint_patch_failsWithNonExistentCategory() throws Exception {
+        List<Long> drillIds = List.of();
+        Long nonExistentCategory = -1L;
+        when(categorySerivce.find(nonExistentCategory)).thenReturn(Optional.empty());
+
+        mockMvc.perform(patch(DrillController.ENDPOINT + "/add_category/" + nonExistentCategory)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(drillIds)))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void test_addCategoryEndpoint_patch_doesNothingWhenAddingDuplicateCategory() throws Exception {
+        List<Long> drillIds = List.of(DRILL_ID_1);
+        drill1.getCategories().add(category1);
+        when(categorySerivce.find(CATEGORY_ID_1)).thenReturn(Optional.of(category1));
+        when(drillService.findAll(drillIds)).thenReturn(
+            // Make sure it is mutable
+            new ArrayList<>(List.of(drill1)));
+        assertEquals(1, drill1.getCategories().size());
+
+        mockMvc.perform(patch(DrillController.ENDPOINT + "/add_category/" + CATEGORY_ID_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(drillIds)))
+            .andExpect(status().isNoContent());
+
+        verify(drillService, times(1)).findAll(drillIds);
+        verify(drillService, times(0)).save(any());
+        assertEquals(1, drill1.getCategories().size());
+        assertEquals(CATEGORY_ID_1, drill1.getCategories().get(0).getId());
     }
 
     @Test

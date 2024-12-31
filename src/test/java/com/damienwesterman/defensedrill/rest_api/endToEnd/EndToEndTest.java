@@ -204,6 +204,32 @@ public class EndToEndTest {
     }
 
     @Test
+    public void test_drill_addingCategory_properlyAddsToAllDrills() {
+        DrillEntity drill2 = DrillEntity.builder()
+                                .name("Drill 2")
+                                .build();
+        drillRepo.save(drill1);
+        drillRepo.save(drill2);
+        categoryRepo.save(category1);
+
+        List<Long> drillIds = List.of(drill1.getId(), drill2.getId());
+
+        ResponseEntity<String> response =
+            restTemplate.exchange(
+                URI.create(DrillController.ENDPOINT + "/add_category/" + category1.getId()),
+                HttpMethod.PATCH,
+                new HttpEntity<>(drillIds),
+                String.class
+            );
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals(1, drillRepo.findById(drill1.getId()).get().getCategories().size());
+        assertEquals(category1.getId(), drillRepo.findById(drill1.getId()).get().getCategories().get(0).getId());
+        assertEquals(1, drillRepo.findById(drill2.getId()).get().getCategories().size());
+        assertEquals(category1.getId(), drillRepo.findById(drill2.getId()).get().getCategories().get(0).getId());
+    }
+
+    @Test
     public void test_instructions_databaseSavesProperly() {
         DrillEntity savedDrill = drillRepo.save(drill1);
         DrillUpdateDTO updatedDrill = new DrillUpdateDTO();
