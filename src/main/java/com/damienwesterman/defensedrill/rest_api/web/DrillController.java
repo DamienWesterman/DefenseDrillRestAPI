@@ -28,7 +28,6 @@ package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -324,8 +323,25 @@ public class DrillController {
         return ResponseEntity.noContent().build();
     }
 
-    // TODO: swagger documentation
-    // TODO: Doc comments
+    /**
+     * Endpoint to add a category to a list of drills by their IDs.
+     *
+     * @param categoryId Category ID to add to the drills.
+     * @param drillIds List of Drill IDs.
+     * @return Empty ResonseEntity.
+     */
+    @Operation(
+        summary = "Add a Category to a list of Drills.",
+        description = "Add a Category to each Drill in a list of given Drill IDs."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Additions were successful.",
+            content = @Content(/* No Content */)),
+        @ApiResponse(responseCode = "400", description = "Issue with request, check returned error message for details.",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDTO.class))),
+        @ApiResponse(responseCode = "404", description = "No Category exists with the given ID.",
+            content = @Content(/* No Content */))
+    })
     @PatchMapping("/add_category/{categoryId}")
     @Transactional
     public ResponseEntity<String> addCategoryToListOfDrills(@PathVariable Long categoryId,
@@ -361,6 +377,25 @@ public class DrillController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Endpoint to add a sub-category to a list of drills by their IDs.
+     *
+     * @param subCategoryId SubCategory ID to add to the drills.
+     * @param drillIds List of Drill IDs.
+     * @return Empty ResonseEntity.
+     */
+    @Operation(
+        summary = "Add a Sub-Category to a list of Drills.",
+        description = "Add a Sub-Category to each Drill in a list of given Drill IDs."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Additions were successful.",
+            content = @Content(/* No Content */)),
+        @ApiResponse(responseCode = "400", description = "Issue with request, check returned error message for details.",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDTO.class))),
+        @ApiResponse(responseCode = "404", description = "No Sub-Category exists with the given ID.",
+            content = @Content(/* No Content */))
+    })
     @PatchMapping("/add_sub_category/{subCategoryId}")
     @Transactional
     public ResponseEntity<String> addSubCategoryToListOfDrills(@PathVariable Long subCategoryId,
