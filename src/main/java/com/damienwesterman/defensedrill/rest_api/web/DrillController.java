@@ -38,14 +38,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 import com.damienwesterman.defensedrill.rest_api.entity.InstructionsEntity;
+import com.damienwesterman.defensedrill.rest_api.entity.SubCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.exception.DatabaseInsertException;
 import com.damienwesterman.defensedrill.rest_api.service.CategorySerivce;
 import com.damienwesterman.defensedrill.rest_api.service.DrillService;
@@ -316,6 +320,114 @@ public class DrillController {
     @DeleteMapping("/id/{id}")
     public ResponseEntity<String> deleteDrillById(@PathVariable Long id) {
         drillService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Endpoint to add a category to a list of drills by their IDs.
+     *
+     * @param categoryId Category ID to add to the drills.
+     * @param drillIds List of Drill IDs.
+     * @return Empty ResonseEntity.
+     */
+    @Operation(
+        summary = "Add a Category to a list of Drills.",
+        description = "Add a Category to each Drill in a list of given Drill IDs."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Additions were successful.",
+            content = @Content(/* No Content */)),
+        @ApiResponse(responseCode = "400", description = "Issue with request, check returned error message for details.",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDTO.class))),
+        @ApiResponse(responseCode = "404", description = "No Category exists with the given ID.",
+            content = @Content(/* No Content */))
+    })
+    @PatchMapping("/add_category/{categoryId}")
+    @Transactional
+    public ResponseEntity<String> addCategoryToListOfDrills(@PathVariable Long categoryId,
+            @RequestBody List<Long> drillIds) {
+        /*
+         * This makes it okay to use transactional even with the save() later, because there
+         * should be no issues with the save as the category should exist
+         */
+        Optional<CategoryEntity> optCategory = categorySerivce.find(categoryId);
+        if (optCategory.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (null != drillIds && !drillIds.isEmpty()) {
+            CategoryEntity category = optCategory.get();
+
+            for (DrillEntity drill : drillService.findAll(drillIds)) {
+                if (null == drill.getCategories()) {
+                    drill.setCategories(List.of(category));
+                } else {
+                    // Make sure that we do not save duplicates, will result in DataIntegrityViolationException
+                    if (drill.getCategories().contains(category)) {
+                        continue;
+                    }
+
+                    drill.getCategories().add(category);
+                }
+
+                drillService.save(drill);
+            }
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Endpoint to add a sub-category to a list of drills by their IDs.
+     *
+     * @param subCategoryId SubCategory ID to add to the drills.
+     * @param drillIds List of Drill IDs.
+     * @return Empty ResonseEntity.
+     */
+    @Operation(
+        summary = "Add a Sub-Category to a list of Drills.",
+        description = "Add a Sub-Category to each Drill in a list of given Drill IDs."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Additions were successful.",
+            content = @Content(/* No Content */)),
+        @ApiResponse(responseCode = "400", description = "Issue with request, check returned error message for details.",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDTO.class))),
+        @ApiResponse(responseCode = "404", description = "No Sub-Category exists with the given ID.",
+            content = @Content(/* No Content */))
+    })
+    @PatchMapping("/add_sub_category/{subCategoryId}")
+    @Transactional
+    public ResponseEntity<String> addSubCategoryToListOfDrills(@PathVariable Long subCategoryId,
+            @RequestBody List<Long> drillIds) {
+        /*
+         * This makes it okay to use transactional even with the save() later, because there
+         * should be no issues with the save as the subCategory should exist
+         */
+        Optional<SubCategoryEntity> optSubCategory = subCategorySerivce.find(subCategoryId);
+        if (optSubCategory.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (null != drillIds && !drillIds.isEmpty()) {
+            SubCategoryEntity subCategory = optSubCategory.get();
+
+            for (DrillEntity drill : drillService.findAll(drillIds)) {
+                if (null == drill.getSubCategories()) {
+                    drill.setSubCategories(List.of(subCategory));
+                } else {
+                    // Make sure that we do not save duplicates, will result in DataIntegrityViolationException
+                    if (drill.getSubCategories().contains(subCategory)) {
+                        continue;
+                    }
+
+                    drill.getSubCategories().add(subCategory);
+                }
+
+                drillService.save(drill);
+            }
+        }
+
         return ResponseEntity.noContent().build();
     }
 
