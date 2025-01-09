@@ -1,4 +1,3 @@
--- TODO: Create named constraints for everything
 -- Changes to any constraints/constraint names must be reflected in service/ErrorMessageUtils.java
 -- NOT NULL constraints do not need to be named as @NotNull annotations will catch it
 CREATE TABLE drills(
