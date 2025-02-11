@@ -42,6 +42,20 @@ public class DefenseDrillRestApiApplication {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
 	}
 
+	/*
+	 * In production, swagger is unavailable behind the gateway. We do allow Redocly as the
+	 * API documentation in production, found at /docs/index.html. In order to update, do
+	 * the following:
+	 * 		1. Make sure to run the supporting docker containers
+	 * 			- Run 'make run-dev-local' from the main directory
+	 * 		2. Start up at least the config-server
+	 * 		3. Run the following commands:
+	 * 			- npm install -g redoc-cli
+	 * 			- redoc-cli bundle http://localhost:5433/v3/api-docs -o static-swagger.html
+	 * 			- mv static-swagger.html src/main/resources/static/docs/index.html
+	 * 		4. Push the changes
+	 */
+
     @Bean
     OpenAPI swaggerHeader() {
 		return new OpenAPI()
