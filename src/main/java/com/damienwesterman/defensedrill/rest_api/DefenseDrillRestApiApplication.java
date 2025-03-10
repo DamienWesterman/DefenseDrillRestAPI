@@ -53,6 +53,11 @@ public class DefenseDrillRestApiApplication {
 	// TODO: Add the above endpoint to the docs and update the docs
 	// TODO: Re-create the rest-api docs
 
+	// TODO: The following using TDD
+	// Add an endpoint to return all drills of a specified category(s) or sub-category(s) ID
+	// TODO: Add the above endpoint to the docs and update the docs
+	// TODO: Re-create the rest-api docs
+
 	public static void main(String[] args) {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
 	}
