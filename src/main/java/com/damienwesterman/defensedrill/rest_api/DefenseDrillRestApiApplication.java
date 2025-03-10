@@ -37,6 +37,21 @@ import io.swagger.v3.oas.models.info.Info;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class DefenseDrillRestApiApplication {
+	// TODO: The following using TDD
+	// TODO: Add last modified timestamp (UTC) to drills, categories, and sub-categories in the DB and entities
+	// TODO: See what other entities need to be modified for the timestamp
+	// TODO: Update endpoints (create/update) to include the now time, maybe using UTC
+	// TODO: Create and update endpoint for drills, categories, and sub-categories that has a parameter for last updated and return anything updated after that point
+	// TODO: Add the above endpoint to the docs and update the docs
+	// TODO: Re-create the rest-api docs
+
+	// TODO: The following using TDD
+	// TODO: Returns instructions alphabetically (adjust docs?)
+
+	// TODO: The following using TDD
+	// TODO: Add an endpoint that takes a list of drills, categories, or sub-categoies ID's and returns the list
+	// TODO: Add the above endpoint to the docs and update the docs
+	// TODO: Re-create the rest-api docs
 
 	public static void main(String[] args) {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
