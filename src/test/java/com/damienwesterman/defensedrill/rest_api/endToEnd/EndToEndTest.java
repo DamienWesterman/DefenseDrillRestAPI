@@ -90,6 +90,7 @@ public class EndToEndTest {
     final String STEP_THREE = "Three";
     final String INSTRUCTION_STEPS_1 = String.join("|", List.of(STEP_ONE, STEP_TWO, STEP_THREE));
     final String VIDEO_ID_1 = "Video ID 1";
+    final Long TIMESTAMP_1 = 12345L;
 
     @BeforeEach
     public void setup() {
@@ -100,6 +101,7 @@ public class EndToEndTest {
 
         drill1 = DrillEntity.builder()
                             .id(null)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(DRILL_NAME_1)
                             .categories(new ArrayList<>())
                             .subCategories(new ArrayList<>())
@@ -108,11 +110,13 @@ public class EndToEndTest {
                             .build();
         category1 = CategoryEntity.builder()
                             .id(null)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(CATEGORY_NAME_1)
                             .description(CATEGORY_DESCRIPTION_1)
                             .build();
         subCategory1 = SubCategoryEntity.builder()
                             .id(null)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(SUB_CATEGORY_NAME_1)
                             .description(SUB_CATEGORY_DESCRIPTION_1)
                             .build();
@@ -176,6 +180,7 @@ public class EndToEndTest {
     @Test
     public void test_drill_addingRelatedDrill_databaseReturnsProperly() {
         DrillEntity relatedDrill = DrillEntity.builder()
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("Related Name")
                                     .build();
         Long relatedDrillId = drillRepo.save(relatedDrill).getId();
@@ -206,6 +211,7 @@ public class EndToEndTest {
     @Test
     public void test_drill_addingCategory_properlyAddsToAllDrills() {
         DrillEntity drill2 = DrillEntity.builder()
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("Drill 2")
                                 .build();
         drillRepo.save(drill1);

@@ -67,6 +67,8 @@ public class DefenseDrillRestApiDatabaseTests {
     @Autowired
     private InstructionsRepo instructionsRepo;
 
+    final Long TIMESTAMP_1 = 12345L;
+
     /*
      * A few of the tests (like testing constraints) are only tested for creating new entities.
      * We are assuming the constraints are set up properly if they passed and will not test the
@@ -102,6 +104,7 @@ public class DefenseDrillRestApiDatabaseTests {
     public void test_drillRepo_save_succeedsWithDrillNameOnly() {
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -120,6 +123,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("New Category Name")
                                     .description("New Category Description")
                                     .build();
@@ -132,6 +136,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name("New SubCategory Name")
                                             .description("New SubCategory Description")
                                             .build();
@@ -147,6 +152,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // Need to have an existing drill
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -173,6 +179,7 @@ public class DefenseDrillRestApiDatabaseTests {
         String drillName = "NEW DRILL";
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name(drillName)
                                 .categories(null)
                                 .subCategories(null)
@@ -193,6 +200,7 @@ public class DefenseDrillRestApiDatabaseTests {
         String categoryName = "NEW CATEGORY";
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name(categoryName)
                                     .description("New Category Description")
                                     .build();
@@ -207,6 +215,7 @@ public class DefenseDrillRestApiDatabaseTests {
         String subCategoryName = "NEW SUB CATEGORY";
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name(subCategoryName)
                                             .description("New SubCategory Description")
                                             .build();
@@ -223,6 +232,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // Need to have an existing drill
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -251,6 +261,7 @@ public class DefenseDrillRestApiDatabaseTests {
         String drillName = "NEW DRILL";
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name(drillName)
                                 .categories(null)
                                 .subCategories(null)
@@ -271,6 +282,7 @@ public class DefenseDrillRestApiDatabaseTests {
         String categoryName = "NEW CATEGORY";
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name(categoryName)
                                     .description("New Category Description")
                                     .build();
@@ -285,6 +297,7 @@ public class DefenseDrillRestApiDatabaseTests {
         String subCategoryName = "NEW SUB CATEGORY";
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name(subCategoryName)
                                             .description("New SubCategory Description")
                                             .build();
@@ -301,6 +314,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // Need to have an existing drill
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -337,6 +351,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name(null)
                                     .description("New Category Description")
                                     .build();
@@ -364,6 +379,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name(null)
                                             .description("New SubCategory Description")
                                             .build();
@@ -395,6 +411,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name(sameName)
                                     .description("New Category Description")
                                     .build();
@@ -402,6 +419,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         CategoryEntity duplicateCategory = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name(sameName)
                                     .description("New Category Description")
                                     .build();
@@ -411,6 +429,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name(sameName)
                                             .description("New SubCategory Description")
                                             .build();
@@ -418,6 +437,7 @@ public class DefenseDrillRestApiDatabaseTests {
         assertDoesNotThrow(() -> subCategoryRepo.save(subCategory));
         SubCategoryEntity duplicateSubCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name(sameName)
                                             .description("New SubCategory Description")
                                             .build();
@@ -430,6 +450,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // Need to have an existing drill
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -462,6 +483,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // Need to have an existing drill
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -517,6 +539,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // Need to have an existing drill
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -548,6 +571,7 @@ public class DefenseDrillRestApiDatabaseTests {
     public void test_drillRepo_save_emptyName_fails() {
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name(null)
                                 .categories(null)
                                 .subCategories(null)
@@ -571,6 +595,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity drill1 = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name(duplicateName)
                                 .categories(null)
                                 .subCategories(null)
@@ -581,6 +606,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity drill2 = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name(duplicateName)
                                 .categories(null)
                                 .subCategories(null)
@@ -596,6 +622,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("New Category Name")
                                     .description("New Category Description")
                                     .build();
@@ -604,6 +631,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name("New SubCategory Name")
                                             .description("New SubCategory Description")
                                             .build();
@@ -611,6 +639,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(List.of(returnedCategory))
                                 .subCategories(List.of(returnedSubCategory))
@@ -629,12 +658,14 @@ public class DefenseDrillRestApiDatabaseTests {
     public void test_drillRepo_save_nonExistentCategory_fails() {
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("New Category Name")
                                     .description("New Category Description")
                                     .build();
 
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -651,12 +682,14 @@ public class DefenseDrillRestApiDatabaseTests {
     public void test_drillRepo_save_nonExistentSubCategory_fails() {
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name("New SubCategory Name")
                                             .description("New SubCategory Description")
                                             .build();
 
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -675,6 +708,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("New Category Name")
                                     .description("New Category Description")
                                     .build();
@@ -683,6 +717,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name("New SubCategory Name")
                                             .description("New SubCategory Description")
                                             .build();
@@ -690,6 +725,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(new ArrayList<>())
                                 .subCategories(new ArrayList<>())
@@ -709,6 +745,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category2 = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("New Category Name 2")
                                     .description("New Category Description 2")
                                     .build();
@@ -717,6 +754,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory2 = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name("New SubCategory Name 2")
                                             .description("New SubCategory Description 2")
                                             .build();
@@ -745,6 +783,7 @@ public class DefenseDrillRestApiDatabaseTests {
     public void test_drillRepo_save_updateWithMoreInstructions_succeeds() {
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -771,6 +810,7 @@ public class DefenseDrillRestApiDatabaseTests {
     public void test_drillRepo_save_updateWithInvalidInstructions_throwsException() {
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -803,6 +843,7 @@ public class DefenseDrillRestApiDatabaseTests {
     public void test_drillRepo_save_updateWithLessInstructions_succeeds() {
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -843,6 +884,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("New Category Name")
                                     .description("New Category Description")
                                     .build();
@@ -851,6 +893,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name("New SubCategory Name")
                                             .description("New SubCategory Description")
                                             .build();
@@ -858,6 +901,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(List.of(returnedCategory))
                                 .subCategories(List.of(returnedSubCategory))
@@ -882,6 +926,7 @@ public class DefenseDrillRestApiDatabaseTests {
     public void test_drillRepo_delete_deleteDrill_doesDeleteInstructions() {
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -915,6 +960,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("New Category Name")
                                     .description("New Category Description")
                                     .build();
@@ -923,6 +969,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name("New SubCategory Name")
                                             .description("New SubCategory Description")
                                             .build();
@@ -930,6 +977,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(List.of(returnedCategory))
                                 .subCategories(List.of(returnedSubCategory))
@@ -956,6 +1004,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // CategoryEntity
         CategoryEntity category = CategoryEntity.builder()
                                     .id(null)
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("New Category Name")
                                     .description("New Category Description")
                                     .build();
@@ -964,6 +1013,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // SubCategoryEntity
         SubCategoryEntity subCategory = SubCategoryEntity.builder()
                                             .id(null)
+                                            .updateTimestamp(TIMESTAMP_1)
                                             .name("New SubCategory Name")
                                             .description("New SubCategory Description")
                                             .build();
@@ -971,6 +1021,7 @@ public class DefenseDrillRestApiDatabaseTests {
 
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(List.of(returnedCategory))
                                 .subCategories(List.of(returnedSubCategory))
@@ -996,6 +1047,7 @@ public class DefenseDrillRestApiDatabaseTests {
         // Need to have an existing drill
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("New Drill")
                                 .categories(null)
                                 .subCategories(null)
@@ -1028,6 +1080,7 @@ public class DefenseDrillRestApiDatabaseTests {
         DrillEntity drill = DrillEntity.builder()
                                 .id(null)
                                 .name("New Drill")
+                                .updateTimestamp(TIMESTAMP_1)
                                 .categories(null)
                                 .subCategories(null)
                                 .relatedDrills(null)

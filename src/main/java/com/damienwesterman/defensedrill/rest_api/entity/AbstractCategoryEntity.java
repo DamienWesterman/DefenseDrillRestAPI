@@ -33,6 +33,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -56,6 +57,13 @@ public abstract class AbstractCategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     // @NotNull -> This can (and should) be null when creating a new entity
     protected Long id;
+
+    @Schema(
+        description = "UTC timestamp of last update",
+        example = "12345"
+    )
+    @NotNull
+    protected Long updateTimestamp;
 
     @Schema(
         description = "Consice category name.",

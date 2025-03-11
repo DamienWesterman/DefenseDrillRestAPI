@@ -72,11 +72,13 @@ public class CategoryControllerTest {
     final Long ID_1 = 1L;
     final String NAME_1 = "Name 1";
     final String DESCRIPTION_1 = "Despcription 1";
+    final Long TIMESTAMP_1 = 12345L;
 
     @BeforeEach
     public void setup() {
         category1 = CategoryEntity.builder()
                         .id(ID_1)
+                        .updateTimestamp(TIMESTAMP_1)
                         .name(NAME_1)
                         .description(DESCRIPTION_1)
                         .build();
@@ -93,10 +95,12 @@ public class CategoryControllerTest {
     @Test
     public void test_rootEndpoint_get_withTwoItemsInDB_returnList() throws Exception {
         Long id2 = 2L;
+        Long timestamp2 = 23456L;
         String name2 = "Name 2";
         String description2 = "Despcription 2";
         CategoryEntity category2 = CategoryEntity.builder()
                         .id(id2)
+                        .updateTimestamp(timestamp2)
                         .name(name2)
                         .description(description2)
                         .build();
@@ -149,6 +153,7 @@ public class CategoryControllerTest {
     public void test_rootEndpoint_post_shouldSucceedWithCorrectFields() throws Exception {
         CategoryEntity entityToSave = CategoryEntity.builder()
                                         .id(null)
+                                        .updateTimestamp(TIMESTAMP_1)
                                         .name(NAME_1)
                                         .description(DESCRIPTION_1)
                                         .build();
@@ -171,6 +176,7 @@ public class CategoryControllerTest {
         // Any jakarta constraint violation should do, empty name is good
         CategoryEntity entityToSave = CategoryEntity.builder()
                                         .id(null)
+                                        .updateTimestamp(TIMESTAMP_1)
                                         .name("")
                                         .description(DESCRIPTION_1)
                                         .build();
@@ -282,6 +288,7 @@ public class CategoryControllerTest {
     public void test_idEndpoint_put_entityIdNull_stillSucceedsEverythingElseValid() throws Exception {
         CategoryEntity entityToSend = CategoryEntity.builder()
                                         .id(null)
+                                        .updateTimestamp(TIMESTAMP_1)
                                         .name(NAME_1)
                                         .description(DESCRIPTION_1)
                                         .build();

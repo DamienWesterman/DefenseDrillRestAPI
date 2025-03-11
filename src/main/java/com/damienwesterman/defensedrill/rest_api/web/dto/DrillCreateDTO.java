@@ -26,6 +26,7 @@
 
 package com.damienwesterman.defensedrill.rest_api.web.dto;
 
+import java.time.Instant;
 import java.util.ArrayList;
 
 import org.springframework.lang.NonNull;
@@ -67,6 +68,7 @@ public class DrillCreateDTO {
     public DrillEntity toEntity() {
         return DrillEntity.builder()
                 .name(this.name)
+                .updateTimestamp(Instant.now().toEpochMilli())
                 .categories(new ArrayList<>())
                 .subCategories(new ArrayList<>())
                 .relatedDrills(new ArrayList<>())
