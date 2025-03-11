@@ -284,6 +284,26 @@ public class DrillControllerTest {
     }
 
     @Test
+    public void test_updateEndpoint_get_shouldSucceed_withMatchingDrills() throws Exception {
+        when(drillService.findAll(TIMESTAMP_1)).thenReturn(List.of(drill1));
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/update?updateTimestamp=" + TIMESTAMP_1))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].id").value(DRILL_ID_1))
+            .andExpect(jsonPath("$[0].name").value(DRILL_NAME_1));
+    }
+
+    @Test
+    public void test_updateEndpoint_get_shouldReturn204_withNoMatchingDrills() throws Exception {
+        when(drillService.findAll(TIMESTAMP_1)).thenReturn(List.of());
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/update?updateTimestamp=" + TIMESTAMP_1))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void test_nameEndpoint_get_succeedsWithExistingName() throws Exception {
         when(drillService.find(DRILL_NAME_1)).thenReturn(Optional.of(drill1));
 

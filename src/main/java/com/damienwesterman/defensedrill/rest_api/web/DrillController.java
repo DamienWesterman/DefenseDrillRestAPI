@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
@@ -103,40 +104,29 @@ public class DrillController {
     })
     @GetMapping
     public ResponseEntity<List<DrillResponseDTO>> getAll() {
-        List<DrillEntity> drills = drillService.findAll();
+        return drillEntityListToDrillResponseDTOList(drillService.findAll());
+    }
 
-        if (drills.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        // Map of Drills by their ID for quick lookup
-        Map<Long, DrillEntity> drillMap = drills.stream()
-            .collect(Collectors.toMap(DrillEntity::getId, Function.identity()));
-
-        return ResponseEntity.ok(
-            drills.stream()
-                // Extract the related drills from the map to create each DrillResponseDTO
-                .map(drill -> {
-                    List<DrillEntity> relatedDrills;
-
-                    /*
-                    * Compiler is generating a warning for each call to drill.getRelatedDrills().
-                    * We can safely ignore this because of this first null check here.
-                    */
-                    if (null == drill.getRelatedDrills()) {
-                        relatedDrills = List.of();
-                    } else {
-                        relatedDrills = new ArrayList<>(drill.getRelatedDrills().size());
-                        relatedDrills = drill.getRelatedDrills().stream()
-                            .map(relatedId -> {
-                                return drillMap.get(relatedId);
-                            })
-                            .collect(Collectors.toList());
-                    }
-                    return new DrillResponseDTO(drill, relatedDrills);
-                })
-                .collect(Collectors.toList())
-        );
+    /**
+     * Endpoint to return all DrillEntity objects that were updated after the given UTC time.
+     *
+     * @param updateTimestamp UTC milliseconds since epoch.
+     * @return ResponseEntity with List of DrillEntity objects.
+     */
+    @Operation(
+        summary = "Retrieve all Drills uptdated after a specified time.",
+        description = "Returns a list of drills that were updated after the given timestamp. "
+            + "The timestamp must be given in milliseconds since epoch in UTC."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Drills have been updated since the given time and were returned."),
+        @ApiResponse(responseCode = "204", description = "No Drills have been updated since the given time.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/update")
+    public ResponseEntity<List<DrillResponseDTO>> getAllDrillAfterTimestamp(
+            @RequestParam Long updateTimestamp) {
+        return drillEntityListToDrillResponseDTOList(drillService.findAll(updateTimestamp));
     }
 
     /**
@@ -527,6 +517,41 @@ public class DrillController {
             new InstructionsDTO(
                 drill.getInstructions().get(number.intValue())
             )
+        );
+    }
+
+    private ResponseEntity<List<DrillResponseDTO>> drillEntityListToDrillResponseDTOList(List<DrillEntity> drills) {
+        if (drills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // Map of Drills by their ID for quick lookup
+        Map<Long, DrillEntity> drillMap = drills.stream()
+            .collect(Collectors.toMap(DrillEntity::getId, Function.identity()));
+
+        return ResponseEntity.ok(
+            drills.stream()
+                // Extract the related drills from the map to create each DrillResponseDTO
+                .map(drill -> {
+                    List<DrillEntity> relatedDrills;
+
+                    /*
+                    * Compiler is generating a warning for each call to drill.getRelatedDrills().
+                    * We can safely ignore this because of this first null check here.
+                    */
+                    if (null == drill.getRelatedDrills()) {
+                        relatedDrills = List.of();
+                    } else {
+                        relatedDrills = new ArrayList<>(drill.getRelatedDrills().size());
+                        relatedDrills = drill.getRelatedDrills().stream()
+                            .map(relatedId -> {
+                                return drillMap.get(relatedId);
+                            })
+                            .collect(Collectors.toList());
+                    }
+                    return new DrillResponseDTO(drill, relatedDrills);
+                })
+                .collect(Collectors.toList())
         );
     }
 }

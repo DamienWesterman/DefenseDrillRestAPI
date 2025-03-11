@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -160,6 +161,16 @@ public class DrillServiceTest {
         when(repo.findAllById(drillIds)).thenReturn(drills);
         assertEquals(drills, service.findAll(drillIds));
         verify(repo, times(1)).findAllById(drillIds);
+    }
+
+    @Test
+    public void test_findAll_afterTimestamp_callsRepoFindByUpdateTimestampGreaterThan() {
+        List<DrillEntity> drills = new ArrayList<>(List.of(drill));
+        Long timestamp = 1111L;
+        when(repo.findByUpdateTimestampGreaterThan(eq(timestamp), any())).thenReturn(drills);
+        assertEquals(drills, service.findAll(timestamp));
+        verify(repo, times(1))
+            .findByUpdateTimestampGreaterThan(eq(timestamp), any());
     }
 
     @Test

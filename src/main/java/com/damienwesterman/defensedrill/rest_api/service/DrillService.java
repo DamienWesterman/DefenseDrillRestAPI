@@ -140,14 +140,20 @@ public class DrillService {
     @NonNull
     public List<DrillEntity> findAll(@NonNull List<Long> ids) {
         List<DrillEntity> ret = repo.findAllById(ids);
-        /*
-         * This is okay to do here because the list being returned should always be
-         * <25 (and this is generous), so overhead should be insignificant.
-         */
         ret.sort(
             (drill1, drill2) -> drill1.getName().compareToIgnoreCase(drill2.getName())
         );
         return ret;
+    }
+
+    /**
+     * Return all entities in the database that were update after the given timestamp.
+     *
+     * @param timestamp UTC milliseconds since epoch.
+     * @return List of Drill objects.
+     */
+    public List<DrillEntity> findAll(Long timestamp) {
+        return repo.findByUpdateTimestampGreaterThan(timestamp, Sort.by(Sort.Direction.ASC, "name"));
     }
 
     /**
