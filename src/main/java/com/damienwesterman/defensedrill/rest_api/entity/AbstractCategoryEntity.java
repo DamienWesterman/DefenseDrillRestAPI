@@ -26,6 +26,8 @@
 
 package com.damienwesterman.defensedrill.rest_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +35,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,11 +59,9 @@ public abstract class AbstractCategoryEntity {
     // @NotNull -> This can (and should) be null when creating a new entity
     protected Long id;
 
-    @Schema(
-        description = "UTC timestamp of last update",
-        example = "12345"
-    )
-    @NotNull
+    /** UTC timestamp of last update in milliseconds since epoch */
+    @JsonIgnore // Do not include this in the DTO
+    // @NotNull -> This can (and should) be null when  used as a DTO
     protected Long updateTimestamp;
 
     @Schema(

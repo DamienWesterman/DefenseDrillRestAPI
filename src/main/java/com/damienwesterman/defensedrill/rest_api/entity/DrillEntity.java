@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.springframework.lang.Nullable;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -68,10 +67,7 @@ public class DrillEntity {
     // @NotNull -> This can (and should) be null when creating a new entity
     private Long id;
 
-    @Schema(
-        description = "UTC timestamp of last update",
-        example = "12345"
-    )
+    /** UTC timestamp of last update in milliseconds since epoch */
     @NotNull
     private Long updateTimestamp;
 

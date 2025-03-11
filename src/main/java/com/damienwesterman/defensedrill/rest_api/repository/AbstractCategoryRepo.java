@@ -26,8 +26,10 @@
 
 package com.damienwesterman.defensedrill.rest_api.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -39,4 +41,5 @@ import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
 @NoRepositoryBean
 public interface AbstractCategoryRepo<E extends AbstractCategoryEntity> extends JpaRepository<E, Long> {
     Optional<E> findByNameIgnoreCase(String name);
+    List<E> findByUpdateTimestampGreaterThan(Long updateTimestamp, Sort sort);
 }

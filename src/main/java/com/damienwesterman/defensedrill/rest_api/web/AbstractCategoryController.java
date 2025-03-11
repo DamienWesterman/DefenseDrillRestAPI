@@ -27,6 +27,7 @@
 package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.damienwesterman.defensedrill.rest_api.entity.AbstractCategoryEntity;
 import com.damienwesterman.defensedrill.rest_api.repository.AbstractCategoryRepo;
 import com.damienwesterman.defensedrill.rest_api.service.AbstractCategoryService;
@@ -87,6 +90,34 @@ public abstract class AbstractCategoryController
     }
 
     /**
+     * Endpoint to return all AbstractCategoryEntity objects that were updated after the given UTC time.
+     *
+     * @param updateTimestamp UTC milliseconds since epoch.
+     * @return ResponseEntity with list of AbstractCategoryEntity objects.
+     */
+    @Operation(
+        summary = "Retrieve all categories updated after a specified time.",
+        description = "Returns a list of categories that were updated after the given timestamp. "
+            + "The timestamp must be given in milliseconds since epoch in UTC."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categories have been updated since the given time and were returned."),
+        @ApiResponse(responseCode = "204", description = "No categories have been updated since the given time.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/update")
+    public ResponseEntity<List<E>> getAllAfterTimestamp(
+                @RequestParam Long updateTimestamp) {
+        List<E> abstractCategories = service.findAll(updateTimestamp);
+
+        if (abstractCategories.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(abstractCategories);
+    }
+
+    /**
      * Endpoint to insert a new AbstractCategoryEntity into the database. With validation.
      *
      * @param abstractCategory Entity to create.
@@ -103,6 +134,7 @@ public abstract class AbstractCategoryController
     })
     @PostMapping
     public ResponseEntity<E> insertNewAbstractCategory(@RequestBody @Valid E abstractCategory) {
+        abstractCategory.setUpdateTimestamp(Instant.now().toEpochMilli());
         E createdAbstractCategory = service.save(abstractCategory);
         return ResponseEntity
             .created(URI.create(getEndpoint() + "/" + createdAbstractCategory.getId()))
@@ -167,6 +199,8 @@ public abstract class AbstractCategoryController
         if (null == abstractCategory.getId()) {
             abstractCategory.setId(id);
         }
+
+        abstractCategory.setUpdateTimestamp(Instant.now().toEpochMilli());
 
         E updatedAbstractCategory = service.save(abstractCategory);
         return ResponseEntity.ok(updatedAbstractCategory);

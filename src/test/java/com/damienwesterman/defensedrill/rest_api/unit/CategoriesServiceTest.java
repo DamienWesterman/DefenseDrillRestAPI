@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -155,6 +156,18 @@ public class CategoriesServiceTest {
         when(subCategoryRepo.findAllById(subCategoryIds)).thenReturn(subCategoryList);
         assertEquals(subCategoryList, subCategoryService.findAll(subCategoryIds));
         verify(subCategoryRepo, times(1)).findAllById(subCategoryIds);
+    }
+
+    @Test
+    public void test_findAll_afterTimestamp_callsRepoFindByUpdateTimestampGreaterThan() {
+        List<CategoryEntity> categories = new ArrayList<>(List.of(categoryEntity));
+        Long timestamp = 1111L;
+        when(categoryRepo.findByUpdateTimestampGreaterThan(eq(timestamp), any())).thenReturn(categories);
+        assertEquals(categories, categorySerivce.findAll(timestamp));
+        verify(categoryRepo, times(1))
+            .findByUpdateTimestampGreaterThan(eq(timestamp), any());
+
+        // Don't need to repeat with subcategories
     }
 
     @Test

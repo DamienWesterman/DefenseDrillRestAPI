@@ -36,6 +36,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -153,11 +154,11 @@ public class CategoryControllerTest {
     public void test_rootEndpoint_post_shouldSucceedWithCorrectFields() throws Exception {
         CategoryEntity entityToSave = CategoryEntity.builder()
                                         .id(null)
-                                        .updateTimestamp(TIMESTAMP_1)
                                         .name(NAME_1)
                                         .description(DESCRIPTION_1)
                                         .build();
-        when(service.save(entityToSave)).thenReturn(category1);
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        when(service.save(categoryMatcher())).thenReturn(category1);
 
         mockMvc.perform(post(CategoryController.ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -168,7 +169,8 @@ public class CategoryControllerTest {
             .andExpect(jsonPath("$.description").value(DESCRIPTION_1))
             .andExpect(header().string("Location", CategoryController.ENDPOINT + "/" + category1.getId()));
 
-        verify(service).save(entityToSave);
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        verify(service).save(categoryMatcher());
     }
 
     @Test
@@ -192,7 +194,8 @@ public class CategoryControllerTest {
 
     @Test
     public void test_rootEndpoint_post_uniqueConstraintViolation_fails() throws Exception {
-        when(service.save(category1)).thenThrow(new DatabaseInsertException("Unique Cosntraint Violation"));
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        when(service.save(categoryMatcher())).thenThrow(new DatabaseInsertException("Unique Cosntraint Violation"));
         mockMvc.perform(post(CategoryController.ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(category1)))
@@ -212,6 +215,29 @@ public class CategoryControllerTest {
     public void test_rootEndpointdelete_delete_shouldFail() throws Exception {
         mockMvc.perform(delete(CategoryController.ENDPOINT))
             .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_updateEndpoint_get_shouldSucceed_withMatchingCategories() throws Exception {
+        when(service.findAll(TIMESTAMP_1)).thenReturn(List.of(category1));
+
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/update?updateTimestamp=" + TIMESTAMP_1))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].id").value(ID_1))
+            // Make sure that timestamp is not sent
+            .andExpect(jsonPath("$[0].updateTimestamp").doesNotExist())
+            .andExpect(jsonPath("$[0].name").value(NAME_1))
+            .andExpect(jsonPath("$[0].description").value(DESCRIPTION_1));
+    }
+
+    @Test
+    public void test_updateEndpoint_get_shouldSReturn204_withNoMatchingCategories() throws Exception {
+        when(service.findAll(TIMESTAMP_1)).thenReturn(List.of());
+
+        mockMvc.perform(get(CategoryController.ENDPOINT + "/update?updateTimestamp=" + TIMESTAMP_1))
+            .andExpect(status().isNoContent());
     }
 
     @Test
@@ -270,7 +296,8 @@ public class CategoryControllerTest {
 
     @Test
     public void test_idEndpoint_put_shouldSucceedWithCorrectFieldsAndExistingId() throws Exception {
-        when(service.save(category1)).thenReturn(category1);
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        when(service.save(categoryMatcher())).thenReturn(category1);
         when(service.find(ID_1)).thenReturn(Optional.of(category1));
 
         mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
@@ -281,7 +308,8 @@ public class CategoryControllerTest {
             .andExpect(jsonPath("$.name").value(NAME_1))
             .andExpect(jsonPath("$.description").value(DESCRIPTION_1));
 
-        verify(service).save(category1);
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        verify(service).save(categoryMatcher());
     }
 
     @Test
@@ -292,7 +320,8 @@ public class CategoryControllerTest {
                                         .name(NAME_1)
                                         .description(DESCRIPTION_1)
                                         .build();
-        when(service.save(category1)).thenReturn(category1);
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        when(service.save(categoryMatcher())).thenReturn(category1);
         when(service.find(ID_1)).thenReturn(Optional.of(category1));
 
         mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
@@ -303,7 +332,8 @@ public class CategoryControllerTest {
             .andExpect(jsonPath("$.name").value(NAME_1))
             .andExpect(jsonPath("$.description").value(DESCRIPTION_1));
 
-        verify(service, times(1)).save(category1);
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        verify(service, times(1)).save(categoryMatcher());
     }
 
     @Test
@@ -355,7 +385,8 @@ public class CategoryControllerTest {
 
     @Test
     public void test_idEndpoint_put_uniqueConstraintViolation_fails() throws Exception {
-        when(service.save(category1)).thenThrow(new DatabaseInsertException("Unique Cosntraint Violation"));
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        when(service.save(categoryMatcher())).thenThrow(new DatabaseInsertException("Unique Cosntraint Violation"));
         when(service.find(ID_1)).thenReturn(Optional.of(category1));
 
         mockMvc.perform(put(CategoryController.ENDPOINT + "/id/" + ID_1)
@@ -423,5 +454,12 @@ public class CategoryControllerTest {
     public void test_nameEndpoint_delete_fails() throws Exception {
         mockMvc.perform(delete(CategoryController.ENDPOINT + "/name/" + NAME_1))
             .andExpect(status().isMethodNotAllowed());
+    }
+
+    private CategoryEntity categoryMatcher() {
+        return argThat(entity -> {
+            return NAME_1.equals(entity.getName())
+                && DESCRIPTION_1.equals(entity.getDescription());
+        });
     }
 }

@@ -152,6 +152,7 @@ public class DrillService {
      * @param timestamp UTC milliseconds since epoch.
      * @return List of Drill objects.
      */
+    @NonNull
     public List<DrillEntity> findAll(Long timestamp) {
         return repo.findByUpdateTimestampGreaterThan(timestamp, Sort.by(Sort.Direction.ASC, "name"));
     }

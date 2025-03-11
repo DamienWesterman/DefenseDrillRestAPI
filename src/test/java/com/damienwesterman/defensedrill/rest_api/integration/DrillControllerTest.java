@@ -229,8 +229,7 @@ public class DrillControllerTest {
     @Test
     public void test_rootEndpoint_post_shouldSucceedWithCorrectFields() throws Exception {
         // Have to be specific with this, as we cannot control what updateTimestamp will be
-        when(drillService.save(argThat(entity ->
-            DRILL_NAME_1.equals(entity.getName())))).thenReturn(drill1);
+        when(drillService.save(drillMatcher())).thenReturn(drill1);
 
         mockMvc.perform(post(DrillController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -239,8 +238,7 @@ public class DrillControllerTest {
             .andExpect(jsonPath("$.id").value(DRILL_ID_1))
             .andExpect(jsonPath("$.name").value(DRILL_NAME_1));
 
-        verify(drillService, times(1)).save(argThat(entity ->
-            DRILL_NAME_1.equals(entity.getName())));
+        verify(drillService, times(1)).save(drillMatcher());
     }
 
     @Test
@@ -512,8 +510,7 @@ public class DrillControllerTest {
         when(subCategorySerivce.findAll(List.of(SUB_CATEGORY_ID_1))).thenReturn(List.of(subCategory1));
         when(drillService.findAll(List.of(RELATED_DRILL_ID))).thenReturn(List.of(relatedDrill));
         // Have to be specific with this, as we cannot control what updateTimestamp will be
-        when(drillService.save(argThat(entity ->
-            DRILL_NAME_1.equals(entity.getName())))).thenReturn(drill1);
+        when(drillService.save(drillMatcher())).thenReturn(drill1);
 
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -537,8 +534,7 @@ public class DrillControllerTest {
             .andExpect(jsonPath("$.instructions.length()").value(1));
 
         verify(drillService, times(1)).find(DRILL_ID_1);
-        verify(drillService, times(1)).save(argThat(entity ->
-            DRILL_NAME_1.equals(entity.getName())));
+        verify(drillService, times(1)).save(drillMatcher());
     }
 
     @Test
@@ -723,5 +719,10 @@ public class DrillControllerTest {
     public void test_idHowToNumberEndpoint_delete_fails() throws Exception {
         mockMvc.perform(delete(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to/" + NUMBER_1))
             .andExpect(status().isMethodNotAllowed());
+    }
+
+    private DrillEntity drillMatcher() {
+        return argThat(entity ->
+            DRILL_NAME_1.equals(entity.getName()));
     }
 }

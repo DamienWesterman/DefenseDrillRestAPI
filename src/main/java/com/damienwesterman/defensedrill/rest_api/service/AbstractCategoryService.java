@@ -107,6 +107,17 @@ public abstract class AbstractCategoryService<E extends AbstractCategoryEntity, 
     }
 
     /**
+     * Return all entities in the database that were updated after the given timestamp.
+     *
+     * @param timestamp UTC milliseconds since epoch.
+     * @return List of AbstractCategoryEntity objects.
+     */
+    @NonNull
+    public List<E> findAll(Long timestamp) {
+        return repo.findByUpdateTimestampGreaterThan(timestamp, Sort.by(Sort.Direction.ASC, "name"));
+    }
+
+    /**
      * Delete an entity from the database by its ID - if it exists.
      *
      * @param id ID of the AbstractCategoryEntity.
