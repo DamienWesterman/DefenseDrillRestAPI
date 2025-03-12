@@ -27,6 +27,7 @@
 package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -528,6 +529,7 @@ public class DrillController {
                     drill.getCategories().add(category);
                 }
 
+                drill.setUpdateTimestamp(Instant.now().toEpochMilli());
                 drillService.save(drill);
             }
         }
@@ -582,6 +584,7 @@ public class DrillController {
                     drill.getSubCategories().add(subCategory);
                 }
 
+                drill.setUpdateTimestamp(Instant.now().toEpochMilli());
                 drillService.save(drill);
             }
         }
