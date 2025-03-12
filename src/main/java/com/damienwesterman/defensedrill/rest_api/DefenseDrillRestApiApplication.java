@@ -37,7 +37,6 @@ import io.swagger.v3.oas.models.info.Info;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class DefenseDrillRestApiApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
 	}
@@ -48,10 +47,9 @@ public class DefenseDrillRestApiApplication {
 	 * the following:
 	 * 		1. Make sure to run the supporting docker containers
 	 * 			- Run 'make run-dev-local' from the main directory
-	 * 		2. Start up at least the config-server
+	 * 		2. Start up at least the config-server, then rest-api (this)
 	 * 		3. Run the following commands:
-	 * 			- npm install -g redoc-cli
-	 * 			- redoc-cli bundle http://localhost:5433/v3/api-docs -o static-swagger.html
+	 * 			- npx @redocly/cli build-docs http://localhost:5433/v3/api-docs -o static-swagger.html
 	 * 			- mv static-swagger.html src/main/resources/static/docs/index.html
 	 * 		4. Push the changes
 	 */
@@ -62,7 +60,7 @@ public class DefenseDrillRestApiApplication {
 			.info(new Info()
 				.title("DefenseDrill Rest API")
 				.description("Rest API for managing drills, categories, and instructions.")
-				.version("1.0.0")
+				.version("1.1.0")
 			);
 	}
 }

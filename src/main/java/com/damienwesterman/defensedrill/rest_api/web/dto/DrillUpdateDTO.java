@@ -26,6 +26,7 @@
 
 package com.damienwesterman.defensedrill.rest_api.web.dto;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,6 +125,7 @@ public class DrillUpdateDTO {
 
         return DrillEntity.builder()
             .id(id)
+            .updateTimestamp(Instant.now().toEpochMilli())
             .name(this.name)
             .categories(new ArrayList<>())
             .subCategories(new ArrayList<>())

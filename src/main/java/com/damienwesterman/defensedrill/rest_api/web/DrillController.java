@@ -27,6 +27,7 @@
 package com.damienwesterman.defensedrill.rest_api.web;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.damienwesterman.defensedrill.rest_api.entity.CategoryEntity;
@@ -140,6 +142,124 @@ public class DrillController {
     }
 
     /**
+     * Endpoint to return all DrillEntity objects that contain any of the given Category IDs.
+     *
+     * @param categoryIds List of Category IDs.
+     * @return ResponseEntity with List of DrillEntity objects.
+     */
+    @Operation(
+        summary = "Retrieve all Drills that are part of any given Categories.",
+        description = "Returns a list of drills that are specified within any of the given Categories."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Drills have been found for the given Category IDs."),
+        @ApiResponse(responseCode = "204", description = "No Drills have been found for the given Category IDs.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/by_category")
+    public ResponseEntity<List<DrillResponseDTO>> getAllByCategoryIds(
+            @RequestParam List<Long> categoryIds) {
+        List<DrillEntity> drills = drillService.findAllByCategory(categoryIds);
+
+        if (drills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(
+            drills.stream()
+                // Extract the related drills from the map to create each DrillResponseDTO
+                .map(drill -> {
+                    List<Long> relatedDrills = drill.getRelatedDrills();
+                    if (null == relatedDrills || relatedDrills.isEmpty()) {
+                        return new DrillResponseDTO(drill);
+                    } else {
+                        return new DrillResponseDTO(drill, drillService.findAll(relatedDrills));
+                    }
+                })
+                .collect(Collectors.toList())
+        );
+    }
+
+    /**
+     * Endpoint to return all DrillEntity objects that contain any of the given Sub-Category IDs.
+     *
+     * @param subCategoryIds List of Sub-Category IDs.
+     * @return ResponseEntity with List of DrillEntity objects.
+     */
+    @Operation(
+        summary = "Retrieve all Drills that are part of any given Sub-Categories.",
+        description = "Returns a list of drills that are specified within any of the given Sub-Categories."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Drills have been found for the given Sub-Category IDs."),
+        @ApiResponse(responseCode = "204", description = "No Drills have been found for the given Sub-Category IDs.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/by_sub_category")
+    public ResponseEntity<List<DrillResponseDTO>> getAllBySubCategoryIds(
+            @RequestParam List<Long> subCategoryIds) {
+        List<DrillEntity> drills = drillService.findAllBySubCategory(subCategoryIds);
+
+        if (drills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(
+            drills.stream()
+                // Extract the related drills from the map to create each DrillResponseDTO
+                .map(drill -> {
+                    List<Long> relatedDrills = drill.getRelatedDrills();
+                    if (null == relatedDrills || relatedDrills.isEmpty()) {
+                        return new DrillResponseDTO(drill);
+                    } else {
+                        return new DrillResponseDTO(drill, drillService.findAll(relatedDrills));
+                    }
+                })
+                .collect(Collectors.toList())
+        );
+    }
+
+    /**
+     * Endpoint to return all DrillEntity objects that were updated after the given UTC time.
+     *
+     * @param updateTimestamp UTC milliseconds since epoch.
+     * @return ResponseEntity with List of DrillEntity objects.
+     */
+    @Operation(
+        summary = "Retrieve all Drills updated after a specified time.",
+        description = "Returns a list of drills that were updated after the given timestamp. "
+            + "The timestamp must be given in milliseconds since epoch in UTC."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Drills have been updated since the given time and were returned."),
+        @ApiResponse(responseCode = "204", description = "No Drills have been updated since the given time.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/update")
+    public ResponseEntity<List<DrillResponseDTO>> getAllDrillAfterTimestamp(
+            @RequestParam Long updateTimestamp) {
+        List<DrillEntity> drills = drillService.findAll(updateTimestamp);
+
+        if (drills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(
+            drills.stream()
+                // Extract the related drills from the map to create each DrillResponseDTO
+                .map(drill -> {
+                    List<Long> relatedDrills = drill.getRelatedDrills();
+                    if (null == relatedDrills || relatedDrills.isEmpty()) {
+                        return new DrillResponseDTO(drill);
+                    } else {
+                        return new DrillResponseDTO(drill, drillService.findAll(relatedDrills));
+                    }
+                })
+                .collect(Collectors.toList())
+        );
+    }
+
+    /**
      * Endpoint to insert a new DrillEntity into the database.
      * <br><br>
      * This essentially creates an empty drill with only a name. To include any related drills,
@@ -200,6 +320,45 @@ public class DrillController {
                         }
                     })
                     .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Retrieve a list of drills using a list of drill IDs.
+     *
+     * @param ids List of Drill IDs to return their drills.
+     * @return ResponseEntity containing a list of Drill objects.
+     */
+    @Operation(
+        summary = "Retrieve all Drills from the list of IDs.",
+        description = "Returns a list of drills that were correspond to the list of given Drill IDs."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Drills have been found and were returned."),
+        @ApiResponse(responseCode = "204", description = "No Drills have been found.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/id")
+    public ResponseEntity<List<DrillResponseDTO>> getDrillsByIds(
+            @RequestParam List<Long> ids) {
+        List<DrillEntity> drills = drillService.findAll(ids);
+
+        if (drills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(
+            drills.stream()
+                // Extract the related drills from the map to create each DrillResponseDTO
+                .map(drill -> {
+                    List<Long> relatedDrills = drill.getRelatedDrills();
+                    if (null == relatedDrills || relatedDrills.isEmpty()) {
+                        return new DrillResponseDTO(drill);
+                    } else {
+                        return new DrillResponseDTO(drill, drillService.findAll(relatedDrills));
+                    }
+                })
+                .collect(Collectors.toList())
+        );
     }
 
     /**
@@ -370,6 +529,7 @@ public class DrillController {
                     drill.getCategories().add(category);
                 }
 
+                drill.setUpdateTimestamp(Instant.now().toEpochMilli());
                 drillService.save(drill);
             }
         }
@@ -424,6 +584,7 @@ public class DrillController {
                     drill.getSubCategories().add(subCategory);
                 }
 
+                drill.setUpdateTimestamp(Instant.now().toEpochMilli());
                 drillService.save(drill);
             }
         }

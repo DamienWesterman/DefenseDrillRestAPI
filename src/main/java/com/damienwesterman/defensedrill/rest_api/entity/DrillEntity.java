@@ -45,6 +45,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,6 +66,10 @@ public class DrillEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     // @NotNull -> This can (and should) be null when creating a new entity
     private Long id;
+
+    /** UTC timestamp of last update in milliseconds since epoch */
+    @NotNull
+    private Long updateTimestamp;
 
     @Column(unique = true)
     @NotEmpty

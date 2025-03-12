@@ -26,6 +26,8 @@
 
 package com.damienwesterman.defensedrill.rest_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -56,6 +58,11 @@ public abstract class AbstractCategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     // @NotNull -> This can (and should) be null when creating a new entity
     protected Long id;
+
+    /** UTC timestamp of last update in milliseconds since epoch */
+    @JsonIgnore // Do not include this in the DTO
+    // @NotNull -> This can (and should) be null when  used as a DTO
+    protected Long updateTimestamp;
 
     @Schema(
         description = "Consice category name.",

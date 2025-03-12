@@ -28,6 +28,7 @@ package com.damienwesterman.defensedrill.rest_api.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -106,11 +107,13 @@ public class DrillControllerTest {
     final String STEP_THREE = "Three";
     final String INSTRUCTION_STEPS_1 = String.join("|", List.of(STEP_ONE, STEP_TWO, STEP_THREE));
     final String VIDEO_ID_1 = "Video ID 1";
+    final Long TIMESTAMP_1 = 12345L;
 
     @BeforeEach
     public void setup() {
         drill1 = DrillEntity.builder()
                             .id(DRILL_ID_1)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(DRILL_NAME_1)
                             .categories(new ArrayList<>())
                             .subCategories(new ArrayList<>())
@@ -119,6 +122,7 @@ public class DrillControllerTest {
                             .build();
         relatedDrill = DrillEntity.builder()
                             .id(RELATED_DRILL_ID)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(RELATED_DRILL_NAME)
                             .categories(new ArrayList<>())
                             .subCategories(new ArrayList<>())
@@ -127,11 +131,13 @@ public class DrillControllerTest {
                             .build();
         category1 = CategoryEntity.builder()
                             .id(CATEGORY_ID_1)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(CATEGORY_NAME_1)
                             .description(CATEGORY_DESCRIPTION_1)
                             .build();
         subCategory1 = SubCategoryEntity.builder()
                             .id(SUB_CATEGORY_ID_1)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(SUB_CATEGORY_NAME_1)
                             .description(SUB_CATEGORY_DESCRIPTION_1)
                             .build();
@@ -222,14 +228,8 @@ public class DrillControllerTest {
 
     @Test
     public void test_rootEndpoint_post_shouldSucceedWithCorrectFields() throws Exception {
-        DrillEntity entityToSave = DrillEntity.builder()
-                                    .name(DRILL_NAME_1)
-                                    .categories(new ArrayList<>())
-                                    .subCategories(new ArrayList<>())
-                                    .relatedDrills(new ArrayList<>())
-                                    .instructions(new ArrayList<>())
-                                    .build();
-        when(drillService.save(entityToSave)).thenReturn(drill1);
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        when(drillService.save(drillMatcher())).thenReturn(drill1);
 
         mockMvc.perform(post(DrillController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -238,7 +238,7 @@ public class DrillControllerTest {
             .andExpect(jsonPath("$.id").value(DRILL_ID_1))
             .andExpect(jsonPath("$.name").value(DRILL_NAME_1));
 
-        verify(drillService, times(1)).save(entityToSave);
+        verify(drillService, times(1)).save(drillMatcher());
     }
 
     @Test
@@ -279,6 +279,26 @@ public class DrillControllerTest {
     public void test_rootEndpointdelete_delete_shouldFail() throws Exception {
         mockMvc.perform(delete(DrillController.ENDPOINT))
             .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void test_updateEndpoint_get_shouldSucceed_withMatchingDrills() throws Exception {
+        when(drillService.findAll(TIMESTAMP_1)).thenReturn(List.of(drill1));
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/update?updateTimestamp=" + TIMESTAMP_1))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].id").value(DRILL_ID_1))
+            .andExpect(jsonPath("$[0].name").value(DRILL_NAME_1));
+    }
+
+    @Test
+    public void test_updateEndpoint_get_shouldReturn204_withNoMatchingDrills() throws Exception {
+        when(drillService.findAll(TIMESTAMP_1)).thenReturn(List.of());
+
+        mockMvc.perform(get(DrillController.ENDPOINT + "/update?updateTimestamp=" + TIMESTAMP_1))
+            .andExpect(status().isNoContent());
     }
 
     @Test
@@ -401,6 +421,44 @@ public class DrillControllerTest {
     }
 
     @Test
+    public void test_idRootEndpoint_get_succeeds_withExistingIds() throws Exception {
+        final Long DRILL_ID_2 = 2L;
+        final String DRILL_NAME_2 = "Drill Name 2";
+        DrillEntity drill2 = DrillEntity.builder()
+                            .id(DRILL_ID_2)
+                            .updateTimestamp(TIMESTAMP_1)
+                            .name(DRILL_NAME_2)
+                            .categories(new ArrayList<>())
+                            .subCategories(new ArrayList<>())
+                            .instructions(new ArrayList<>())
+                            .relatedDrills(new ArrayList<>())
+                            .build();
+        when(drillService.findAll(List.of(DRILL_ID_1, DRILL_ID_2)))
+            .thenReturn(List.of(drill1, drill2));
+
+        mockMvc.perform(get(DrillController.ENDPOINT 
+                + "/id?ids=" + DRILL_ID_1 + "&ids=" + DRILL_ID_2))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").value(DRILL_ID_1))
+            .andExpect(jsonPath("$[0].name").value(DRILL_NAME_1))
+            .andExpect(jsonPath("$[1].id").value(DRILL_ID_2))
+            .andExpect(jsonPath("$[1].name").value(DRILL_NAME_2));
+    }
+
+    @Test
+    public void test_idRootEndpoint_get_returns204_withNoExistingIds() throws Exception {
+        final Long DRILL_ID_2 = 2L;
+        when(drillService.findAll(List.of(DRILL_ID_1, DRILL_ID_2)))
+            .thenReturn(List.of());
+
+        mockMvc.perform(get(DrillController.ENDPOINT 
+                + "/id?ids=" + DRILL_ID_1 + "&ids=" + DRILL_ID_2))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void test_idEndpoint_get_succeedsWithExistingId() throws Exception {
         when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
 
@@ -489,7 +547,8 @@ public class DrillControllerTest {
         when(categorySerivce.findAll(List.of(CATEGORY_ID_1))).thenReturn(List.of(category1));
         when(subCategorySerivce.findAll(List.of(SUB_CATEGORY_ID_1))).thenReturn(List.of(subCategory1));
         when(drillService.findAll(List.of(RELATED_DRILL_ID))).thenReturn(List.of(relatedDrill));
-        when(drillService.save(drill1)).thenReturn(drill1);
+        // Have to be specific with this, as we cannot control what updateTimestamp will be
+        when(drillService.save(drillMatcher())).thenReturn(drill1);
 
         mockMvc.perform(put(DrillController.ENDPOINT + "/id/" + DRILL_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -513,7 +572,7 @@ public class DrillControllerTest {
             .andExpect(jsonPath("$.instructions.length()").value(1));
 
         verify(drillService, times(1)).find(DRILL_ID_1);
-        verify(drillService, times(1)).save(drill1);
+        verify(drillService, times(1)).save(drillMatcher());
     }
 
     @Test
@@ -698,5 +757,10 @@ public class DrillControllerTest {
     public void test_idHowToNumberEndpoint_delete_fails() throws Exception {
         mockMvc.perform(delete(DrillController.ENDPOINT + "/id/" + DRILL_ID_1 + "/how-to/" + NUMBER_1))
             .andExpect(status().isMethodNotAllowed());
+    }
+
+    private DrillEntity drillMatcher() {
+        return argThat(entity ->
+            DRILL_NAME_1.equals(entity.getName()));
     }
 }

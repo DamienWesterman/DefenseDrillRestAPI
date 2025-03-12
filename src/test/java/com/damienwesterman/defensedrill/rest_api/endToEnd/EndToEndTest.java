@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +91,7 @@ public class EndToEndTest {
     final String STEP_THREE = "Three";
     final String INSTRUCTION_STEPS_1 = String.join("|", List.of(STEP_ONE, STEP_TWO, STEP_THREE));
     final String VIDEO_ID_1 = "Video ID 1";
+    final Long TIMESTAMP_1 = 12345L;
 
     @BeforeEach
     public void setup() {
@@ -100,6 +102,7 @@ public class EndToEndTest {
 
         drill1 = DrillEntity.builder()
                             .id(null)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(DRILL_NAME_1)
                             .categories(new ArrayList<>())
                             .subCategories(new ArrayList<>())
@@ -108,11 +111,13 @@ public class EndToEndTest {
                             .build();
         category1 = CategoryEntity.builder()
                             .id(null)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(CATEGORY_NAME_1)
                             .description(CATEGORY_DESCRIPTION_1)
                             .build();
         subCategory1 = SubCategoryEntity.builder()
                             .id(null)
+                            .updateTimestamp(TIMESTAMP_1)
                             .name(SUB_CATEGORY_NAME_1)
                             .description(SUB_CATEGORY_DESCRIPTION_1)
                             .build();
@@ -127,14 +132,34 @@ public class EndToEndTest {
         dtoToSend.setName(DRILL_NAME_1);
     }
 
+    /**
+     * Helper function to check if the update time is expected. i.e. within 1 seconds from start.
+     *
+     * @param startTime Timestamp before udpate operation
+     * @param updateTime Timestamp after update operation
+     * @return boolean if the timestamps are within expected parameters
+     */
+    private boolean updateTimestampCorrect(Long startTime, Long updateTime) {
+        // A little arbitrary, but we are assuming it takes at most 1 second to update
+        final Long MAX_EXPECTED_DIFFERENCE = 1000L;
+
+        return MAX_EXPECTED_DIFFERENCE > updateTime - startTime;
+    }
+
     @Test
     public void test_drill_databaseSavesProperly() {
+        Long timeBeforeInsert = Instant.now().toEpochMilli();
         ResponseEntity<DrillResponseDTO> response =
             restTemplate.postForEntity(URI.create(DrillController.ENDPOINT), dtoToSend, DrillResponseDTO.class);
         System.out.println(response.getBody());
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(DRILL_NAME_1, response.getBody().getName());
         assertEquals(1, drillRepo.count());
         assertEquals(DRILL_NAME_1, drillRepo.findAll().get(0).getName());
+        assertTrue(updateTimestampCorrect(
+            timeBeforeInsert,
+            drillRepo.findAll().get(0).getUpdateTimestamp()
+        ));
     }
 
     @Test
@@ -176,6 +201,7 @@ public class EndToEndTest {
     @Test
     public void test_drill_addingRelatedDrill_databaseReturnsProperly() {
         DrillEntity relatedDrill = DrillEntity.builder()
+                                    .updateTimestamp(TIMESTAMP_1)
                                     .name("Related Name")
                                     .build();
         Long relatedDrillId = drillRepo.save(relatedDrill).getId();
@@ -206,6 +232,7 @@ public class EndToEndTest {
     @Test
     public void test_drill_addingCategory_properlyAddsToAllDrills() {
         DrillEntity drill2 = DrillEntity.builder()
+                                .updateTimestamp(TIMESTAMP_1)
                                 .name("Drill 2")
                                 .build();
         drillRepo.save(drill1);
@@ -282,6 +309,7 @@ public class EndToEndTest {
 
     @Test
     public void test_categories_databaseSavesProperly() {
+        Long timeBeforeInsert = Instant.now().toEpochMilli();
         ResponseEntity<CategoryEntity> response =
             restTemplate.postForEntity(
                 CategoryController.ENDPOINT,
@@ -290,6 +318,12 @@ public class EndToEndTest {
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(CATEGORY_NAME_1, response.getBody().getName());
+        assertEquals(1, categoryRepo.count());
+        assertEquals(CATEGORY_NAME_1, categoryRepo.findAll().get(0).getName());
+        assertTrue(updateTimestampCorrect(
+            timeBeforeInsert,
+            categoryRepo.findAll().get(0).getUpdateTimestamp()
+        ));
     }
 
     @Test

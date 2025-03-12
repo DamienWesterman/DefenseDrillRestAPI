@@ -26,8 +26,10 @@
 
 package com.damienwesterman.defensedrill.rest_api.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -39,4 +41,7 @@ import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 @Repository
 public interface DrillRepo extends JpaRepository<DrillEntity, Long> {
     Optional<DrillEntity> findByNameIgnoreCase(String name);
+    List<DrillEntity> findByUpdateTimestampGreaterThan(Long updateTimestamp, Sort sort);
+    List<DrillEntity> findByCategoriesIdIn(List<Long> categoryIds, Sort sort);
+    List<DrillEntity> findBySubCategoriesIdIn(List<Long> subCategoryIds, Sort sort);
 }
