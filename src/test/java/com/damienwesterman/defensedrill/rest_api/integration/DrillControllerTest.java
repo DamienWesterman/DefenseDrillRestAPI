@@ -421,6 +421,44 @@ public class DrillControllerTest {
     }
 
     @Test
+    public void test_idRootEndpoint_get_succeeds_withExistingIds() throws Exception {
+        final Long DRILL_ID_2 = 2L;
+        final String DRILL_NAME_2 = "Drill Name 2";
+        DrillEntity drill2 = DrillEntity.builder()
+                            .id(DRILL_ID_2)
+                            .updateTimestamp(TIMESTAMP_1)
+                            .name(DRILL_NAME_2)
+                            .categories(new ArrayList<>())
+                            .subCategories(new ArrayList<>())
+                            .instructions(new ArrayList<>())
+                            .relatedDrills(new ArrayList<>())
+                            .build();
+        when(drillService.findAll(List.of(DRILL_ID_1, DRILL_ID_2)))
+            .thenReturn(List.of(drill1, drill2));
+
+        mockMvc.perform(get(DrillController.ENDPOINT 
+                + "/id?ids=" + DRILL_ID_1 + "&ids=" + DRILL_ID_2))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").value(DRILL_ID_1))
+            .andExpect(jsonPath("$[0].name").value(DRILL_NAME_1))
+            .andExpect(jsonPath("$[1].id").value(DRILL_ID_2))
+            .andExpect(jsonPath("$[1].name").value(DRILL_NAME_2));
+    }
+
+    @Test
+    public void test_idRootEndpoint_get_returns204_withNoExistingIds() throws Exception {
+        final Long DRILL_ID_2 = 2L;
+        when(drillService.findAll(List.of(DRILL_ID_1, DRILL_ID_2)))
+            .thenReturn(List.of());
+
+        mockMvc.perform(get(DrillController.ENDPOINT 
+                + "/id?ids=" + DRILL_ID_1 + "&ids=" + DRILL_ID_2))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void test_idEndpoint_get_succeedsWithExistingId() throws Exception {
         when(drillService.find(DRILL_ID_1)).thenReturn(Optional.of(drill1));
 
