@@ -142,6 +142,33 @@ public abstract class AbstractCategoryController
     }
 
     /**
+     * Retrieve a list of categories using a list of category IDs.
+     *
+     * @param ids List of category IDs to return their categories.
+     * @return ResponseEntity containing a list of AbstractCategory objects.
+     */
+    @Operation(
+        summary = "Retrieve all categories from the list of IDs.",
+        description = "Returns a list of categories that were correspond to the list of given category IDs."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categories have been found and were returned."),
+        @ApiResponse(responseCode = "204", description = "No categories have been found.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/id")
+    public ResponseEntity<List<E>> getAbstractCategoriesByIds(
+            @RequestParam List<Long> ids) {
+        List<E> abstractCategories = service.findAll(ids);
+
+        if (abstractCategories.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(abstractCategories);
+    }
+
+    /**
      * Endpoint to find an AbstractCategoryEntity by its ID.
      *
      * @param id ID of the AbstractCategoryEntity.

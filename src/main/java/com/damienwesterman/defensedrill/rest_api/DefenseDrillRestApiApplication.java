@@ -38,11 +38,6 @@ import io.swagger.v3.oas.models.info.Info;
 @EnableDiscoveryClient
 public class DefenseDrillRestApiApplication {
 	// TODO: The following using TDD
-	// TODO: Add an endpoint that takes a list of categories, or sub-categoies ID's and returns the list
-	// TODO: Add the above endpoint to the docs and update the docs
-	// TODO: Re-create the rest-api docs
-
-	// TODO: The following using TDD
 	// Add an endpoint to return all drills of a specified category(s) or sub-category(s) ID
 	// TODO: Add the above endpoint to the docs and update the docs
 	// TODO: Re-create the rest-api docs

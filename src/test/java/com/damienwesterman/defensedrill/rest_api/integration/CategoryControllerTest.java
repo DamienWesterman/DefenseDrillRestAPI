@@ -241,6 +241,41 @@ public class CategoryControllerTest {
     }
 
     @Test
+    public void test_idRootEndpoint_get_succeeds_withExistingIds() throws Exception {
+        final Long ID_2 = 2L;
+        final String NAME_2 = "Name 2";
+        CategoryEntity category2 = CategoryEntity.builder()
+                        .id(ID_2)
+                        .updateTimestamp(TIMESTAMP_1)
+                        .name(NAME_2)
+                        .description(DESCRIPTION_1)
+                        .build();
+        when(service.findAll(List.of(ID_1, ID_2)))
+            .thenReturn(List.of(category1, category2));
+
+        mockMvc.perform(get(CategoryController.ENDPOINT
+                + "/id?ids=" + ID_1 + "&ids=" + ID_2))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").value(ID_1))
+            .andExpect(jsonPath("$[0].name").value(NAME_1))
+            .andExpect(jsonPath("$[1].id").value(ID_2))
+            .andExpect(jsonPath("$[1].name").value(NAME_2));
+    }
+
+    @Test
+    public void test_idRootEndpoint_get_returns204_withNoExistingIds() throws Exception {
+        final Long ID_2 = 2L;
+        when(service.findAll(List.of(ID_1, ID_2)))
+            .thenReturn(List.of());
+
+        mockMvc.perform(get(CategoryController.ENDPOINT
+                + "/id?ids=" + ID_1 + "&ids=" + ID_2))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void test_idEndpoint_get_succeedsWithExistingId() throws Exception {
         when(service.find(ID_1)).thenReturn(Optional.of(category1));
 
