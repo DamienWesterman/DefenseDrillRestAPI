@@ -153,8 +153,30 @@ public class DrillService {
      * @return List of Drill objects.
      */
     @NonNull
-    public List<DrillEntity> findAll(Long timestamp) {
+    public List<DrillEntity> findAll(@NonNull Long timestamp) {
         return repo.findByUpdateTimestampGreaterThan(timestamp, Sort.by(Sort.Direction.ASC, "name"));
+    }
+
+    /**
+     * Return all entities in the database that contain any of the given category IDs.
+     *
+     * @param categoryIds List of Category IDs.
+     * @return List of Drill objects.
+     */
+    @NonNull
+    public List<DrillEntity> findAllByCategory(@NonNull List<Long> categoryIds) {
+        return repo.findByCategoriesIdIn(categoryIds);
+    }
+
+    /**
+     * Return all entities in the database that contain any of the given sub-ategory IDs.
+     *
+     * @param subCategoryIds List of SubCategory IDs.
+     * @return List of Drill objects.
+     */
+    @NonNull
+    public List<DrillEntity> findAllBySubCategory(@NonNull List<Long> subCategoryIds) {
+        return repo.findBySubCategoriesIdIn(subCategoryIds);
     }
 
     /**

@@ -141,6 +141,84 @@ public class DrillController {
     }
 
     /**
+     * Endpoint to return all DrillEntity objects that contain any of the given Category IDs.
+     *
+     * @param categoryIds List of Category IDs.
+     * @return ResponseEntity with List of DrillEntity objects.
+     */
+    @Operation(
+        summary = "Retrieve all Drills that are part of any given Categories.",
+        description = "Returns a list of drills that are specified within any of the given Categories."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Drills have been found for the given Category IDs."),
+        @ApiResponse(responseCode = "204", description = "No Drills have been found for the given Category IDs.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/by_category")
+    public ResponseEntity<List<DrillResponseDTO>> getAllByCategoryIds(
+            @RequestParam List<Long> categoryIds) {
+        List<DrillEntity> drills = drillService.findAllByCategory(categoryIds);
+
+        if (drills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(
+            drills.stream()
+                // Extract the related drills from the map to create each DrillResponseDTO
+                .map(drill -> {
+                    List<Long> relatedDrills = drill.getRelatedDrills();
+                    if (null == relatedDrills || relatedDrills.isEmpty()) {
+                        return new DrillResponseDTO(drill);
+                    } else {
+                        return new DrillResponseDTO(drill, drillService.findAll(relatedDrills));
+                    }
+                })
+                .collect(Collectors.toList())
+        );
+    }
+
+    /**
+     * Endpoint to return all DrillEntity objects that contain any of the given Sub-Category IDs.
+     *
+     * @param subCategoryIds List of Sub-Category IDs.
+     * @return ResponseEntity with List of DrillEntity objects.
+     */
+    @Operation(
+        summary = "Retrieve all Drills that are part of any given Sub-Categories.",
+        description = "Returns a list of drills that are specified within any of the given Sub-Categories."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Drills have been found for the given Sub-Category IDs."),
+        @ApiResponse(responseCode = "204", description = "No Drills have been found for the given Sub-Category IDs.",
+            content = @Content(/* No Content */))
+    })
+    @GetMapping("/by_sub_category")
+    public ResponseEntity<List<DrillResponseDTO>> getAllBySubCategoryIds(
+            @RequestParam List<Long> subCategoryIds) {
+        List<DrillEntity> drills = drillService.findAllBySubCategory(subCategoryIds);
+
+        if (drills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(
+            drills.stream()
+                // Extract the related drills from the map to create each DrillResponseDTO
+                .map(drill -> {
+                    List<Long> relatedDrills = drill.getRelatedDrills();
+                    if (null == relatedDrills || relatedDrills.isEmpty()) {
+                        return new DrillResponseDTO(drill);
+                    } else {
+                        return new DrillResponseDTO(drill, drillService.findAll(relatedDrills));
+                    }
+                })
+                .collect(Collectors.toList())
+        );
+    }
+
+    /**
      * Endpoint to return all DrillEntity objects that were updated after the given UTC time.
      *
      * @param updateTimestamp UTC milliseconds since epoch.
