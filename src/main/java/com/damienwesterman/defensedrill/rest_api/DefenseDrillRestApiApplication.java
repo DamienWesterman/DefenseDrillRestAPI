@@ -37,14 +37,6 @@ import io.swagger.v3.oas.models.info.Info;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class DefenseDrillRestApiApplication {
-	// TODO: The following using TDD
-	// Add an endpoint to return all drills of a specified category(s) or sub-category(s) ID
-	// TODO: Add the above endpoint to the docs and update the docs
-	// TODO: Re-create the rest-api docs
-
-	// TODO: update the main repo's docs with the updated UML diagrams (ER, Endpoints, microservice architecture)
-	// TODO: Update the OpenAPI version, and manifest version
-
 	public static void main(String[] args) {
 		SpringApplication.run(DefenseDrillRestApiApplication.class, args);
 	}
@@ -68,7 +60,7 @@ public class DefenseDrillRestApiApplication {
 			.info(new Info()
 				.title("DefenseDrill Rest API")
 				.description("Rest API for managing drills, categories, and instructions.")
-				.version("1.0.0")
+				.version("1.1.0")
 			);
 	}
 }
