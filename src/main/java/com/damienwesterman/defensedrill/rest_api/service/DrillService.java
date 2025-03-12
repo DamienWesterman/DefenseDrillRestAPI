@@ -165,7 +165,7 @@ public class DrillService {
      */
     @NonNull
     public List<DrillEntity> findAllByCategory(@NonNull List<Long> categoryIds) {
-        return repo.findByCategoriesIdIn(categoryIds);
+        return repo.findByCategoriesIdIn(categoryIds, Sort.by(Sort.Direction.ASC, "name"));
     }
 
     /**
@@ -176,7 +176,7 @@ public class DrillService {
      */
     @NonNull
     public List<DrillEntity> findAllBySubCategory(@NonNull List<Long> subCategoryIds) {
-        return repo.findBySubCategoriesIdIn(subCategoryIds);
+        return repo.findBySubCategoriesIdIn(subCategoryIds, Sort.by(Sort.Direction.ASC, "name"));
     }
 
     /**

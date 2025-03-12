@@ -42,6 +42,6 @@ import com.damienwesterman.defensedrill.rest_api.entity.DrillEntity;
 public interface DrillRepo extends JpaRepository<DrillEntity, Long> {
     Optional<DrillEntity> findByNameIgnoreCase(String name);
     List<DrillEntity> findByUpdateTimestampGreaterThan(Long updateTimestamp, Sort sort);
-    List<DrillEntity> findByCategoriesIdIn(List<Long> categoryIds);
-    List<DrillEntity> findBySubCategoriesIdIn(List<Long> subCategoryIds);
+    List<DrillEntity> findByCategoriesIdIn(List<Long> categoryIds, Sort sort);
+    List<DrillEntity> findBySubCategoriesIdIn(List<Long> subCategoryIds, Sort sort);
 }
